@@ -248,8 +248,10 @@
         <span>Cases, wakes, request status, packet metadata, and audit spans</span></div>
     </div>
     <p class="small muted narrow">Gemini 3.5 Flash and Gemma 4 MaaS are served from Vertex AI's
-      global endpoint. Identifiers are removed before structured downstream persistence. Storage
-      and compute are pinned to us-central1; model inference is not described as regional.</p>
+      global endpoint. Real direct identifiers from the transcribed letter are removed before
+      structured downstream persistence. The API accepts only explicit <code>DEMO-*</code> and
+      <code>DR-DEMO*</code> packet references. Storage and compute are pinned to us-central1;
+      model inference is not described as regional.</p>
   </div>
 </section>
 
@@ -273,10 +275,21 @@
         failure to provide supporting evidence. This motivates the workflow; it does not predict
         any applicant’s outcome.</p><p class="small"><a
         href="https://www.gao.gov/products/gao-20-503">Source: GAO-20-503</a></p></div>
+      <div class="card"><h3>Evidence routes are source-specific</h3><p class="small">FEMA lists
+        multiple ownership and occupancy records, while its insurance guide distinguishes settlement,
+        denial, and proof of excluded or absent coverage. Sixty Days now routes those alternatives
+        explicitly and treats photos as optional context, not proof of sufficiency.</p><p class="small">
+        <a href="https://www.fema.gov/fact-sheet/verifying-home-ownership-or-occupancy">Source:
+        FEMA ownership and occupancy fact sheet</a><br>
+        <a href="https://www.fema.gov/sites/default/files/documents/fema_insurance_qrg_20241010.pdf">Source:
+        FEMA insurance quick reference</a></p></div>
     </div>
     <div class="callout narrow"><p><b>Important:</b> FEMA says supporting documents may be sent
       without a separate appeal letter or form. The generated PDF is therefore an optional
-      organizing draft for applicant review, not a required agency form.</p></div>
+      organizing draft for applicant review, not a required agency form. A current FEMA IHP
+      explainer also instructs applicants to put their application and disaster numbers on every
+      submitted page, so this PDF repeats synthetic references in every footer for the applicant
+      to verify. <a href="https://www.fema.gov/fact-sheet/fema-individuals-and-households-program-application-eligibility-registration-and-appeals">Source: FEMA IHP application, eligibility, registration, and appeals</a>.</p></div>
   </div>
 </section>
 
@@ -295,8 +308,9 @@
       documents and reports observable image features. Deterministic code verifies exact quotes,
       routes requirements, schedules wakes, and preserves missing items.</p></details>
     <details><summary>Is any real survivor information used?</summary><p>No. The fixtures are
-      synthetic and unbranded. The persistence layer also omits raw text, image bytes, names,
-      addresses, registration references, and applicant narrative.</p></details>
+      synthetic and unbranded. The persistence layer omits raw text, image bytes, real names,
+      addresses, registration references, and applicant narrative; the API accepts only explicit
+      demo-prefixed packet references.</p></details>
     <details><summary>How can a judge verify the rules?</summary><p>The
       <a href="/sixty-days/conformance">conformance report</a> maps each public rule to an official
       source, implementation path, and passing test.</p></details>

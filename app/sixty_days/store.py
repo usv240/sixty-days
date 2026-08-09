@@ -23,6 +23,7 @@ class CaseStore:
         self,
         case: Case,
         applicant_ref: str,
+        disaster_ref: str,
         letter: Letter,
         requirements: list[Requirement],
     ) -> None:
@@ -30,6 +31,7 @@ class CaseStore:
             {
                 "run_id": case.run_id,
                 "applicant_ref": applicant_ref,
+                "disaster_ref": disaster_ref,
                 "letter_date": case.letter_date.isoformat(),
                 "deadline": case.deadline.isoformat(),
                 "determination": letter.determination.value,

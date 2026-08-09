@@ -96,10 +96,13 @@ def test_requirements_are_routed_least_burden_first():
     assert [r.source for r in requirements] == [
         Source.PUBLIC_RECORD,
         Source.THIRD_PARTY,
-        Source.APPLICANT_ONLY,
-        Source.APPLICANT_ONLY,
+        Source.THIRD_PARTY,
         Source.APPLICANT_ONLY,
     ]
+    by_key = {item.key: item for item in requirements}
+    assert "guarantee" not in " ".join(item.plain_description for item in requirements)
+    assert "signed statement" in by_key["insurance_denial"].plain_description
+    assert "optional supporting context" in by_key["photo_wide"].plain_description
 
 
 def test_duplicate_deficiencies_do_not_duplicate_requests():

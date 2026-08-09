@@ -9,7 +9,7 @@ from typing import Any
 
 from fastapi import APIRouter, HTTPException
 from fastapi.responses import FileResponse, Response
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 from sixty_days.deadline import Case, Contact, DeadlineKeeper
 from sixty_days.evidence import EvidenceChecker
@@ -28,7 +28,14 @@ EVIDENCE_RECORDINGS = FIXTURES / "evidence_recordings"
 
 class OpenCaseRequest(BaseModel):
     fixture: str
-    applicant_ref: str = "demo-applicant"
+    applicant_ref: str = Field(
+        default="DEMO-APPLICATION", min_length=1, max_length=40,
+        pattern=r"^DEMO-[A-Za-z0-9._-]+$",
+    )
+    disaster_ref: str = Field(
+        default="DR-DEMO", min_length=1, max_length=40,
+        pattern=r"^DR-DEMO(?:-[A-Za-z0-9._-]+)?$",
+    )
 
 
 class ChaseRequest(BaseModel):
@@ -179,9 +186,11 @@ def build_sixty_days_router(client, clock, scheduler, runner) -> APIRouter:
         keeper = DeadlineKeeper(scheduler())
         registered = keeper.open_case(case)
         requirements = plan_requirements(result.letter.deficiencies)
-        cases.save(case, request.applicant_ref, result.letter, requirements)
+        cases.save(case, request.applicant_ref, request.disaster_ref, result.letter, requirements)
         return {
             "case_id": case.case_id,
+            "application_ref": request.applicant_ref,
+            "disaster_ref": request.disaster_ref,
             "run_id": run_id,
             "determination": result.letter.determination.value,
             "letter_date": case.letter_date.isoformat(),
@@ -334,6 +343,11 @@ def build_sixty_days_router(client, clock, scheduler, runner) -> APIRouter:
             "fema_ia-quick-reference_appeals.pdf"
         )
         tips_source = "https://www.fema.gov/fact-sheet/8-tips-appealing-femas-decision-1"
+        ihp_source = (
+            "https://www.fema.gov/fact-sheet/"
+            "fema-individuals-and-households-program-application-eligibility-"
+            "registration-and-appeals"
+        )
         return {
             "standard": "Current FEMA public Individual Assistance appeals guidance",
             "rules": [
@@ -381,6 +395,18 @@ def build_sixty_days_router(client, clock, scheduler, runner) -> APIRouter:
                     "source": tips_source,
                     "implementation": "sixty_days/packet.py: DecisionLetterVerifier",
                     "test": "tests/test_packet.py::test_regulatory_paraphrase_is_rejected_even_when_it_cites_a_real_quote",
+                },
+                {
+                    "rule": (
+                        "The draft repeats the synthetic application and disaster references "
+                        "in the footer of every PDF page for applicant verification."
+                    ),
+                    "source": ihp_source,
+                    "implementation": "sixty_days/packet.py: PacketRenderer.footer",
+                    "test": (
+                        "tests/test_packet.py::"
+                        "test_pdf_is_parseable_labeled_draft_and_page_numbered"
+                    ),
                 },
                 {
                     "rule": "The system never submits on the applicant's behalf.",

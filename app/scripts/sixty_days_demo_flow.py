@@ -77,7 +77,7 @@ def main() -> int:
     })
 
     opened = api.call("POST", "/sixty-days/cases", {
-        "fixture": "short_window", "applicant_ref": "demo-short-window"
+        "fixture": "short_window", "applicant_ref": "DEMO-short-window"
     })
     check("letter reason is grounded", len(opened["deficiencies"]) == 1 and not opened["dropped"])
     check("identity evidence routes only to applicant", opened["requirements"][0]["source"] == "applicant_only")
@@ -90,7 +90,7 @@ def main() -> int:
     check("structured case persisted without raw transcript", "raw" not in stored and "transcription" not in stored)
 
     damage = api.call("POST", "/sixty-days/cases", {
-        "fixture": "damage_and_insurance", "applicant_ref": "demo-damage"
+        "fixture": "damage_and_insurance", "applicant_ref": "DEMO-damage"
     })
     bad = api.call(
         "POST",

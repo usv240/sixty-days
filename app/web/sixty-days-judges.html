@@ -13,7 +13,7 @@
 <header class="site">
   <div class="wrap bar">
     <div class="brand">Sixty Days <span>&mdash; judge evidence</span></div>
-    <nav aria-label="Judge sections"><a href="/">Product</a><a href="#rubric">Rubric</a><a href="#requirements">Requirements</a><a href="#proof">Proof</a><a href="#reproduce">Reproduce</a><a href="#limits">Limits</a></nav>
+    <nav aria-label="Judge sections"><a href="/">Product</a><a href="#rubric">Rubric</a><a href="#requirements">Requirements</a><a href="#proof">Proof</a><a href="#reproduce">Reproduce</a><a href="#sources">Research</a><a href="#limits">Limits</a></nav>
     <button class="theme-toggle" id="theme-toggle" aria-pressed="false">Use dark mode</button>
   </div>
 </header>
@@ -94,6 +94,22 @@ curl -X POST -H "Content-Type: application/json" -d '{}' https://SERVICE_URL/exi
     <div class="card"><h3>Audit the redaction artifact</h3><p>An audit found all-caps applicant names and FEMA registration references missing from an older pattern set. Regression tests now enforce <code>PERSON</code> and <code>CASE_REF</code> coverage.</p></div>
     <div class="card"><h3>Partial is safer than false-complete</h3><p>A packet may be generated with missing items visibly listed. The verifier refuses to turn absence into a confident claim.</p></div>
   </div>
+</div></section>
+
+<section id="sources"><div class="wrap">
+  <div class="section-heading"><div><p class="eyebrow">Research-to-design trace</p><h2>Each source changes a guardrail</h2></div><p class="narrow">Official examples are treated as routing options, never as a promise that one document will change an outcome.</p></div>
+  <div class="table-scroll" tabindex="0" aria-label="FEMA source to product decision table"><table>
+    <thead><tr><th>Official finding</th><th>Implemented decision</th><th>Boundary</th></tr></thead>
+    <tbody>
+      <tr><td>The decision letter identifies the documents relevant to that determination.</td><td>Every requirement begins with an exact quoted reason; unknown reasons stop for caseworker review.</td><td>The catalogue cannot override the applicant's letter.</td></tr>
+      <tr><td>FEMA lists several ownership and occupancy records, including alternatives when public-record matching fails.</td><td>The planner names multiple accepted examples and their date context instead of prescribing one rigid document.</td><td>No listed record is called sufficient or outcome-determinative.</td></tr>
+      <tr><td>FEMA's insurance guide distinguishes settlements, denials, and policy evidence of exclusions or missing coverage.</td><td>The insurer route requests those records and no longer treats an unsupported signed statement as equivalent.</td><td>The applicant sends the request; no insurer is contacted by the service.</td></tr>
+      <tr><td>A September 2025 FEMA IHP explainer tells applicants to put application and disaster numbers on every submitted page.</td><td>The PDF repeats synthetic application and disaster references in every page footer and asks the applicant to verify them.</td><td>The PDF remains optional, unofficial, and not submitted.</td></tr>
+    </tbody>
+  </table></div>
+  <p><a href="https://www.fema.gov/fact-sheet/verifying-home-ownership-or-occupancy">FEMA ownership and occupancy fact sheet</a> &middot;
+  <a href="https://www.fema.gov/sites/default/files/documents/fema_insurance_qrg_20241010.pdf">FEMA insurance quick reference</a> &middot;
+  <a href="https://www.fema.gov/fact-sheet/fema-individuals-and-households-program-application-eligibility-registration-and-appeals">FEMA IHP application, eligibility, registration, and appeals explainer</a></p>
 </div></section>
 
 <section id="limits"><div class="wrap">

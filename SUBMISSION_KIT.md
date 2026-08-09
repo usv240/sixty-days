@@ -41,7 +41,7 @@ the backend runs on Google Cloud.
 | 1:08-1:35 | Show deadline and registered wakes | “The whole deadline ladder is registered immediately: eight deterministic wakes, including early no-reply and final packet checks. The simulated clock is labeled; production due wakes are claimed from Firestore by a scheduled worker.” |
 | 1:35-2:04 | Check close and wide evidence images | “The close image receives an actionable retake because the requested context is not visible. The wider image is ready for applicant review. The system checks only observable framing and legibility; it never values damage or predicts acceptance. Two recorded model calls score six out of six decisions.” |
 | 2:04-2:28 | Prepare insurer request | “The agent prepares this insurer request and registers a no-reply wake. Notice the boundary: nothing was sent. The applicant reviews and sends every external request.” |
-| 2:28-2:53 | Build packet and download PDF | “The packet keeps the letter's exact reason next to the supporting evidence and lists anything still missing. A partial packet stays visibly partial. The PDF is explicitly marked draft and not submitted.” |
+| 2:28-2:53 | Build packet and download PDF | “The packet keeps the letter's exact reason next to the supporting evidence and lists anything still missing. A partial packet stays visibly partial. Current FEMA guidance also tells applicants to identify every submitted page, so this draft repeats its synthetic application and disaster references in every footer. It is explicitly marked draft and not submitted.” |
 | 2:53-3:14 | Advance simulated clock; show wake event | “Now time advances. The deadline watcher wakes, records the due action idempotently, and surfaces the missing work. That is asynchronous action over durable state, not a chat response.” |
 | 3:14-3:34 | Conformance and judge pages | “Every public rule links to an official FEMA source, implementation, and test. The standalone repository has one hundred and eighty-seven passing tests, a twenty-three-step live acceptance flow, and explicit legal and privacy boundaries.” |
 | 3:34-3:52 | Cloud Run dashboard, service and revision visible | “This is the independent `sixty-days` Cloud Run service in `us-central1`, backed by Firestore, Vertex AI, Cloud Scheduler, and Cloud Trace. The public URL you just watched is this revision.” |
@@ -70,6 +70,7 @@ submits an appeal.
 - Observable evidence-photo framing checks with actionable retake guidance
 - Applicant-reviewable records-request preparation and no-reply tracking
 - Partial-safe draft packet and PDF with visible missing items
+- Synthetic application and disaster references repeated in every PDF page footer for applicant verification
 - Redaction, prompt-injection quarantine, independent verification, and durable audit state
 - Public conformance map from policy source to implementation and test
 
@@ -81,9 +82,10 @@ Pub/Sub, autonomous third-party contact, and appeal submission are not part of t
 
 ### Data sources
 
-All demonstration letters, people, addresses, and images are synthetic. Policy claims cite the
-current FEMA Individual Assistance appeals quick reference and appeal tips. Historical problem
-context cites GAO-20-503. Truth files sit beside every fixture, and recorded model calls are graded.
+All demonstration letters, people, addresses, and images are synthetic. Policy claims cite current
+FEMA Individual Assistance appeals guidance, ownership and occupancy examples, and insurance
+documentation guidance. Historical problem context cites GAO-20-503. Truth files sit beside every
+fixture, and recorded model calls are graded.
 
 ### Findings and learnings
 

@@ -27,6 +27,9 @@ def test_console_states_the_safety_boundary_plainly():
     assert "no submission endpoint" in normalized
     assert "Synthetic" in html
     assert "No government agency endorses" in html
+    assert "application and disaster numbers on every" in normalized
+    assert "verifying-home-ownership-or-occupancy" in html
+    assert "fema_insurance_qrg_20241010.pdf" in html
 
 
 def test_console_script_does_not_call_a_destructive_case_reset():
@@ -57,9 +60,13 @@ def test_console_has_no_mojibake_and_distinguishes_review_from_acceptance():
         "187 tests",
         "sixty-days-109051079423.us-central1.run.app",
         "github.com/usv240/sixty-days",
+        "Research-to-design trace",
+        "unsupported signed statement",
+        "every page footer",
     ):
         assert evidence in judges
     assert "Service:</b> <code>spine</code>" not in judges
+    assert "demo-prefixed packet references" in html
     assert "â" not in html + script
     assert "ready for applicant review" in html
     assert "never “FEMA will accept this.”" in html

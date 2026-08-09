@@ -1,4 +1,5 @@
 from io import BytesIO
+from pathlib import Path
 
 from pypdf import PdfReader
 
@@ -8,7 +9,8 @@ from spine.verify import Claim, ClaimKind, SourceRef
 
 CASE = {
     "case_id": "case_demo",
-    "applicant_ref": "APPLICANT_1",
+    "applicant_ref": "DEMO-APPLICANT_1",
+    "disaster_ref": "DR-DEMO",
     "deadline": "2026-09-30",
     "deficiencies": [{
         "kind": "damage_evidence",
@@ -61,15 +63,20 @@ def test_partial_packet_lists_missing_evidence_and_applicant_statement():
 
 def test_pdf_is_parseable_labeled_draft_and_page_numbered():
     packet = PacketBuilder().build(CASE, "Please review the attached evidence.")
-    raw = PacketRenderer().render(packet)
+    image = Path(__file__).resolve().parents[1] / "fixtures" / "evidence_scans" / "damage_wide_good.png"
+    raw = PacketRenderer().render(packet, {"ev_good": image})
     reader = PdfReader(BytesIO(raw))
-    text = "\n".join(page.extract_text() or "" for page in reader.pages)
+    page_texts = [page.extract_text() or "" for page in reader.pages]
+    text = "\n".join(page_texts)
     assert raw.startswith(b"%PDF")
     assert "DRAFT APPEAL PACKET" in text
     assert "has not been submitted" in text
     assert "not an agency form" in text
+    assert "Verify the application and disaster references" in text
     assert "Ready for applicant review" in text
     assert "Page 1" in text
+    assert len(page_texts) >= 2
+    assert all("Application DEMO-APPLICANT_1 | Disaster DR-DEMO" in page for page in page_texts)
 
 
 def test_applicant_markup_is_rendered_as_text_not_reportlab_markup():

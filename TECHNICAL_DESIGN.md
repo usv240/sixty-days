@@ -87,16 +87,17 @@ image. It never means valid, sufficient, authentic, approved, or accepted.
 
 One Firestore document per case stores:
 
-- pseudonymous applicant reference;
+- explicitly synthetic `DEMO-*` application and `DR-DEMO*` disaster references;
 - dates, determination, exact quoted reasons, and plain-language explanations;
 - planned requirements and their statuses;
 - evidence check booleans, guidance, fixture identifier, model, and recording flag;
 - prepared request text and tracking metadata; and
 - packet status, missing-item list, and build timestamp.
 
-The store deliberately omits raw letter text, model raw responses, photo bytes, photo
-transcriptions, applicant names/addresses/registration numbers, and the applicant’s free-text
-packet statement. The statement exists only long enough to render the response PDF.
+The public API rejects references without those demo prefixes. The store deliberately omits raw
+letter text, model raw responses, photo bytes, photo transcriptions, real applicant
+names/addresses/registration numbers, and the applicant’s free-text packet statement. The
+statement exists only long enough to render the response PDF.
 
 ## 5. Request preparation, never autonomous contact
 
@@ -183,6 +184,15 @@ There is deliberately no reset, delete, send, contact, submit, or close-as-submi
 - [GAO-20-503](https://www.gao.gov/products/gao-20-503) for historical evidence that insufficient
   damage and missing supporting evidence were common ineligibility reasons. This is problem
   context, never an outcome claim.
+- [FEMA, Verifying Home Ownership or Occupancy](https://www.fema.gov/fact-sheet/verifying-home-ownership-or-occupancy)
+  for alternative records and their date context.
+- [FEMA, Help for Survivors with Insurance](https://www.fema.gov/sites/default/files/documents/fema_insurance_qrg_20241010.pdf)
+  for settlement, denial, and coverage-exclusion documentation.
+- [FEMA IHP application, eligibility, registration, and appeals](https://www.fema.gov/fact-sheet/fema-individuals-and-households-program-application-eligibility-registration-and-appeals)
+  for the applicant/disaster references repeated on every draft PDF page.
+
+The code treats these as routing examples and conservative packet checks. No listed document is
+called sufficient, and a photo is optional supporting context rather than proof of eligibility.
 
 The machine-readable mapping from each public rule to source, implementation, and test is served
 at `/sixty-days/conformance`.

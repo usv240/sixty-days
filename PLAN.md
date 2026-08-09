@@ -24,6 +24,9 @@ requests, and produces an honest partial draft before the deadline.
 | Current Individual Assistance guidance says appeals must be submitted within 60 days of the date on the decision letter and lists supporting-document examples | [FEMA Individual Assistance appeals quick reference](https://www.fema.gov/sites/default/files/documents/fema_ia-quick-reference_appeals.pdf) |
 | The decision letter should be read for the reason and requested documentation; examples include insurer, occupancy, and ownership records | [FEMA, 8 Tips for Appealing FEMA’s Decision](https://www.fema.gov/fact-sheet/8-tips-appealing-femas-decision-1) |
 | From 2016 through 2018, roughly 1.7 million applicants were determined ineligible; common reasons included insufficient damage, failure to submit supporting evidence, and failure to contact an inspector | [GAO-20-503](https://www.gao.gov/products/gao-20-503) |
+| FEMA lists alternative ownership and occupancy records and describes their date context; one rigid document should not be prescribed when the letter and official alternatives allow others | [FEMA, Verifying Home Ownership or Occupancy](https://www.fema.gov/fact-sheet/verifying-home-ownership-or-occupancy) |
+| FEMA's insurance guide distinguishes settlement information, denial letters, and proof that coverage is excluded or absent | [FEMA, Help for Survivors with Insurance](https://www.fema.gov/sites/default/files/documents/fema_insurance_qrg_20241010.pdf) |
+| A September 2025 IHP explainer instructs applicants to include their application and disaster numbers on every page of submitted documentation | [FEMA IHP application, eligibility, registration, and appeals](https://www.fema.gov/fact-sheet/fema-individuals-and-households-program-application-eligibility-registration-and-appeals) |
 
 The GAO finding is historical problem context, not an estimate of current denial rates or product
 impact. An unsupported five-percent appeal-rate claim was removed during the August 8 audit.
@@ -87,7 +90,7 @@ Veo, and per-agent runtime identities are not part of this build and must not ap
 | 0:25–0:55 | Open `damage_and_insurance`; show exact quoted reasons, redaction count, routes, and all registered wakes |
 | 0:55–1:30 | Screen the too-close synthetic photo: actionable retake. Screen the wide photo: ready for applicant review, never “accepted” |
 | 1:30–2:00 | Prepare the insurer request. Show “nothing was sent,” applicant-sends status, and no-reply wake |
-| 2:00–2:40 | Build the packet; show exact letter statements and missing items; download the labeled draft PDF |
+| 2:00–2:40 | Build the packet; show exact letter statements and missing items; download the labeled draft PDF and show its synthetic application/disaster references repeated in the page footer |
 | 2:40–3:10 | Advance the simulated clock and show the agent wake itself |
 | 3:10–3:35 | Open conformance: each rule maps to an official FEMA source, implementation, and test |
 | 3:35–4:00 | Cloud Run, Firestore, Vertex recordings, Cloud Trace, 187 standalone tests, 23/23 acceptance, accessibility |

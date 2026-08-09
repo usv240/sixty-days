@@ -61,7 +61,8 @@ flowchart LR
 The domain modules and copied spine execute in one `sixty-days` Cloud Run service. The
 `spine-scan-due` scheduler job invokes a shared worker that claims due wakes from the same Firestore
 substrate; it is not represented as a second Sixty Days service. Raw letter text, image bytes, and
-applicant narrative are deliberately excluded from Firestore.
+applicant narrative are deliberately excluded from Firestore. The demo persists only explicit
+`DEMO-*` application and `DR-DEMO*` disaster references; the API rejects real-looking identifiers.
 
 The source version of the diagram is in [`docs/architecture.mmd`](docs/architecture.mmd).
 
@@ -108,6 +109,20 @@ The workflow is grounded in the current
 and [GAO-20-503](https://www.gao.gov/products/gao-20-503). Public copy distinguishes official
 requirements from product choices and avoids presenting the draft packet as an official form.
 
+The requirement catalogue was tightened against three additional official sources:
+
+- FEMA's [ownership and occupancy fact sheet](https://www.fema.gov/fact-sheet/verifying-home-ownership-or-occupancy)
+  supports multiple alternative records and the date context now shown in the planner.
+- FEMA's [insurance quick reference](https://www.fema.gov/sites/default/files/documents/fema_insurance_qrg_20241010.pdf)
+  distinguishes settlements, denials, and policy evidence of exclusions or absent coverage. The
+  product no longer treats an unsupported signed statement as equivalent insurer documentation.
+- FEMA's [September 2025 IHP explainer](https://www.fema.gov/fact-sheet/fema-individuals-and-households-program-application-eligibility-registration-and-appeals)
+  tells applicants to place application and disaster references on each submitted page. The draft
+  PDF now repeats synthetic versions in every footer for applicant verification.
+
+Photos remain optional supporting context in this product. They are never described as sufficient
+proof, authenticated evidence, or a predictor of FEMA acceptance.
+
 ## Repository map
 
 - `app/sixty_days/`: project domain logic
@@ -116,6 +131,7 @@ requirements from product choices and avoids presenting the draft packet as an o
 - `app/fixtures/`: synthetic inputs, adjacent truth, and recorded model outputs
 - `app/tests/`: unit, integration, safety, claims, and UI contract tests
 - `app/scripts/`: fixture creation, recording, grading, accessibility, and demo verification
+- `docs/research-traceability.md`: official source-to-guardrail decisions and rejected claims
 - `SUBMISSION_KIT.md`: evidence-backed video and Devpost plan
 
 ## Disclosure

@@ -137,7 +137,7 @@ $("#btn-open").addEventListener("click", async () => {
   const fixture = $("#fixture").value;
   const { ok, data } = await api("/sixty-days/cases", {
     fixture,
-    applicant_ref: `demo-${fixture}`,
+    applicant_ref: `DEMO-${fixture}`,
   });
   if (!ok) {
     log("letter reader", data.detail || "Case failed to open.", "", "reject");
@@ -159,6 +159,10 @@ $("#btn-open").addEventListener("click", async () => {
     (item) => item.source === "third_party" || item.source === "public_record"
   );
   addOptions($("#request-requirement"), requestable);
+  if (requestable.length) {
+    const preferred = requestable.find((item) => item.key === "insurance_denial") || requestable[0];
+    $("#request-requirement").value = preferred.key;
+  }
   $("#request-requirement").disabled = requestable.length === 0;
   $("#btn-prepare").disabled = requestable.length === 0;
   $("#btn-screen").disabled = !data.requirements.some((item) => item.key === "photo_wide");

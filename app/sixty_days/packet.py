@@ -74,6 +74,7 @@ class PacketEvidence:
 class AppealPacket:
     case_id: str
     applicant_ref: str
+    disaster_ref: str
     deadline: str
     status: str
     applicant_statement: str
@@ -85,12 +86,16 @@ class AppealPacket:
         return {
             "case_id": self.case_id,
             "applicant_ref": self.applicant_ref,
+            "disaster_ref": self.disaster_ref,
             "deadline": self.deadline,
             "status": self.status,
             "verified_statements": self.verified_statements,
             "evidence": [item.__dict__ for item in self.evidence],
             "missing": self.missing,
-            "safety": "Draft only. The applicant reviews, signs, and submits it.",
+            "safety": (
+                "Draft only. The applicant reviews, signs, and submits it. Verify the synthetic "
+                "application and disaster references repeated on every page."
+            ),
         }
 
 
@@ -147,6 +152,7 @@ class PacketBuilder:
         return AppealPacket(
             case_id=case_id,
             applicant_ref=str(case.get("applicant_ref", "applicant")),
+            disaster_ref=str(case.get("disaster_ref", "DR-DEMO")),
             deadline=str(case["deadline"]),
             status=status,
             applicant_statement=applicant_statement.strip(),
@@ -186,12 +192,14 @@ class PacketRenderer:
             Paragraph("DRAFT APPEAL PACKET", styles["PacketTitle"]),
             Paragraph(
                 "Applicant review required. This optional organizing draft is not an agency form, "
-                "has not been submitted, and is not legal advice.",
+                "has not been submitted, and is not legal advice. Verify the application and "
+                "disaster references printed on every page before using this draft.",
                 styles["Safety"],
             ),
             Table(
                 [
                     ["Case reference", packet.applicant_ref],
+                    ["Disaster reference", packet.disaster_ref],
                     ["Appeal deadline", packet.deadline],
                     ["Packet status", packet.status.replace("_", " ")],
                 ],
@@ -275,8 +283,14 @@ class PacketRenderer:
             canvas.saveState()
             canvas.setFont("Helvetica", 8)
             canvas.setFillColor(colors.HexColor("#52606d"))
-            canvas.drawString(0.7 * inch, 0.35 * inch, "Draft only - applicant review and submission required")
-            canvas.drawRightString(7.8 * inch, 0.35 * inch, f"Page {canvas.getPageNumber()}")
+            canvas.drawString(
+                0.7 * inch, 0.35 * inch,
+                f"Application {packet.applicant_ref} | Disaster {packet.disaster_ref}",
+            )
+            canvas.drawRightString(
+                7.8 * inch, 0.35 * inch,
+                f"Draft only | Page {canvas.getPageNumber()}",
+            )
             canvas.restoreState()
 
         doc.build(story, onFirstPage=footer, onLaterPages=footer)

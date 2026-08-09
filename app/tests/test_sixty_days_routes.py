@@ -87,8 +87,12 @@ def test_fixture_catalogue_reports_the_measured_live_calls():
 
 
 def test_open_case_decodes_reasons_routes_evidence_and_registers_wakes():
+    rejected = client().post(
+        "/sixty-days/cases", json={"fixture": "ownership", "applicant_ref": "123456789"}
+    )
+    assert rejected.status_code == 422
     response = client().post(
-        "/sixty-days/cases", json={"fixture": "ownership", "applicant_ref": "demo-1"}
+        "/sixty-days/cases", json={"fixture": "ownership", "applicant_ref": "DEMO-1"}
     )
     assert response.status_code == 200
     body = response.json()
@@ -96,6 +100,8 @@ def test_open_case_decodes_reasons_routes_evidence_and_registers_wakes():
     assert body["requirements"][0]["routed_to"] == "county recorder"
     assert len(body["wakes"]) == 8
     assert body["redacted"] >= 1
+    assert body["application_ref"] == "DEMO-1"
+    assert body["disaster_ref"] == "DR-DEMO"
 
 
 def test_short_window_preserves_partial_packet_and_final_alert():
@@ -208,6 +214,8 @@ def test_partial_packet_pdf_is_grounded_draft_and_does_not_persist_statement():
     assert "DRAFT APPEAL PACKET" in text
     assert " ".join(opened["deficiencies"][0]["quoted_text"].split()) in " ".join(text.split())
     assert "Items still missing" in text
+    assert f"Application {opened['application_ref']}" in text
+    assert f"Disaster {opened['disaster_ref']}" in text
     stored = test_client.get(f"/sixty-days/cases/{opened['case_id']}").json()
     assert stored["packet"]["applicant_statement_persisted"] is False
     assert "Please review my photographs" not in str(stored)
@@ -226,6 +234,7 @@ def test_router_exposes_no_bulk_delete_or_submission_endpoint():
 
 def test_conformance_is_machine_checkable():
     body = client().get("/sixty-days/conformance").json()
-    assert len(body["rules"]) == 6
+    assert len(body["rules"]) == 7
+    assert any("every PDF page" in row["rule"] for row in body["rules"])
     assert all(row["source"].startswith("https://www.fema.gov/") for row in body["rules"])
     assert all(row["implementation"] and row["test"] for row in body["rules"])

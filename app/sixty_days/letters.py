@@ -121,15 +121,19 @@ class Letter:
 
 # What actually cures each deficiency, and who can produce it. Held as a versioned table rather
 # than generated, so it is auditable and testable. Derived from FEMA's published guidance on what
-# documentation supports an appeal.
+# documentation supports an appeal. The ownership/occupancy examples come from FEMA's
+# "Verifying Home Ownership or Occupancy" fact sheet; insurance examples come from the October
+# 2024 "Help for Survivors with Insurance" quick reference. These are conservative routing
+# examples, not a claim that any single document guarantees eligibility.
 REQUIREMENTS: dict[Deficiency, tuple[Requirement, ...]] = {
     Deficiency.OWNERSHIP: (
         Requirement(
             key="deed",
             title="Proof you own the home",
             plain_description=(
-                "A deed, property tax bill, or mortgage statement showing your name and the "
-                "damaged address."
+                "A deed or property-tax record showing your name and the damaged address. FEMA "
+                "also lists mortgage, title, insurance, will, and certain court records; review "
+                "the decision letter before choosing an alternative."
             ),
             source=Source.PUBLIC_RECORD,
             routed_to="county recorder",
@@ -141,8 +145,9 @@ REQUIREMENTS: dict[Deficiency, tuple[Requirement, ...]] = {
             key="occupancy",
             title="Proof you were living there",
             plain_description=(
-                "A utility bill, lease, or state ID showing the damaged address, dated near the "
-                "disaster."
+                "A lease, rent receipt, utility bill, pay stub, bank statement, state ID, or "
+                "another FEMA-listed record showing the damaged address. FEMA's fact sheet says "
+                "occupancy records should be dated within one year before the disaster."
             ),
             source=Source.THIRD_PARTY,
             routed_to="utility provider",
@@ -151,28 +156,24 @@ REQUIREMENTS: dict[Deficiency, tuple[Requirement, ...]] = {
     ),
     Deficiency.DAMAGE_EVIDENCE: (
         Requirement(
+            key="repair_record",
+            title="Repair estimate, bill, or receipt",
+            plain_description=(
+                "A contractor estimate, repair bill, or receipt may help document disaster-related "
+                "work or cost. The decision letter controls which record is relevant."
+            ),
+            source=Source.THIRD_PARTY,
+            routed_to="contractor or repair vendor",
+            cures=Deficiency.DAMAGE_EVIDENCE,
+        ),
+        Requirement(
             key="photo_wide",
-            title="A wide photo of the damaged room",
+            title="A wide context photo for applicant review",
             plain_description=(
                 "Stand back so the floor and the wall are both in frame, and the water line is "
-                "visible."
+                "visible. This is optional supporting context, not proof that FEMA will accept "
+                "or find the damage sufficient."
             ),
-            source=Source.APPLICANT_ONLY,
-            routed_to="you",
-            cures=Deficiency.DAMAGE_EVIDENCE,
-        ),
-        Requirement(
-            key="photo_scale",
-            title="A close photo with something for scale",
-            plain_description="Put a ruler, a shoe, or a can beside the damage so its size is clear.",
-            source=Source.APPLICANT_ONLY,
-            routed_to="you",
-            cures=Deficiency.DAMAGE_EVIDENCE,
-        ),
-        Requirement(
-            key="photo_exterior",
-            title="A photo of the outside showing the house number",
-            plain_description="This ties the damage photos to the address on your application.",
             source=Source.APPLICANT_ONLY,
             routed_to="you",
             cures=Deficiency.DAMAGE_EVIDENCE,
@@ -183,8 +184,9 @@ REQUIREMENTS: dict[Deficiency, tuple[Requirement, ...]] = {
             key="insurance_denial",
             title="Your insurer's decision letter",
             plain_description=(
-                "The letter denying your claim or showing your settlement. If you have no policy, "
-                "a signed statement saying so."
+                "An insurance settlement, denial letter, or policy document showing an exclusion "
+                "or lack of coverage. This product does not treat an unsupported signed statement "
+                "as equivalent to insurer documentation."
             ),
             source=Source.THIRD_PARTY,
             routed_to="your insurer",
