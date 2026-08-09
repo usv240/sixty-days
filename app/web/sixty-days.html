@@ -1,0 +1,216 @@
+<!doctype html>
+<html lang="en" data-project="sixty-days" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sixty Days — hold the appeal clock</title>
+<meta name="description" content="A working console that reads a synthetic disaster-assistance letter, screens evidence framing, prepares applicant-controlled records requests, and builds a reviewable draft packet.">
+<link rel="stylesheet" href="/static/styles.css">
+</head>
+<body>
+<a class="skip-link" href="#main">Skip to main content</a>
+<header class="site">
+  <div class="wrap bar">
+    <div class="brand">Sixty Days <span>— a deadline keeper for disaster appeals</span></div>
+    <nav aria-label="Sections"><a href="#workflow">How it works</a><a href="#console">Live workflow</a><a href="#research">Sources</a><a href="/judges">For judges</a><a href="https://day-three-109051079423.us-central1.run.app">Day Three</a></nav>
+    <button class="theme-toggle" id="theme-toggle" aria-pressed="false">Use dark mode</button>
+  </div>
+</header>
+
+<main id="main">
+<section class="hero">
+  <div class="wrap">
+    <div class="hero-layout">
+      <div class="hero-copy">
+        <p class="eyebrow">The Taskmaster · Live on Google Cloud</p>
+        <h1>The letter says no. The clock has already started.</h1>
+        <p class="lede">Sixty Days turns the exact reason in a disaster-assistance decision letter
+          into a dated, reviewable evidence plan—without deciding eligibility, contacting anyone,
+          or submitting on the applicant’s behalf.</p>
+        <div class="btn-row">
+          <a class="btn btn-primary" href="#console">Open a synthetic case</a>
+          <a class="btn" href="#workflow">See the four-stage plan</a>
+        </div>
+        <div class="trust-band" aria-label="Product boundaries">
+          <span class="trust-item"><b>Synthetic data</b> only</span>
+          <span class="trust-item"><b>Applicant sends</b> every request</span>
+          <span class="trust-item"><b>No submission</b> endpoint</span>
+        </div>
+        <p class="boundary-line"><b>Scope:</b> This is not legal advice, does not predict an
+          outcome, and has no submission endpoint. The applicant reviews and controls every action.</p>
+      </div>
+      <aside class="hero-proof" aria-label="Live proof">
+        <span class="proof-label">Verified public build</span>
+        <strong class="proof-value">23 / 23</strong>
+        <span class="muted">live acceptance checks passing</span>
+        <ul class="proof-list">
+          <li><b>20/20</b> recorded decision-letter fields correct</li>
+          <li><b>6/6</b> observable evidence-photo checks correct</li>
+          <li><b>8</b> deterministic deadline wakes registered</li>
+          <li><b>0</b> send or submission endpoints</li>
+        </ul>
+      </aside>
+    </div>
+  </div>
+</section>
+
+<section id="workflow">
+  <div class="wrap">
+    <div class="section-heading">
+      <div><p class="eyebrow">Before you use the console</p><h2>From decision letter to reviewable draft</h2></div>
+      <p class="narrow">The system organizes work around the applicant. It never turns document
+        preparation into permission to act for them.</p>
+    </div>
+    <div class="journey">
+      <div class="journey-step"><span class="step-index">Step 01 · Understand</span>
+        <h3>Quote the exact reason</h3><p>Read the synthetic decision letter, remove identifiers,
+        and keep only reasons that can be quoted from the transcription.</p></div>
+      <div class="journey-step"><span class="step-index">Step 02 · Gather</span>
+        <h3>Route each missing item</h3><p>Separate applicant-held evidence from insurer or public
+        records, then screen only observable photo framing.</p></div>
+      <div class="journey-step"><span class="step-index">Step 03 · Track</span>
+        <h3>Prepare, never send</h3><p>Draft a request for the applicant to review and send. Register
+        a no-reply check against the deadline.</p></div>
+      <div class="journey-step"><span class="step-index">Step 04 · Review</span>
+        <h3>Build a partial-safe packet</h3><p>Render an optional PDF that preserves exact reasons
+        and keeps every missing item visible. Nothing is submitted.</p></div>
+    </div>
+  </div>
+</section>
+
+<section id="console">
+  <div class="wrap">
+    <div class="section-heading">
+      <div><p class="eyebrow">Interactive proof</p><h2>Run the appeal workflow</h2></div>
+      <p class="narrow">Choose a synthetic letter, then follow the numbered stages from left to
+        right. Disabled controls become available only when the case contains what they need.</p>
+    </div>
+    <div class="console-shell">
+    <div class="console-intro">
+      <p id="measurement">Loading measured Gemini fixture catalogues…</p>
+      <a class="btn" href="/judges">Open judge evidence</a>
+    </div>
+    <div class="clock"><span>Clock:</span><b id="clock-now">loading</b><span class="note">Simulated
+      for demonstration; production uses the same durable wake path.</span></div>
+    <div class="console">
+      <div class="pane">
+        <span class="control-kicker">Stage 1 · Understand</span>
+        <h3>Decision letter</h3>
+        <label for="fixture">Synthetic letter fixture</label>
+        <select id="fixture" class="control"></select>
+        <button class="btn-primary" id="btn-open">Read letter and open case</button>
+        <img id="letter-image" class="fixture-image" alt="Synthetic determination letter scan"
+             hidden>
+
+        <span class="control-kicker subhead">Stage 2 · Gather</span>
+        <h3>Evidence photo</h3>
+        <label for="evidence-fixture">Synthetic photo fixture</label>
+        <select id="evidence-fixture" class="control"></select>
+        <button id="btn-screen" disabled>Screen requested framing</button>
+        <img id="evidence-image" class="fixture-image" alt="Synthetic flood-damage evidence fixture"
+             hidden>
+      </div>
+
+      <div class="pane">
+        <span class="control-kicker">Live audit trail</span>
+        <h3>Agent activity</h3>
+        <div class="stream" id="stream" aria-live="polite" aria-relevant="additions">
+          <div class="event"><span class="agent">system</span><div>Open a synthetic case to begin.</div></div>
+        </div>
+        <div class="btn-row" aria-label="Simulated deadline controls">
+          <button id="btn-day3" disabled>Advance 3 days</button>
+          <button id="btn-day52" disabled>Advance 49 more days</button>
+          <button id="btn-day58" disabled>Advance 6 more days</button>
+        </div>
+
+        <span class="control-kicker subhead">Stage 3 · Track</span>
+        <h3>Applicant-controlled records request</h3>
+        <label for="request-requirement">Record to request</label>
+        <select id="request-requirement" class="control" disabled></select>
+        <label for="requested-on">Date applicant plans to send it</label>
+        <input id="requested-on" class="control" type="date" value="2026-08-10">
+        <button id="btn-prepare" disabled>Prepare and track — do not send</button>
+        <div id="prepared-request" class="small muted" aria-live="polite"></div>
+
+        <span class="control-kicker subhead">Stage 4 · Review</span>
+        <h3>Draft packet</h3>
+        <label for="applicant-statement">Applicant’s explanation</label>
+        <textarea id="applicant-statement" class="control" rows="4"
+          placeholder="The applicant adds their own explanation here."></textarea>
+        <div class="btn-row">
+          <button id="btn-packet" disabled>Check draft packet</button>
+          <button id="btn-pdf" disabled>Download draft PDF</button>
+        </div>
+        <div id="packet-status" class="small muted" aria-live="polite">No packet built.</div>
+      </div>
+
+      <div class="pane">
+        <span class="control-kicker">Current case</span>
+        <h3>Case plan</h3>
+        <div id="case-plan" class="small muted">No case open.</div>
+      </div>
+    </div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <h2>What this build proves</h2>
+    <div class="grid-3">
+      <div class="card"><h3>Quoted, not guessed</h3><p class="small">A reason is discarded unless
+        its exact words occur in the transcription. Four recorded Gemini calls scored 20/20
+        extraction fields.</p></div>
+      <div class="card"><h3>Screened, not adjudicated</h3><p class="small">Two recorded image calls
+        scored 6/6 observable checks. The only outcomes are ready for applicant review, retake,
+        or manual review—never “FEMA will accept this.”</p></div>
+      <div class="card"><h3>Prepared, not sent</h3><p class="small">A utility or insurer request is
+        drafted with blanks and tracked against the deadline. The applicant reviews and sends it;
+        the service has no send route.</p></div>
+      <div class="card"><h3>Grounded draft PDF</h3><p class="small">Every system-authored decision
+        statement reproduces an exact letter quote. Missing evidence remains visibly listed in a
+        partial packet.</p></div>
+      <div class="card"><h3>Privacy by omission</h3><p class="small">Raw letters, photo bytes,
+        transcriptions, and the applicant’s free-text statement are not persisted in the case
+        record.</p></div>
+      <div class="card"><h3>The whole clock exists now</h3><p class="small">Day 3 through day 58
+        wakes are registered at intake. A shorter printed deadline moves the packet and final
+        alert safeguards earlier.</p></div>
+    </div>
+    <p class="conformance-link"><a href="/sixty-days/conformance">Machine-checkable conformance report</a></p>
+  </div>
+</section>
+
+<section id="research">
+  <div class="wrap">
+    <h2>Research basis and limits</h2>
+    <div class="grid-3">
+      <div class="card"><h3>Deadline and supporting documents</h3><p class="small">FEMA’s current
+        Individual Assistance quick reference says appeals must be submitted within 60 days of the
+        decision-letter date and lists supporting documents such as receipts, bills, estimates,
+        titles, and deeds.</p><p class="small"><a
+        href="https://www.fema.gov/sites/default/files/documents/fema_ia-quick-reference_appeals.pdf">Source:
+        FEMA Individual Assistance appeals quick reference</a></p></div>
+      <div class="card"><h3>The letter controls the ask</h3><p class="small">FEMA advises applicants
+        to read the decision letter for the reason and requested documentation. Examples include
+        insurance records, occupancy documents, and ownership records.</p><p class="small"><a
+        href="https://www.fema.gov/fact-sheet/8-tips-appealing-femas-decision-1">Source: FEMA,
+        8 Tips for Appealing FEMA’s Decision</a></p></div>
+      <div class="card"><h3>Historical friction, not a product promise</h3><p class="small">GAO
+        reported that common historical ineligibility reasons included insufficient damage and
+        failure to provide supporting evidence. This motivates the workflow; it does not predict
+        any applicant’s outcome.</p><p class="small"><a
+        href="https://www.gao.gov/products/gao-20-503">Source: GAO-20-503</a></p></div>
+    </div>
+    <div class="callout narrow"><p><b>Important:</b> FEMA says supporting documents may be sent
+      without a separate appeal letter or form. The generated PDF is therefore an optional
+      organizing draft for applicant review, not a required agency form.</p></div>
+  </div>
+</section>
+</main>
+
+<footer class="site"><div class="wrap"><p>Built for the All Things Agentic Hackathon. Synthetic,
+unbranded documents and images only. No government agency endorses this project.</p></div></footer>
+<script src="/static/sixty-days.js"></script>
+</body>
+</html>

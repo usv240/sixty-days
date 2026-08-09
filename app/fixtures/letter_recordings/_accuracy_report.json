@@ -1,0 +1,84 @@
+[
+  {
+    "fixture": "damage_and_insurance",
+    "fields": {
+      "letter_date": true,
+      "determination": true,
+      "stated_deadline": true,
+      "deficiency_kinds": true,
+      "all_quotes_grounded": true
+    },
+    "correct": 5,
+    "total": 5,
+    "expected_kinds": [
+      "damage_evidence",
+      "insurance"
+    ],
+    "extracted_kinds": [
+      "damage_evidence",
+      "insurance"
+    ],
+    "dropped_by_guard": [],
+    "redacted_identifiers": 1
+  },
+  {
+    "fixture": "occupancy",
+    "fields": {
+      "letter_date": true,
+      "determination": true,
+      "stated_deadline": true,
+      "deficiency_kinds": true,
+      "all_quotes_grounded": true
+    },
+    "correct": 5,
+    "total": 5,
+    "expected_kinds": [
+      "occupancy"
+    ],
+    "extracted_kinds": [
+      "occupancy"
+    ],
+    "dropped_by_guard": [],
+    "redacted_identifiers": 0
+  },
+  {
+    "fixture": "ownership",
+    "fields": {
+      "letter_date": true,
+      "determination": true,
+      "stated_deadline": true,
+      "deficiency_kinds": true,
+      "all_quotes_grounded": true
+    },
+    "correct": 5,
+    "total": 5,
+    "expected_kinds": [
+      "ownership"
+    ],
+    "extracted_kinds": [
+      "ownership"
+    ],
+    "dropped_by_guard": [],
+    "redacted_identifiers": 1
+  },
+  {
+    "fixture": "short_window",
+    "fields": {
+      "letter_date": true,
+      "determination": true,
+      "stated_deadline": true,
+      "deficiency_kinds": true,
+      "all_quotes_grounded": true
+    },
+    "correct": 5,
+    "total": 5,
+    "expected_kinds": [
+      "identity"
+    ],
+    "extracted_kinds": [
+      "identity"
+    ],
+    "dropped_by_guard": [],
+    "redacted_identifiers": 1
+  }
+]

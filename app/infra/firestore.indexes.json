@@ -1,0 +1,41 @@
+{
+  "_comment": [
+    "Composite indexes required by the spine's wake queries.",
+    "Firestore cannot serve an equality filter plus a range filter on a different field without",
+    "one of these. Kept as code rather than created by clicking a console link, so the README's",
+    "reproducible setup is genuinely reproducible. Rules.md line 425 scores the spin up",
+    "instructions as proof the project can be rebuilt.",
+    "",
+    "Apply with: bash infra/apply_indexes.sh"
+  ],
+  "indexes": [
+    {
+      "collectionGroup": "wakes",
+      "queryScope": "COLLECTION",
+      "_why": "scan_due: find pending wakes whose time has arrived",
+      "fields": [
+        { "fieldPath": "status", "order": "ASCENDING" },
+        { "fieldPath": "due_at", "order": "ASCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "wakes",
+      "queryScope": "COLLECTION",
+      "_why": "scan_due: reclaim wakes whose worker died and whose lease has expired",
+      "fields": [
+        { "fieldPath": "status", "order": "ASCENDING" },
+        { "fieldPath": "lease_expires_at", "order": "ASCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "wakes",
+      "queryScope": "COLLECTION",
+      "_why": "for_run: list a course's whole wake ladder in due order, for cancellation and audit",
+      "fields": [
+        { "fieldPath": "run_id", "order": "ASCENDING" },
+        { "fieldPath": "due_at", "order": "ASCENDING" }
+      ]
+    }
+  ],
+  "fieldOverrides": []
+}

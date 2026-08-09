@@ -1,0 +1,10 @@
+google-cloud-firestore>=2.19
+google-genai>=1.0
+fastapi>=0.115
+uvicorn[standard]>=0.32
+pydantic>=2.9
+reportlab>=4.2
+pypdf>=5.0
+opentelemetry-sdk>=1.27
+opentelemetry-exporter-gcp-trace>=1.7
+opentelemetry-instrumentation-fastapi>=0.48b0

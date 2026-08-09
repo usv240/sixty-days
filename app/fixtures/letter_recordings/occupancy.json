@@ -1,0 +1,13 @@
+{
+  "transcription": "DISASTER ASSISTANCE DETERMINATION \u2014 SYNTHETIC DEMONSTRATION\nNot an agency document. No government endorsement.\n\nApplicant: DEVON CARTER\nDamaged dwelling: 72 PINE LANDING, SAMPLE COUNTY\nRegistration: DEMO-7319\nDate: August 3, 2026\n\nDecision: Assistance is not approved at this time.\n\nThe information provided did not establish that the damaged home was your primary residence.\nAn appeal must be received no later than October 2, 2026.\nSend only material that addresses the reason printed in this letter.\n\nThis synthetic page was created solely for software testing.",
+  "letter_date": "2026-08-03",
+  "determination": "denied",
+  "stated_deadline": "2026-10-02",
+  "deficiencies": [
+    {
+      "kind": "occupancy",
+      "plain_language": "The agency was unable to verify that the damaged home was your primary residence.",
+      "quoted_text": "The information provided did not establish that the damaged home was your primary residence."
+    }
+  ]
+}

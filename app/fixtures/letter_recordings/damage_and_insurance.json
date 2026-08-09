@@ -1,0 +1,18 @@
+{
+  "transcription": "DISASTER ASSISTANCE DETERMINATION \u2014 SYNTHETIC DEMONSTRATION\nNot an agency document. No government endorsement.\n\nApplicant: ELISE NGUYEN\nDamaged dwelling: 905 MOCKINGBIRD LANE, TEST COUNTY\nRegistration: DEMO-1158\nDate: August 5, 2026\n\nDecision: Some requested assistance is not approved.\n\nThe inspection did not show disaster-caused damage that made the home unsafe to occupy.\nWe also need the insurance settlement or denial before we can consider uninsured losses.\nYour appeal must be received by October 4, 2026.\n\nThis synthetic page was created solely for software testing.",
+  "letter_date": "2026-08-05",
+  "determination": "partial",
+  "stated_deadline": "2026-10-04",
+  "deficiencies": [
+    {
+      "kind": "damage_evidence",
+      "plain_language": "The inspection did not find disaster-related damage that made the home unsafe to live in.",
+      "quoted_text": "The inspection did not show disaster-caused damage that made the home unsafe to occupy."
+    },
+    {
+      "kind": "insurance",
+      "plain_language": "The agency needs to see your insurance settlement or denial letter before they can evaluate uninsured losses.",
+      "quoted_text": "We also need the insurance settlement or denial before we can consider uninsured losses."
+    }
+  ]
+}

@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="en" data-project="sixty-days" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sixty Days: for judges</title>
+<meta name="description" content="Deployment proof, measured evidence, safety limits, and reproduction steps for Sixty Days.">
+<link rel="stylesheet" href="/static/styles.css">
+</head>
+<body>
+<a class="skip-link" href="#main">Skip to main content</a>
+<header class="site">
+  <div class="wrap bar">
+    <div class="brand">Sixty Days <span>&mdash; for judges</span></div>
+    <nav aria-label="Pages"><a href="/">Sixty Days</a><a href="/sixty-days/conformance">Conformance</a></nav>
+    <button class="theme-toggle" id="theme-toggle" aria-pressed="false">Use dark mode</button>
+  </div>
+</header>
+<main id="main">
+<section class="hero"><div class="wrap">
+  <p class="eyebrow">The Taskmaster</p>
+  <h1>A deadline keeper, not an appeal decider.</h1>
+  <p class="lede narrow">This deployed workflow reads a synthetic decision letter, derives the
+  deadline, routes supporting-document requirements, checks observable photo framing, prepares
+  applicant-controlled requests, and renders an optional draft packet.</p>
+  <div class="callout ok narrow"><p><b>Live proof:</b> 23/23 public acceptance checks, 20/20
+  recorded letter fields, 6/6 recorded evidence checks, and the shared 10/10 exit test.</p></div>
+</div></section>
+<section><div class="wrap">
+  <h2>What is real</h2>
+  <div class="grid-3">
+    <div class="card"><h3>Four letters</h3><p>Four genuine recorded Gemini 3.5 Flash calls are
+    graded against adjacent truth. Applicant names and FEMA registration references are redacted.</p></div>
+    <div class="card"><h3>Evidence and packet</h3><p>Observable framing checks return retake,
+    manual review, or ready for applicant review. The PDF is explicitly not submitted.</p></div>
+    <div class="card"><h3>Durable clock</h3><p>Eight deterministic wakes cover the deadline.
+    Due actions are recorded idempotently; no insurer, agency, or other third party is contacted.</p></div>
+  </div>
+</div></section>
+<section><div class="wrap">
+  <h2>Safety and claim boundaries</h2>
+  <ul>
+    <li>Synthetic, unbranded fixtures only; no real survivor data.</li>
+    <li>No legal advice, eligibility prediction, autonomous sending, or submission endpoint.</li>
+    <li>FEMA says an appeal letter or form can be optional; the PDF is an organizing draft.</li>
+    <li>Provisioned service-account roles are not described as per-agent runtime identities.</li>
+  </ul>
+  <p><a href="https://www.fema.gov/sites/default/files/documents/fema_ia-quick-reference_appeals.pdf">Current FEMA appeal quick reference</a>
+  &middot; <a href="https://www.gao.gov/products/gao-20-503">GAO-20-503</a></p>
+</div></section>
+<section><div class="wrap">
+  <h2>Reproduce</h2>
+  <pre><code>python -m pytest -q
+python scripts/check_a11y.py
+python scripts/sixty_days_demo_flow.py --url https://SERVICE_URL
+curl -X POST -H "Content-Type: application/json" -d '{}' https://SERVICE_URL/exit-test</code></pre>
+</div></section>
+</main>
+<footer class="site"><div class="wrap"><p>Built for the All Things Agentic Hackathon. No government
+agency endorses this project.</p></div></footer>
+<script>
+const toggle = document.querySelector("#theme-toggle");
+const themes = ["light", "dark"];
+let theme = localStorage.getItem("theme");
+if (!themes.includes(theme)) theme = "light";
+function applyTheme() {
+  document.documentElement.setAttribute("data-theme", theme);
+  toggle.textContent = theme === "light" ? "Use dark mode" : "Use light mode";
+  toggle.setAttribute("aria-pressed", String(theme === "dark"));
+  localStorage.setItem("theme", theme);
+}
+toggle.addEventListener("click", () => {
+  theme = themes[(themes.indexOf(theme) + 1) % themes.length];
+  applyTheme();
+});
+applyTheme();
+</script>
+</body>
+</html>

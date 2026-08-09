@@ -1,0 +1,8 @@
+{
+  "requirement_key": "photo_wide",
+  "checks": {
+    "damage_visible": true,
+    "floor_and_wall_visible": true,
+    "water_line_visible": true
+  }
+}

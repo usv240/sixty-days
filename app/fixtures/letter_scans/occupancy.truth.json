@@ -1,0 +1,11 @@
+{
+  "letter_date": "2026-08-03",
+  "determination": "denied",
+  "stated_deadline": "2026-10-02",
+  "deficiencies": [
+    {
+      "kind": "occupancy",
+      "quote": "did not establish that the damaged home was your primary residence"
+    }
+  ]
+}

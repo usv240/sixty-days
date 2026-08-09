@@ -1,0 +1,48 @@
+from pathlib import Path
+
+
+WEB = Path(__file__).resolve().parent.parent / "web"
+
+
+def test_console_has_keyboard_reachable_controls_and_live_status():
+    html = (WEB / "sixty-days.html").read_text(encoding="utf-8")
+    for element_id in (
+        "fixture", "btn-open", "evidence-fixture", "btn-screen",
+        "request-requirement", "btn-prepare", "applicant-statement",
+        "btn-packet", "btn-pdf", "btn-day3", "btn-day52", "btn-day58",
+    ):
+        assert f'id="{element_id}"' in html
+    assert 'aria-live="polite"' in html
+    assert 'href="#main"' in html
+
+
+def test_console_states_the_safety_boundary_plainly():
+    html = (WEB / "sixty-days.html").read_text(encoding="utf-8")
+    normalized = " ".join(html.split())
+    assert "not legal advice" in normalized
+    assert "no submission endpoint" in normalized
+    assert "Synthetic" in html
+    assert "No government agency endorses" in html
+
+
+def test_console_script_does_not_call_a_destructive_case_reset():
+    script = (WEB / "sixty-days.js").read_text(encoding="utf-8")
+    assert "/sixty-days/reset" not in script
+    assert "innerHTML" not in script
+    assert "/send" not in script
+    assert "/submit" not in script
+
+
+def test_console_uses_the_measured_catalogue_not_a_hard_coded_score():
+    script = (WEB / "sixty-days.js").read_text(encoding="utf-8")
+    assert "data.measured.correct" in script
+    assert "data.measured.total" in script
+    assert "/sixty-days/evidence/fixtures" in script
+
+
+def test_console_has_no_mojibake_and_distinguishes_review_from_acceptance():
+    html = (WEB / "sixty-days.html").read_text(encoding="utf-8")
+    script = (WEB / "sixty-days.js").read_text(encoding="utf-8")
+    assert "â" not in html + script
+    assert "ready for applicant review" in html
+    assert "never “FEMA will accept this.”" in html

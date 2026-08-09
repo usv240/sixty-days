@@ -1,0 +1,24 @@
+[
+  {
+    "fixture": "damage_close_bad",
+    "fields": {
+      "damage_visible": true,
+      "floor_and_wall_visible": true,
+      "water_line_visible": true
+    },
+    "correct": 3,
+    "total": 3,
+    "decision": "retake"
+  },
+  {
+    "fixture": "damage_wide_good",
+    "fields": {
+      "damage_visible": true,
+      "floor_and_wall_visible": true,
+      "water_line_visible": true
+    },
+    "correct": 3,
+    "total": 3,
+    "decision": "ready_for_review"
+  }
+]

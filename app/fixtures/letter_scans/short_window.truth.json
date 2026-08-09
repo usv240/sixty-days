@@ -1,0 +1,11 @@
+{
+  "letter_date": "2026-08-08",
+  "determination": "denied",
+  "stated_deadline": "2026-09-22",
+  "deficiencies": [
+    {
+      "kind": "identity",
+      "quote": "could not confirm the identity associated with this application"
+    }
+  ]
+}

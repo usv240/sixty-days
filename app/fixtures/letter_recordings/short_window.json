@@ -1,0 +1,13 @@
+{
+  "transcription": "DISASTER ASSISTANCE DETERMINATION \u2014 SYNTHETIC DEMONSTRATION\nNot an agency document. No government endorsement.\n\nApplicant: JORDAN PATEL\nDamaged dwelling: 44 EXAMPLE AVENUE, PRACTICE COUNTY\nRegistration: DEMO-9044\nDate: August 8, 2026\n\nDecision: Assistance is not approved at this time.\n\nWe could not confirm the identity associated with this application.\nThe date printed for receipt of an appeal is September 22, 2026.\n\nThis synthetic page was created solely for software testing.",
+  "letter_date": "2026-08-08",
+  "determination": "denied",
+  "stated_deadline": "2026-09-22",
+  "deficiencies": [
+    {
+      "kind": "identity",
+      "plain_language": "The agency was unable to verify the identity of the applicant.",
+      "quoted_text": "We could not confirm the identity associated with this application."
+    }
+  ]
+}

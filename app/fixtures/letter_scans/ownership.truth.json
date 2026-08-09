@@ -1,0 +1,11 @@
+{
+  "letter_date": "2026-08-01",
+  "determination": "denied",
+  "stated_deadline": "2026-09-30",
+  "deficiencies": [
+    {
+      "kind": "ownership",
+      "quote": "unable to verify ownership of the damaged dwelling"
+    }
+  ]
+}

@@ -1,0 +1,13 @@
+{
+  "transcription": "DISASTER ASSISTANCE DETERMINATION \u2014 SYNTHETIC DEMONSTRATION\nNot an agency document. No government endorsement.\n\nApplicant: MARA RIVERA\nDamaged dwelling: 1847 RIVER BEND ROAD, EXAMPLE PARISH\nRegistration: DEMO-4821\nDate: August 1, 2026\n\nDecision: Assistance is not approved at this time.\n\nWe are unable to verify ownership of the damaged dwelling.\nYou may ask us to review this decision. Your appeal must be received by September 30, 2026.\nInclude documents that support the specific issue described above.\n\nThis synthetic page was created solely for software testing.",
+  "letter_date": "2026-08-01",
+  "determination": "denied",
+  "stated_deadline": "2026-09-30",
+  "deficiencies": [
+    {
+      "kind": "ownership",
+      "plain_language": "The agency was unable to verify that you own the damaged property.",
+      "quoted_text": "We are unable to verify ownership of the damaged dwelling."
+    }
+  ]
+}

@@ -1,0 +1,9 @@
+{
+  "model": "gemini-3.5-flash",
+  "recorded": true,
+  "checks": {
+    "damage_visible": true,
+    "floor_and_wall_visible": true,
+    "water_line_visible": true
+  }
+}

@@ -1,0 +1,15 @@
+{
+  "letter_date": "2026-08-05",
+  "determination": "partial",
+  "stated_deadline": "2026-10-04",
+  "deficiencies": [
+    {
+      "kind": "damage_evidence",
+      "quote": "inspection did not show disaster-caused damage"
+    },
+    {
+      "kind": "insurance",
+      "quote": "need the insurance settlement or denial"
+    }
+  ]
+}
