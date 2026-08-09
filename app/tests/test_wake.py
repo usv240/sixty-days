@@ -133,6 +133,15 @@ def test_direct_dispatch_handles_and_completes_a_due_wake_once(scheduler, clock)
     assert scheduler.dispatch_due(lambda due: handled.append(due.wake_id)) == []
     assert handled == [wake.wake_id]
 
+    other = scheduler.sleep_for("run_2", "other_project", timedelta(hours=1))
+    clock.advance(timedelta(hours=2))
+    assert scheduler.dispatch_due(
+        lambda _due: None,
+        predicate=lambda candidate: candidate.run_id == "run_1",
+    ) == []
+    assert scheduler._store.get(other.wake_id).status is WakeStatus.PENDING
+    assert [item.wake_id for item in scheduler.dispatch_due(lambda _due: None)] == [other.wake_id]
+
 
 def test_direct_dispatch_failure_releases_the_wake_for_bounded_retry(clock):
     store = MemoryWakeStore()

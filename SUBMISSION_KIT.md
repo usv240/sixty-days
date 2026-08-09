@@ -28,8 +28,11 @@ the backend runs on Google Cloud.
 3. Use a fresh 1440x900 browser window, light theme, no bookmarks bar, and no extensions.
 4. Open the live app in the first tab and the `sixty-days` Cloud Run service in the second.
 5. Open Cloud Trace only if a fresh trace from this exact rehearsal has been inspected.
-6. Rehearse once. Record the product execution in one continuous take; edits may precede or follow it.
-7. Keep the final export below 3:55 and correct the English captions before publishing.
+6. Leave the default `damage_and_insurance` fixture selected and click **Start guided demo with
+   this letter**. Confirm the clock reads August 5, 2026. The control anchors time but deletes no
+   stored case or audit evidence.
+7. Rehearse once. Record the product execution in one continuous take; edits may precede or follow it.
+8. Keep the final export below 3:55 and correct the English captions before publishing.
 
 ### Shot list and narration
 
@@ -37,9 +40,9 @@ the backend runs on Google Cloud.
 |---|---|---|
 | 0:00-0:22 | Landing hero and problem cards | “A disaster-assistance decision letter can start a short appeal clock while the records it requests are scattered across insurers, public offices, and a damaged home. Sixty Days is a deadline keeper that organizes that work without pretending to be a lawyer or acting as the applicant.” |
 | 0:22-0:38 | Product boundaries and four-stage workflow | “It understands the letter, gathers and checks evidence, tracks applicant-controlled requests, and builds a reviewable draft. It never sends, contacts, or submits.” |
-| 0:38-1:08 | Open `damage_and_insurance` | “This is the deployed service reading a synthetic photographed letter. Gemini 3.5 Flash preserves the exact stated reasons and requirements. Direct identifiers are redacted before structured persistence. Four recorded calls score twenty out of twenty fields against adjacent truth.” |
+| 0:38-1:08 | Click **Start guided demo** with `damage_and_insurance` selected | “The guided preset anchors the labelled clock to this synthetic letter, so every rehearsal proves the same wake sequence without deleting audit evidence. Gemini 3.5 Flash preserves the exact stated reasons and requirements. Direct identifiers are redacted before structured persistence. Four recorded calls score twenty out of twenty fields against adjacent truth.” |
 | 1:08-1:35 | Show deadline and registered wakes | “The whole deadline ladder is registered immediately: eight deterministic wakes, including early no-reply and final packet checks. The simulated clock is labeled; production due wakes are claimed from Firestore by a scheduled worker.” |
-| 1:35-2:04 | Check close and wide evidence images | “The close image receives an actionable retake because the requested context is not visible. The wider image is ready for applicant review. The system checks only observable framing and legibility; it never values damage or predicts acceptance. Two recorded model calls score six out of six decisions.” |
+| 1:35-2:04 | Click the close-photo check, then the automatically selected wider comparison | “The close image receives an actionable retake because the requested context is not visible. The guided preset now selects the wider comparison, which is ready for applicant review. The system checks only observable framing and legibility; it never values damage or predicts acceptance. Two recorded model calls score six out of six decisions.” |
 | 2:04-2:28 | Prepare insurer request | “The agent prepares this insurer request and registers a no-reply wake. Notice the boundary: nothing was sent. The applicant reviews and sends every external request.” |
 | 2:28-2:53 | Build packet and download PDF | “The packet keeps the letter's exact reason next to the supporting evidence and lists anything still missing. A partial packet stays visibly partial. Current FEMA guidance also tells applicants to identify every submitted page, so this draft repeats its synthetic application and disaster references in every footer. It is explicitly marked draft and not submitted.” |
 | 2:53-3:14 | Advance simulated clock; show wake event | “Now time advances. The deadline watcher wakes, records the due action idempotently, and surfaces the missing work. That is asynchronous action over durable state, not a chat response.” |

@@ -93,6 +93,7 @@ curl -X POST -H "Content-Type: application/json" -d '{}' https://SERVICE_URL/exi
     <div class="card"><h3>Quote before reasoning</h3><p>Keeping the exact decision reason beside every action prevents a polished packet from drifting away from what the letter actually said.</p></div>
     <div class="card"><h3>Audit the redaction artifact</h3><p>An audit found all-caps applicant names and FEMA registration references missing from an older pattern set. Regression tests now enforce <code>PERSON</code> and <code>CASE_REF</code> coverage.</p></div>
     <div class="card"><h3>Partial is safer than false-complete</h3><p>A packet may be generated with missing items visibly listed. The verifier refuses to turn absence into a confident claim.</p></div>
+    <div class="card"><h3>Test the two demos together</h3><p>A parallel rehearsal exposed a shared simulation clock: one submission could move the other's timeline. Demo clocks are now namespaced, simulated wake claims check run ownership, and the production wall-clock worker remains shared.</p></div>
   </div>
 </div></section>
 

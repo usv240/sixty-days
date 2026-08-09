@@ -21,7 +21,7 @@ from spine.clock import ClockState, ClockStateStore
 from spine.state import Run, RunStatus, StateStore, Step, StepStatus
 from spine.wake import Wake, WakeStatus, WakeStore
 
-CLOCK_DOC = "sim/clock"
+CLOCK_COLLECTION = "sim"
 
 
 def _as_utc(value: Any) -> Any:
@@ -36,14 +36,18 @@ def _clean(data: dict[str, Any]) -> dict[str, Any]:
 
 
 class FirestoreClockStateStore(ClockStateStore):
-    """Simulation state shared by every Cloud Run instance.
+    """Simulation state shared by every instance of one public project.
 
     Without a shared store each instance would have its own idea of the time, and a wake would
-    fire on one instance and not another.
+    fire on one instance and not another. Different submissions must not share a demo clock:
+    advancing Sixty Days while Day Three is being judged would otherwise move both timelines.
     """
 
-    def __init__(self, client: firestore.Client) -> None:
-        self._ref = client.document(CLOCK_DOC)
+    def __init__(self, client: firestore.Client, namespace: str = "shared") -> None:
+        safe = namespace.strip().lower()
+        if not safe or not safe.replace("-", "").replace("_", "").isalnum():
+            raise ValueError("clock namespace must contain only letters, numbers, hyphens or underscores")
+        self._ref = client.collection(CLOCK_COLLECTION).document(f"clock-{safe}")
 
     def read(self) -> ClockState:
         snapshot = self._ref.get()

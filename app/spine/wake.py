@@ -25,7 +25,7 @@ from abc import ABC, abstractmethod
 from dataclasses import dataclass, field, replace
 from datetime import datetime, timedelta
 from enum import StrEnum
-from typing import Any
+from typing import Any, Callable
 
 from spine.clock import Clock
 
@@ -194,11 +194,17 @@ class WakeScheduler:
     ) -> Wake:
         return self.sleep_until(run_id, kind, self._clock.now() + delta, payload, discriminator)
 
-    def scan_due(self, limit: int = 50) -> list[Wake]:
+    def scan_due(
+        self,
+        limit: int = 50,
+        predicate: Callable[[Wake], bool] | None = None,
+    ) -> list[Wake]:
         """What Cloud Scheduler triggers. Returns wakes this worker successfully claimed."""
         now = self._clock.now()
         claimed: list[Wake] = []
         for candidate in self._store.due(now, limit):
+            if predicate is not None and not predicate(candidate):
+                continue
             token = f"tok_{now.timestamp()}_{candidate.wake_id}"
             won = self._store.try_claim(candidate.wake_id, token, now, now + self._lease)
             if won is None:
@@ -211,7 +217,12 @@ class WakeScheduler:
             claimed.append(won)
         return claimed
 
-    def dispatch_due(self, handler, limit: int = 50) -> list[Wake]:
+    def dispatch_due(
+        self,
+        handler,
+        limit: int = 50,
+        predicate: Callable[[Wake], bool] | None = None,
+    ) -> list[Wake]:
         """Claim, handle, and complete due wakes without an unprovisioned queue.
 
         The handler must be idempotent by wake_id. A crash after its side effect but before
@@ -220,7 +231,7 @@ class WakeScheduler:
         existing bounded retry/dead-letter path.
         """
         dispatched: list[Wake] = []
-        for wake in self.scan_due(limit):
+        for wake in self.scan_due(limit, predicate=predicate):
             try:
                 handler(wake)
             except Exception as exc:  # noqa: BLE001 - persist the typed failure and continue

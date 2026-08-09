@@ -76,6 +76,7 @@ def main() -> int:
         "correct": 6, "total": 6, "recorded_calls": 2
     })
 
+    api.call("POST", "/sixty-days/demo/anchor", {"fixture": "short_window"})
     opened = api.call("POST", "/sixty-days/cases", {
         "fixture": "short_window", "applicant_ref": "DEMO-short-window"
     })
@@ -89,6 +90,7 @@ def main() -> int:
     stored = api.call("GET", f"/sixty-days/cases/{opened['case_id']}")
     check("structured case persisted without raw transcript", "raw" not in stored and "transcription" not in stored)
 
+    api.call("POST", "/sixty-days/demo/anchor", {"fixture": "damage_and_insurance"})
     damage = api.call("POST", "/sixty-days/cases", {
         "fixture": "damage_and_insurance", "applicant_ref": "DEMO-damage"
     })

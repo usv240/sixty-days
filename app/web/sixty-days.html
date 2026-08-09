@@ -118,7 +118,10 @@
       <li data-step="4"><b>Review</b>Build the draft</li>
     </ol>
     <div class="console-intro">
-      <p id="measurement">Loading measured Gemini fixture catalogues…</p>
+      <div><p id="measurement">Loading measured Gemini fixture catalogues…</p>
+      <p class="small muted"><b>Guided preset:</b> damage and insurance letter, failed close photo,
+        wider comparison, insurer request, packet, then deadline wakes. Starting anchors the
+        simulated clock to the selected letter date without deleting stored audit records.</p></div>
       <a class="btn" href="/judges">Open judge evidence</a>
     </div>
     <div class="clock"><span>Clock:</span><b id="clock-now">loading</b><span class="note">Simulated
@@ -129,7 +132,7 @@
         <h3>Decision letter</h3>
         <label for="fixture">Synthetic letter fixture</label>
         <select id="fixture" class="control"></select>
-        <button class="btn-primary" id="btn-open">Read letter and open case</button>
+        <button class="btn-primary" id="btn-open">Start guided demo with this letter</button>
         <img id="letter-image" class="fixture-image" alt="Synthetic determination letter scan"
              hidden>
 
@@ -137,7 +140,7 @@
         <h3>Evidence photo</h3>
         <label for="evidence-fixture">Synthetic photo fixture</label>
         <select id="evidence-fixture" class="control"></select>
-        <button id="btn-screen" disabled>Screen requested framing</button>
+        <button id="btn-screen" disabled>Screen close photo (expected retake)</button>
         <img id="evidence-image" class="fixture-image" alt="Synthetic flood-damage evidence fixture"
              hidden>
       </div>

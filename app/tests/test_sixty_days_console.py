@@ -17,6 +17,8 @@ def test_console_has_keyboard_reachable_controls_and_live_status():
     for section_id in ("problem", "workflow", "console", "limits", "architecture", "faq"):
         assert f'id="{section_id}"' in html
     assert 'class="workflow-progress"' in html
+    assert "Guided preset:" in html
+    assert "without deleting stored audit records" in html
     assert "github.com/usv240/sixty-days" in html
 
 
@@ -35,6 +37,10 @@ def test_console_states_the_safety_boundary_plainly():
 def test_console_script_does_not_call_a_destructive_case_reset():
     script = (WEB / "sixty-days.js").read_text(encoding="utf-8")
     assert "/sixty-days/reset" not in script
+    assert "/sixty-days/demo/anchor" in script
+    assert "damage_close_bad" in script
+    assert "damage_wide_good" in script
+    assert "No stored case or audit record is deleted." in script
     assert "innerHTML" not in script
     assert "/send" not in script
     assert "/submit" not in script
@@ -63,6 +69,7 @@ def test_console_has_no_mojibake_and_distinguishes_review_from_acceptance():
         "Research-to-design trace",
         "unsupported signed statement",
         "every page footer",
+        "parallel rehearsal exposed a shared simulation clock",
     ):
         assert evidence in judges
     assert "Service:</b> <code>spine</code>" not in judges

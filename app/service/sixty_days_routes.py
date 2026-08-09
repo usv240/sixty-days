@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import json
-from datetime import date
+from datetime import date, datetime, time, timezone
 from pathlib import Path
 from typing import Any
 
@@ -11,6 +11,7 @@ from fastapi import APIRouter, HTTPException
 from fastapi.responses import FileResponse, Response
 from pydantic import BaseModel, Field
 
+from spine.clock import ClockState
 from sixty_days.deadline import Case, Contact, DeadlineKeeper
 from sixty_days.evidence import EvidenceChecker
 from sixty_days.letters import plan_requirements
@@ -36,6 +37,10 @@ class OpenCaseRequest(BaseModel):
         default="DR-DEMO", min_length=1, max_length=40,
         pattern=r"^DR-DEMO(?:-[A-Za-z0-9._-]+)?$",
     )
+
+
+class DemoPresetRequest(BaseModel):
+    fixture: str
 
 
 class ChaseRequest(BaseModel):
@@ -156,6 +161,35 @@ def build_sixty_days_router(client, clock, scheduler, runner) -> APIRouter:
         if not image.exists():
             raise HTTPException(status_code=404, detail=f"no evidence image for {safe}")
         return FileResponse(image, media_type="image/png")
+
+    @router.post("/demo/anchor")
+    def preset_demo_clock(request: DemoPresetRequest) -> dict[str, Any]:
+        """Anchor the labelled demo clock to the selected synthetic letter.
+
+        Fixture dates are fixed evidence. Without this explicit demo-only anchor, a rehearsal
+        would change as wall time advances and eventually begin with several wakes already due.
+        No case or audit data is deleted.
+        """
+        name = _safe_name(request.fixture)
+        recording_path = RECORDINGS / f"{name}.json"
+        if not recording_path.exists():
+            raise HTTPException(status_code=404, detail=f"no complete recording for {name}")
+        extraction = json.loads(recording_path.read_text(encoding="utf-8"))
+        start = datetime.combine(
+            date.fromisoformat(extraction["letter_date"]),
+            time(9, 0),
+            tzinfo=timezone.utc,
+        )
+        simulated = clock
+        if not getattr(simulated, "simulated", False):
+            raise HTTPException(status_code=409, detail="demo preset requires simulation mode")
+        simulated._store.write(ClockState(frozen_at=start))
+        return {
+            "fixture": name,
+            "simulated_now": simulated.now().isoformat(),
+            "deleted_cases": 0,
+            "label": "Synthetic demo clock anchored to the selected letter date.",
+        }
 
     @router.post("/cases")
     def open_case(request: OpenCaseRequest) -> dict[str, Any]:

@@ -133,20 +133,64 @@ function renderPlan(data) {
   target.append(list);
 }
 
+function resetDemoUi() {
+  currentCase = null;
+  runId = null;
+  setProgress(1);
+  stream.replaceChildren();
+  log("demo preset", "Preparing a fresh synthetic case.",
+      "No stored case or audit record is deleted.");
+  $("#case-plan").replaceChildren();
+  $("#letter-image").hidden = true;
+  $("#evidence-image").hidden = true;
+  $("#prepared-request").textContent = "";
+  $("#packet-status").textContent = "No packet built.";
+  $("#applicant-statement").value = "";
+  $("#evidence-fixture").value = "damage_close_bad";
+  $("#btn-screen").textContent = "Screen close photo (expected retake)";
+  $("#request-requirement").replaceChildren();
+  $("#request-requirement").disabled = true;
+  for (const selector of [
+    "#btn-screen", "#btn-prepare", "#btn-day3", "#btn-day52",
+    "#btn-day58", "#btn-packet", "#btn-pdf",
+  ]) {
+    $(selector).disabled = true;
+  }
+}
+
 $("#btn-open").addEventListener("click", async () => {
   const fixture = $("#fixture").value;
+  const openButton = $("#btn-open");
+  openButton.disabled = true;
+  openButton.textContent = "Anchoring the demo clock...";
+  resetDemoUi();
+  const preset = await api("/sixty-days/demo/anchor", { fixture });
+  if (!preset.ok) {
+    log("demo preset", preset.data.detail || "Demo clock could not be anchored.", "", "reject");
+    openButton.disabled = false;
+    openButton.textContent = "Start guided demo with this letter";
+    return;
+  }
+  await refreshClock();
+  log("demo preset", "Clock anchored to the selected synthetic letter date.",
+      "The same recorded fixture now behaves identically during every rehearsal.", "accept");
   const { ok, data } = await api("/sixty-days/cases", {
     fixture,
     applicant_ref: `DEMO-${fixture}`,
   });
   if (!ok) {
     log("letter reader", data.detail || "Case failed to open.", "", "reject");
+    openButton.disabled = false;
+    openButton.textContent = "Start guided demo with this letter";
     return;
   }
   currentCase = data;
   runId = data.run_id;
   $("#letter-image").src = `/sixty-days/fixtures/${fixture}/image`;
   $("#letter-image").hidden = false;
+  const plannedSend = new Date(`${data.letter_date}T09:00:00Z`);
+  plannedSend.setUTCDate(plannedSend.getUTCDate() + 5);
+  $("#requested-on").value = plannedSend.toISOString().slice(0, 10);
   renderPlan(data);
   log("letter reader", `${data.deficiencies.length} quoted reason(s) survived verification.`,
       `${data.redacted} identifier(s) removed before downstream storage.`, "accept");
@@ -169,6 +213,8 @@ $("#btn-open").addEventListener("click", async () => {
   for (const button of ["#btn-day3", "#btn-day52", "#btn-day58", "#btn-packet", "#btn-pdf"]) {
     $(button).disabled = false;
   }
+  openButton.disabled = false;
+  openButton.textContent = "Restart guided demo with this letter";
   setProgress(2);
 });
 
@@ -187,6 +233,14 @@ $("#btn-screen").addEventListener("click", async () => {
   }
   const tone = data.decision === "ready_for_review" ? "accept" : "reject";
   log("evidence checker", data.decision.replaceAll("_", " "), data.guidance, tone);
+  if (fixture === "damage_close_bad") {
+    $("#evidence-fixture").value = "damage_wide_good";
+    $("#btn-screen").textContent = "Screen wider comparison (expected review)";
+    log("demo preset", "The wider comparison is selected for the next click.",
+        "This makes the retake-to-review difference visible without hidden setup.");
+  } else {
+    $("#btn-screen").textContent = "Screen this photo again";
+  }
   setProgress(3);
 });
 

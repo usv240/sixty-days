@@ -42,8 +42,10 @@ settings = load_settings()
 settings.assert_region_pinned()
 
 client = firestore.Client(project=settings.project_id)
+SIM_PROJECT = "sixty-days"
 clock = (
-    SimulatedClock(FirestoreClockStateStore(client)) if settings.sim_mode else RealClock()
+    SimulatedClock(FirestoreClockStateStore(client, namespace=SIM_PROJECT))
+    if settings.sim_mode else RealClock()
 )
 state_store = FirestoreStateStore(client)
 wake_store = FirestoreWakeStore(client)
@@ -212,7 +214,11 @@ def sim_advance(request: AdvanceRequest) -> dict[str, Any]:
     if delta.total_seconds() <= 0:
         raise HTTPException(status_code=400, detail="advance must be positive")
     now = simulated.advance(delta)
-    fired = scheduler().dispatch_due(record_due_action)
+    def owns_demo_wake(wake: Wake) -> bool:
+        run = state_store.get_run(wake.run_id)
+        return run is not None and run.project_id == SIM_PROJECT
+
+    fired = scheduler().dispatch_due(record_due_action, predicate=owns_demo_wake)
     return {
         "simulated_now": now.isoformat(),
         "advanced_by_hours": delta.total_seconds() / 3600,

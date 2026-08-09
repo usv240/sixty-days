@@ -64,6 +64,7 @@ Code paths:
 | HTTP surface | `app/service/sixty_days_routes.py` |
 | Judge console | `app/web/sixty-days.html`, `app/web/sixty-days.js` |
 | Executable acceptance flow | `app/scripts/sixty_days_demo_flow.py` |
+| Date-stable frontend demo | `POST /sixty-days/demo/anchor` |
 
 ## 3. Model boundaries and measured fixtures
 
@@ -73,6 +74,9 @@ Code paths:
 - Production/demo paths replay recordings; model recording is an explicit paid action.
 - Four photographed letter recordings score 20/20 graded fields.
 - Two clearly synthetic evidence-image recordings score 6/6 observable checks.
+- The guided console anchors the simulated clock to the selected fixture's letter date before
+  creating a fresh case. This prevents fixed evidence dates from making the recorded wake sequence
+  drift as wall time advances; no durable case or audit record is deleted.
 
 Evidence decisions are only:
 
@@ -145,6 +149,10 @@ the partial-packet/final-alert safeguards move earlier. Third-party requests get
 - Firestore for structured case/run/wake state.
 - The existing `spine-scan-due` Cloud Scheduler job invokes a shared spine worker that claims due
   wakes from the same Firestore substrate; it is not a second Sixty Days service.
+- Firestore simulation clocks are namespaced per public project
+  (`sim/clock-sixty-days` here). Simulated advances filter candidates by the owning run's project
+  before claiming, so concurrent demos cannot move or consume each other's timeline. The
+  production wall-clock scanner stays shared and unfiltered.
 - Cloud Trace and Cloud Logging are wired and verified.
 - Vertex AI global endpoint serves Gemini and Gemma MaaS.
 - Five differentiated service accounts are provisioned as intended boundaries, but the deployed

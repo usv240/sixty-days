@@ -64,6 +64,12 @@ substrate; it is not represented as a second Sixty Days service. Raw letter text
 applicant narrative are deliberately excluded from Firestore. The demo persists only explicit
 `DEMO-*` application and `DR-DEMO*` disaster references; the API rejects real-looking identifiers.
 
+The two public submissions share that durable substrate but not demo time. `sixty-days` uses its
+own Firestore simulation-clock document, and simulated advances filter due candidates by their
+owning run before claiming them. The production scheduler remains an unfiltered shared worker on
+wall-clock time. A concurrent Day Three rehearsal therefore cannot move this clock or consume a
+Sixty Days demonstration wake.
+
 The source version of the diagram is in [`docs/architecture.mmd`](docs/architecture.mmd).
 
 ## Reproduce locally
@@ -89,6 +95,12 @@ uvicorn service.main:app --reload
 python scripts/sixty_days_demo_flow.py --url http://127.0.0.1:8000
 curl -X POST -H "Content-Type: application/json" -d '{}' http://127.0.0.1:8000/exit-test
 ```
+
+The public console's **Start guided demo** control calls `/sixty-days/demo/anchor` before opening
+the selected synthetic letter. It freezes the labelled simulation at that fixture's letter date,
+so the day-3 through day-58 wake sequence remains identical even when rehearsed during judging.
+It deletes no case, wake, or audit record. The close-photo preset automatically advances to the
+wider comparison after the expected retake result.
 
 Deploying from `app/` with `bash deploy.sh` targets the independent Cloud Run service `sixty-days`.
 

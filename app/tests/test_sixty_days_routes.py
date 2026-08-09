@@ -105,11 +105,19 @@ def test_open_case_decodes_reasons_routes_evidence_and_registers_wakes():
 
 
 def test_short_window_preserves_partial_packet_and_final_alert():
-    body = client().post("/sixty-days/cases", json={"fixture": "short_window"}).json()
+    test_client = client()
+    preset = test_client.post(
+        "/sixty-days/demo/anchor", json={"fixture": "short_window"}
+    )
+    assert preset.status_code == 200
+    assert preset.json()["simulated_now"] == "2026-08-08T09:00:00+00:00"
+    assert preset.json()["deleted_cases"] == 0
+    body = test_client.post("/sixty-days/cases", json={"fixture": "short_window"}).json()
     wakes = {wake["kind"]: wake for wake in body["wakes"]}
     assert wakes["build_partial"]["day"] == 37
     assert wakes["final_alert"]["day"] == 43
     assert body["deadline_conflict"]
+    assert wakes["understood_check"]["due_at"] == "2026-08-11T09:00:00+00:00"
 
 
 def test_case_is_persisted_without_raw_transcription():
