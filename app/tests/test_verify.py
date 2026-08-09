@@ -64,6 +64,49 @@ def test_rejects_a_claim_with_no_source(verifier):
     assert result.code is RejectionCode.NO_SOURCE
 
 
+def test_rejects_a_source_reference_with_an_empty_quote(verifier):
+    """Regression, found by boundary-probing the Verifier.
+
+    `"" in anything` is True, so a source reference carrying an empty quote passed the
+    containment check and the claim was ACCEPTED. That defeats the invariant the whole system
+    rests on. Rule 1 only rejects an empty `source_refs` tuple, not a present-but-empty quote.
+    """
+    claim = Claim(
+        id="clm_empty_quote",
+        text="The isolate is susceptible to meropenem.",
+        kind=ClaimKind.SUSCEPTIBILITY,
+        source_refs=(SourceRef("art_lab_0031", ""),),
+    )
+    result = verifier.verify(claim)
+    assert not result.accepted
+    assert result.code is RejectionCode.NO_SOURCE
+
+
+def test_rejects_a_whitespace_only_quote(verifier):
+    """Same hole, one step further: whitespace normalises to empty."""
+    claim = Claim(
+        id="clm_blank_quote",
+        text="The isolate is susceptible to meropenem.",
+        kind=ClaimKind.SUSCEPTIBILITY,
+        source_refs=(SourceRef("art_lab_0031", "   \n\t  "),),
+    )
+    assert verifier.verify(claim).code is RejectionCode.NO_SOURCE
+
+
+def test_an_empty_quote_cannot_be_hidden_behind_a_valid_one(verifier):
+    """Every reference must carry weight; one good quote must not launder an empty one."""
+    claim = Claim(
+        id="clm_mixed",
+        text="Susceptible to ceftriaxone and meropenem.",
+        kind=ClaimKind.SUSCEPTIBILITY,
+        source_refs=(
+            SourceRef("art_lab_0031", "CEFTRIAXONE          <=1        S"),
+            SourceRef("art_lab_0031", ""),
+        ),
+    )
+    assert not verifier.verify(claim).accepted
+
+
 def test_rejects_a_fabricated_quote(verifier):
     """The model invented a susceptibility that is not on the page."""
     claim = Claim(

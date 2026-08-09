@@ -119,6 +119,38 @@ def test_a_letter_with_no_street_address_still_redacts(redactor):
     assert "could not confirm that you lived" in result.text
 
 
+@pytest.mark.parametrize(
+    "text,identifier",
+    [
+        ("Applicant: MARY-JANE OKONKWO", "MARY-JANE OKONKWO"),
+        ("Applicant: SEAN O'BRIEN", "SEAN O'BRIEN"),
+        ("Applicant: SEAN O’BRIEN", "SEAN O’BRIEN"),
+        ("applicant: Devon Carter", "Devon Carter"),
+        ("Mailing: P.O. Box 4417", "P.O. Box 4417"),
+        ("Mailing: PO Box 22", "PO Box 22"),
+    ],
+)
+def test_ordinary_real_world_spellings_are_not_missed(redactor, text, identifier):
+    """Regression from boundary probing. Every one of these leaked: the name class excluded
+    hyphens and apostrophes, the label was case-sensitive, and a PO box has no street suffix
+    for the address pattern to anchor on."""
+    assert identifier not in redactor.redact(text).text
+
+
+@pytest.mark.parametrize(
+    "text",
+    [
+        "The organism Escherichia coli was isolated from urine.",
+        "Name of disaster: SEVERE STORMS AND FLOODING",
+        "CEFTRIAXONE          <=1        S",
+    ],
+)
+def test_the_gate_does_not_over_redact(redactor, text):
+    """Over-redaction is safer than under-redaction but still destroys the product: the reason
+    for a denial and the susceptibility results are the whole output."""
+    assert redactor.redact(text).text == text
+
+
 def test_a_document_with_no_identifiers_passes_through_unchanged(redactor):
     text = "Organism: Klebsiella pneumoniae\nMEROPENEM  <=0.25  S"
     result = redactor.redact(text)

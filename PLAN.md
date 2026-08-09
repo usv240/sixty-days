@@ -50,7 +50,7 @@ Measured results:
 
 - letters: 20/20 graded fields across four recorded model calls;
 - evidence: 6/6 observable checks across two recorded model calls;
-- standalone repository: 190 tests (279 in the separate combined integration workspace);
+- standalone repository: 202 tests (291 in the separate combined integration workspace);
 - Sixty Days executable flow: 23/23;
 - accessibility: WCAG gate green in light and dark themes.
 
@@ -93,7 +93,7 @@ Veo, and per-agent runtime identities are not part of this build and must not ap
 | 2:00–2:40 | Build the packet; show exact letter statements and missing items; download the labeled draft PDF and show its synthetic application/disaster references repeated in the page footer |
 | 2:40–3:10 | Advance the simulated clock and show the agent wake itself |
 | 3:10–3:35 | Open conformance: each rule maps to an official FEMA source, implementation, and test |
-| 3:35–4:00 | Cloud Run, Firestore, Vertex recordings, Cloud Trace, 190 standalone tests, 23/23 acceptance, accessibility |
+| 3:35–4:00 | Cloud Run, Firestore, Vertex recordings, Cloud Trace, 202 standalone tests, 23/23 acceptance, accessibility |
 
 ## 7. Submission checklist
 

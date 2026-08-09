@@ -81,9 +81,22 @@ _PATTERNS: tuple[tuple[str, re.Pattern[str]], ...] = (
     #   2. The name shape required Titlecase, but government letters print names in ALL CAPS,
     #      so "Applicant: DEVON CARTER" matched nothing even once the label was added.
     # Single spaces only between name words: \s would match a newline and swallow the next label.
+    # PO boxes: a mailing address with no street suffix for the ADDRESS pattern to anchor on.
+    ("ADDRESS", re.compile(r"\bP\.?\s?O\.?\s?Box\s+\d+\b", re.I)),
+    # Labeled person names.
+    #
+    # Boundary probing found three further leaks after the ALL-CAPS fix, all of them ordinary
+    # real-world spellings:
+    #   * hyphenated names   ("MARY-JANE OKONKWO")
+    #   * apostrophes        ("SEAN O'BRIEN", including the typographic apostrophe)
+    #   * a lowercase label  ("applicant:" as typed in an email or a scan transcription)
+    # The label is matched case-insensitively via a scoped group, but the *name* stays
+    # case-sensitive on purpose: making the whole pattern IGNORECASE would let the all-caps
+    # alternative match ordinary lowercase prose and redact half the letter.
     ("PERSON", re.compile(
-        r"\b(?:Patient(?: Name)?|Applicant(?: Name)?|Recipient|Claimant|Name)[: ]+"
-        r"((?:[A-Z][a-z]+|[A-Z]{2,})(?: (?:[A-Z][a-z]+|[A-Z]{2,})){1,2})"
+        r"\b(?i:Patient(?: Name)?|Applicant(?: Name)?|Recipient|Claimant|Name)[: ]+"
+        r"((?:[A-Z][a-z'’-]+|[A-Z][A-Z'’-]+)"
+        r"(?: (?:[A-Z][a-z'’-]+|[A-Z][A-Z'’-]+)){1,3})"
     )),
 )
 

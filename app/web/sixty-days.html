@@ -32,11 +32,25 @@
           <a class="btn btn-primary" href="#console">Open a synthetic case</a>
           <a class="btn" href="#workflow">See the four-stage plan</a>
         </div>
+        <div class="stat-strip">
+          <div class="stat"><b>4.4 million</b><span>applicants referred to the Individuals and
+            Households Program, 2016&ndash;2018 <a href="#ref-scale" aria-label="Reference: GAO-20-503">[1]</a></span></div>
+          <div class="stat"><b>~1.7 million</b><span>were determined ineligible in that period;
+            <b>failure to submit supporting evidence</b> was among the common reasons
+            <a href="#ref-scale">[1]</a></span></div>
+          <div class="stat"><b>60 days</b><span>from the date on the decision letter to appeal, and
+            the letter names what is missing <a href="#ref-window">[2]</a></span></div>
+          <div class="stat"><b>20 of 20</b><span>letter fields extracted correctly across four real
+            Gemini&nbsp;3.5 calls, measured against ground truth <a href="/judges#requirements">[3]</a></span></div>
+        </div>
         <div class="trust-band" aria-label="Product boundaries">
           <span class="trust-item"><b>Synthetic data</b> only</span>
           <span class="trust-item"><b>Applicant sends</b> every request</span>
           <span class="trust-item"><b>No submission</b> endpoint</span>
         </div>
+        <p class="small muted">These describe the documented population and process, not a
+          predicted outcome for any applicant. This product does not estimate eligibility, appeal
+          success, or how many people would benefit.</p>
         <p class="boundary-line"><b>Scope:</b> This is not legal advice, does not predict an
           outcome, and has no submission endpoint. The applicant reviews and controls every action.</p>
       </div>
@@ -288,7 +302,7 @@
   <div class="wrap">
     <h2>Research basis and limits</h2>
     <div class="grid-3">
-      <div class="card"><h3>Deadline and supporting documents</h3><p class="small">FEMA’s current
+      <div class="card" id="ref-window"><h3>Deadline and supporting documents</h3><p class="small">FEMA’s current
         Individual Assistance quick reference says appeals must be submitted within 60 days of the
         decision-letter date and lists supporting documents such as receipts, bills, estimates,
         titles, and deeds.</p><p class="small"><a
@@ -299,7 +313,7 @@
         insurance records, occupancy documents, and ownership records.</p><p class="small"><a
         href="https://www.fema.gov/fact-sheet/8-tips-appealing-femas-decision-1">Source: FEMA,
         8 Tips for Appealing FEMA’s Decision</a></p></div>
-      <div class="card"><h3>Historical friction, not a product promise</h3><p class="small">GAO
+      <div class="card" id="ref-scale"><h3>Historical friction, not a product promise</h3><p class="small">GAO
         reported that common historical ineligibility reasons included insufficient damage and
         failure to provide supporting evidence. This motivates the workflow; it does not predict
         any applicant’s outcome.</p><p class="small"><a

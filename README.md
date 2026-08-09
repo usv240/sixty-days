@@ -32,7 +32,7 @@ their prerequisites exist, so the judge can follow the numbered stages without g
 | Gate | Reproducible result |
 |---|---:|
 | Deployed public acceptance flow | **23/23** |
-| Standalone automated tests | **190 passed** |
+| Standalone automated tests | **202 passed** |
 | Recorded letter fields | **20/20** |
 | Recorded evidence decisions | **6/6** |
 | Shared-substrate exit test | **10/10** |
@@ -114,7 +114,8 @@ hashes are public, and none of them creates evidence or makes an appeal decision
 ## Safety and legal boundaries
 
 - Synthetic, unbranded fixtures only; no real survivor or applicant data.
-- Deterministic redaction covers person names, addresses, and FEMA-style case references before model review.
+- Deterministic redaction covers names with common punctuation, lowercase labels, street addresses, PO boxes, and FEMA-style case references before model review.
+- Every source reference must contain a nonempty quote; one valid reference cannot launder an empty one.
 - No legal advice, eligibility prediction, appeal strategy, or outcome forecast.
 - No send, contact, or submission endpoint; the applicant controls every external action.
 - Evidence screening is limited to observable framing and legibility, never authenticity or damage valuation.

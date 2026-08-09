@@ -201,7 +201,21 @@ class Verifier:
                     RejectionCode.UNKNOWN_ARTIFACT,
                     f"Cites artifact {ref.artifact_id!r}, which this run has never seen.",
                 )
-            if normalise(ref.quoted_text) not in self._artifacts[ref.artifact_id]:
+            needle = normalise(ref.quoted_text)
+            # An empty quote must be rejected explicitly. `"" in anything` is True, so without
+            # this guard a source reference carrying no quote at all satisfies the containment
+            # check and the claim is accepted. That silently defeats the one invariant the whole
+            # system rests on: no quote, no claim, no rendered sentence. Rule 1 only catches an
+            # empty `source_refs` tuple, not a present-but-empty quote.
+            if not needle:
+                return Result(
+                    claim.id,
+                    Verdict.REJECTED,
+                    RejectionCode.NO_SOURCE,
+                    f"Source reference to {ref.artifact_id} carries an empty quote, so it "
+                    "supports nothing.",
+                )
+            if needle not in self._artifacts[ref.artifact_id]:
                 return Result(
                     claim.id,
                     Verdict.REJECTED,

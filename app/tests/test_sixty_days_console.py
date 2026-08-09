@@ -63,7 +63,7 @@ def test_console_has_no_mojibake_and_distinguishes_review_from_acceptance():
         "Deployment proof",
         "Findings and learnings",
         "Deliberate non-capabilities",
-        "190 tests",
+        "202 tests",
         "sixty-days-109051079423.us-central1.run.app",
         "github.com/usv240/sixty-days",
         "Research-to-design trace",

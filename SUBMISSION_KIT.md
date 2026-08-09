@@ -1,55 +1,94 @@
 # Sixty Days: Submission Kit
 
-This is the final evidence and recording plan for the independent **Taskmaster** submission.
-Every number and infrastructure statement below is tied to the standalone repository or deployed
-service. Do not substitute the combined workspace's larger test count.
+This is the final evidence, recording, and Devpost package for the independent Taskmaster
+submission. Every number below belongs to the standalone Sixty Days repository or its deployed
+service. Do not substitute the larger combined-workspace count.
 
 ## Submission facts
 
 - Hosted project: `https://sixty-days-109051079423.us-central1.run.app`
 - Judge evidence: `https://sixty-days-109051079423.us-central1.run.app/judges`
+- Conformance evidence: `https://sixty-days-109051079423.us-central1.run.app/sixty-days/conformance`
 - Public repository: `https://github.com/usv240/sixty-days`
-- Public acceptance: **23/23**
-- Standalone tests: **190 passed**
-- Recorded model measurements: **20/20 letter fields**, **6/6 evidence decisions**
-- Shared substrate exit test: **10/10**
-- Category: **The Taskmaster**
+- Category: The Taskmaster
+- Public acceptance flow: 23/23
+- Standalone tests: 202 passed
+- Recorded letter extraction: 20/20 fields
+- Recorded evidence screening: 6/6 decisions
+- Shared-substrate exit test: 10/10
+- Accessibility: passing in light and dark themes
+- Additional Google models: Gemma 4 MaaS, Gemini 3.1 Flash Image, and Veo 3.1 Fast
 
-## Four-minute video
+## What the video must prove
 
-The video is a Stage One requirement and 30 percent of Stage Two. It must be public on YouTube or
-Vimeo, no longer than four minutes, in English or accurately captioned, and must visibly prove that
-the backend runs on Google Cloud.
+The video is required for Stage One and carries 30 percent of Stage Two. In less than four minutes,
+it must make five things undeniable:
 
-### Pre-flight
+1. The friction is real and specific.
+2. The system performs a multi-step workflow over durable time, not a single chat response.
+3. The applicant retains control of every external action.
+4. The architecture and safety boundaries are deliberate.
+5. The demonstrated backend is running on Google Cloud.
 
-1. Run `python scripts/sixty_days_demo_flow.py --url https://sixty-days-109051079423.us-central1.run.app` and save the 23/23 result.
-2. Run the standalone suite and accessibility gate; confirm 190 passing tests.
-3. Use a fresh 1440x900 browser window, light theme, no bookmarks bar, and no extensions.
-4. Open the live app in the first tab and the `sixty-days` Cloud Run service in the second.
-5. Open Cloud Trace only if a fresh trace from this exact rehearsal has been inspected.
-6. Leave the default `damage_and_insurance` fixture selected and click **Start guided demo with
-   this letter**. Confirm the clock reads August 5, 2026. The control anchors time but deletes no
-   stored case or audit evidence.
-7. Rehearse once. Record the product execution in one continuous take; edits may precede or follow it.
-8. Keep the final export below 3:55 and correct the English captions before publishing.
+The live product execution should be one continuous take. Introductory and closing stills may be
+edited around it, but the proof-of-action sequence should not be cut.
 
-### Shot list and narration
+## Pre-flight checklist
 
-| Time | On screen | Narration |
+1. From `app/`, run:
+   `python scripts/sixty_days_demo_flow.py --url https://sixty-days-109051079423.us-central1.run.app`
+   and save the 23/23 result.
+2. Run `python -m pytest -q` and confirm 202 passed.
+3. Run `python scripts/check_a11y.py` and confirm both themes pass.
+4. Use a fresh 1440 by 900 browser window in light mode. Hide bookmarks, extensions, notifications,
+   personal accounts, and unrelated tabs.
+5. Open the live app in tab one, the architecture diagram in tab two, and the Google Cloud Run
+   service page for `sixty-days` in tab three.
+6. Show Cloud Trace only if a fresh trace from the exact rehearsal has been inspected first.
+7. Leave the default `damage_and_insurance` fixture selected.
+8. Press **Start guided demo with this letter** and confirm the labelled clock anchors to
+   August 5, 2026.
+9. Rehearse once, then record one continuous product run.
+10. Export below 3 minutes 55 seconds and correct the English captions before publishing.
+
+## Four-minute shot list and exact narration
+
+Timings are targets. Keep at least five seconds of final margin.
+
+| Time | On screen | Say exactly |
 |---|---|---|
-| 0:00-0:22 | Landing hero and problem cards | “A disaster-assistance decision letter can start a short appeal clock while the records it requests are scattered across insurers, public offices, and a damaged home. Sixty Days is a deadline keeper that organizes that work without pretending to be a lawyer or acting as the applicant.” |
-| 0:22-0:38 | Product boundaries and four-stage workflow | “It understands the letter, gathers and checks evidence, tracks applicant-controlled requests, and builds a reviewable draft. It never sends, contacts, or submits.” |
-| 0:38-1:08 | Click **Start guided demo** with `damage_and_insurance` selected | “The guided preset anchors the labelled clock to this synthetic letter, so every rehearsal proves the same wake sequence without deleting audit evidence. Gemini 3.5 Flash preserves the exact stated reasons and requirements. Direct identifiers are redacted before structured persistence. Four recorded calls score twenty out of twenty fields against adjacent truth.” |
-| 1:08-1:35 | Show deadline and registered wakes | “The whole deadline ladder is registered immediately: eight deterministic wakes, including early no-reply and final packet checks. The simulated clock is labeled; production due wakes are claimed from Firestore by a scheduled worker.” |
-| 1:35-2:04 | Click the close-photo check, then the automatically selected wider comparison | “The close image receives an actionable retake because the requested context is not visible. The guided preset now selects the wider comparison, which is ready for applicant review. The system checks only observable framing and legibility; it never values damage or predicts acceptance. Two recorded model calls score six out of six decisions.” |
-| 2:04-2:28 | Prepare insurer request | “The agent prepares this insurer request and registers a no-reply wake. Notice the boundary: nothing was sent. The applicant reviews and sends every external request.” |
-| 2:28-2:53 | Build packet and download PDF | “The packet keeps the letter's exact reason next to the supporting evidence and lists anything still missing. A partial packet stays visibly partial. Current FEMA guidance also tells applicants to identify every submitted page, so this draft repeats its synthetic application and disaster references in every footer. It is explicitly marked draft and not submitted.” |
-| 2:53-3:14 | Advance simulated clock; show wake event | “Now time advances. The deadline watcher wakes, records the due action idempotently, and surfaces the missing work. That is asynchronous action over durable state, not a chat response.” |
-| 3:14-3:34 | Conformance and judge pages | “Every public rule links to an official FEMA source, implementation, and test. The standalone repository has one hundred and ninety passing tests, a twenty-three-step live acceptance flow, and explicit legal and privacy boundaries.” |
-| 3:34-3:52 | Cloud Run dashboard, service and revision visible | “This is the independent `sixty-days` Cloud Run service in `us-central1`, backed by Firestore, Vertex AI, Cloud Scheduler, and Cloud Trace. The public URL you just watched is this revision.” |
+| 0:00 to 0:20 | Landing hero and problem cards | "A disaster-assistance decision letter can start a short appeal clock while the records it requests are scattered across insurers, public offices, and a damaged home. Sixty Days keeps the reason, evidence, and deadline together without pretending to be a lawyer or acting as the applicant." |
+| 0:20 to 0:35 | Four-stage workflow and boundaries | "It understands the letter, checks observable evidence, tracks applicant-controlled requests, and builds a reviewable draft. It never contacts a third party, predicts eligibility, or submits an appeal." |
+| 0:35 to 1:05 | Open the console and press **Start guided demo with this letter** | "This is the live deployed service. The guided preset anchors a clearly labelled simulation clock to this synthetic letter, so every rehearsal proves the same sequence without deleting stored audit evidence. Gemini 3.5 Flash preserves exact reasons and requirements. Four recorded calls score twenty out of twenty fields against adjacent truth." |
+| 1:05 to 1:30 | Show exact reason, deadline, requirements, and eight wakes | "The letter controls the plan. Its exact reason is quoted, the deadline is calculated deterministically, and all eight wakes are registered immediately. In production, a scheduled worker claims due work from Firestore on wall-clock time." |
+| 1:30 to 1:58 | Press **Screen close photo**, then screen the automatically selected wider comparison | "The close image receives an actionable retake because the requested context is missing. The wider comparison becomes ready for applicant review. That phrase is deliberate. The system checks only framing and legibility. It does not authenticate evidence, value damage, or predict agency acceptance. Two recorded calls score six out of six decisions." |
+| 1:58 to 2:20 | Prepare the insurer request | "The agent prepares an insurer request with blanks and registers a no-reply wake. Nothing is sent. The applicant reviews and sends every external request, and the service has no send endpoint." |
+| 2:20 to 2:48 | Add the applicant statement, check the packet, and download the PDF | "The packet keeps the letter's quoted reason beside the evidence and lists everything still missing. Every page repeats validated synthetic application and disaster references for applicant verification. The PDF is clearly marked draft, optional, and not submitted." |
+| 2:48 to 3:08 | Advance the simulated days and show the wake in the audit trail | "Now time advances. The deadline keeper resumes from durable state, records the due action idempotently, and surfaces the remaining work. That is asynchronous action over time, not a chat response." |
+| 3:08 to 3:30 | Show the architecture diagram, then the judge evidence page | "One Cloud Run service coordinates bounded modules. Firestore stores structured cases and wakes, while raw letters, photo bytes, and applicant narrative are omitted. Gemini performs measured extraction, Gemma reviews redaction, and the Verifier rejects unsupported or empty quotes. The standalone repository passes two hundred and two tests." |
+| 3:30 to 3:52 | Show the Cloud Run service, public URL, and current revision | "This is the independent sixty-days service running on Google Cloud in us-central1, with Firestore, Vertex AI, Cloud Scheduler, Cloud Trace, and scale-to-zero Cloud Run. The public URL you just watched is this deployed service." |
 
-Upload as **“Sixty Days - All Things Agentic Hackathon”**, public, with corrected English captions.
+Upload publicly to YouTube or Vimeo with the title:
+
+**Sixty Days: All Things Agentic Hackathon**
+
+Use corrected English captions. Do not leave the video unlisted.
+
+## Hardening evidence worth mentioning in judging
+
+The best engineering story is not that no bug existed. It is that adversarial checks found bugs
+before judging and turned them into permanent invariants.
+
+- The Verifier used to accept a present source reference with an empty quote because an empty string
+  is contained in every string. It now rejects empty and whitespace-only quotes, and a valid quote
+  cannot launder an empty reference beside it.
+- The deterministic privacy layer now covers hyphenated names, straight and typographic
+  apostrophes, lowercase applicant labels, and PO boxes.
+- Negative controls prove the expanded patterns do not erase organism names, susceptibility rows,
+  or phrases such as "Name of disaster."
+- Partial packets stay visibly partial. A missing record never becomes a confident eligibility claim.
+
+These are verified by tests and should be described as hardening work, not as product outcome proof.
 
 ## Devpost copy
 
@@ -59,12 +98,12 @@ The letter says no. The clock has already started.
 
 ### Short description
 
-Sixty Days turns a synthetic disaster-assistance decision letter into an auditable, applicant-
-controlled evidence workflow. Gemini 3.5 Flash extracts only quote-grounded reasons and requested
-documents; a durable deadline ladder tracks the case; evidence checks return retake, manual review,
-or ready for applicant review; and a verifier builds a partial-safe draft packet. The agent prepares
-and tracks work but never contacts a third party, provides legal advice, predicts eligibility, or
-submits an appeal.
+Sixty Days turns a synthetic disaster-assistance decision letter into an auditable,
+applicant-controlled evidence workflow. Gemini 3.5 Flash extracts only quote-grounded reasons and
+requested documents. A durable deadline ladder tracks the case, evidence screening returns retake,
+manual review, or ready for applicant review, and a verifier builds a partial-safe draft packet.
+The agent prepares and tracks work but never contacts a third party, provides legal advice, predicts
+eligibility, or submits an appeal.
 
 ### Features and functionality
 
@@ -73,48 +112,77 @@ submits an appeal.
 - Observable evidence-photo framing checks with actionable retake guidance
 - Applicant-reviewable records-request preparation and no-reply tracking
 - Partial-safe draft packet and PDF with visible missing items
-- Synthetic application and disaster references repeated in every PDF page footer for applicant verification
+- Synthetic references repeated in every PDF footer for applicant verification
 - Redaction, prompt-injection quarantine, independent verification, and durable audit state
-- Public conformance map from policy source to implementation and test
+- Public policy-to-implementation conformance evidence
 
-### Technologies
+### Architecture and technologies
 
-Gemini 3.5 Flash, Gemma 4 MaaS, Gemini 3.1 Flash Image, and Veo 3.1 Fast through Vertex AI, Google GenAI SDK, FastAPI, Cloud Run,
-Firestore, Cloud Scheduler, Cloud Trace/Logging, OpenTelemetry, Artifact Registry, and Cloud Build.
-Pub/Sub, autonomous third-party contact, and appeal submission are not part of the build.
+One FastAPI service runs on Cloud Run. Modular roles share a reviewed durable spine. Firestore stores
+structured case, requirement, request, and wake state. Cloud Scheduler invokes the due-work path.
+Cloud Trace and Logging expose execution evidence.
+
+Models and tools:
+
+- Gemini 3.5 Flash through Vertex AI for measured structured transcription and evidence screening
+- Gemma 4 MaaS for second-pass privacy review
+- Gemini 3.1 Flash Image for optional build-time onboarding media
+- Veo 3.1 Fast for optional build-time motion briefing
+- Google GenAI SDK, FastAPI, Firestore, Cloud Scheduler, Cloud Trace, OpenTelemetry, Artifact
+  Registry, and Cloud Build
+
+Pub/Sub, autonomous third-party contact, eligibility prediction, and appeal submission are not part
+of the build.
 
 ### Data sources
 
-All demonstration letters, people, addresses, and images are synthetic. Policy claims cite current
-FEMA Individual Assistance appeals guidance, ownership and occupancy examples, and insurance
-documentation guidance. Historical problem context cites GAO-20-503. Truth files sit beside every
-fixture, and recorded model calls are graded.
+All demonstration letters, people, addresses, case references, and images are synthetic. Policy
+claims cite current FEMA Individual Assistance appeal guidance, ownership and occupancy examples,
+insurance documentation guidance, and the September 2025 IHP explainer. Historical problem context
+uses GAO-20-503 with its original 2016 to 2018 scope. Truth files sit beside every fixture, and
+recorded model calls are graded against them.
 
 ### Findings and learnings
 
-Exact quoting matters more than polished paraphrase when a deadline workflow starts from an
-official letter. A redaction audit also showed why generated artifacts need regression tests: an
-older pattern set missed all-caps applicant names and FEMA registration references, so PERSON and
-CASE_REF coverage is now enforced. Finally, a visibly partial packet is safer than a false-complete
-one, and preparing a request is meaningfully different from having authority to send it.
+Exact quoting matters more than polished paraphrase when an administrative deadline begins with an
+official letter. The strongest verifier rule also needed an adversarial test: a source reference
+could be present while its quote was empty, so every reference now has to carry nonempty support.
+Privacy patterns also needed ordinary real-world spellings, including hyphenated names, apostrophes,
+lowercase labels, and PO boxes. Finally, a visibly partial packet is safer than a false-complete one,
+and preparing a request is meaningfully different from having authority to send it.
 
 ### Disclosure
 
 Built during the contest period with AI coding assistants. The shared spine was developed during
-the same period and copied into this standalone repository. All demonstration data is synthetic;
-no government agency endorses the project.
+the same period and copied into this standalone repository. All demonstration data is synthetic.
+No government agency endorses this project.
+
+## Bonus contribution package
+
+- Additional Google models: three integrated models provide the maximum model-integration bonus
+  evidence. Prompts, model IDs, sizes, and hashes are public in `BONUS_EVIDENCE.md` and the media
+  provenance manifest.
+- Build story: publish `docs/public-build-story.md` on a public platform. It must say that the
+  piece was created for the purpose of entering the All Things Agentic Hackathon.
+- Social post: publish `docs/social-post.md` on an eligible social platform with the exact hashtag
+  `#AllThingsAgenticHackathon`.
 
 ## Final submission checklist
 
-- [ ] Public YouTube or Vimeo video under four minutes with corrected English captions
-- [ ] Live Cloud Run proof visible in the video
-- [x] Public hosted project, no credentials required
+- [ ] Public YouTube or Vimeo video under four minutes
+- [ ] English captions reviewed and corrected
+- [ ] Problem, value proposition, architecture, live action, and Google Cloud proof visible
+- [ ] Continuous product execution shown without cuts
+- [x] Public hosted project with no credentials required
 - [x] Public standalone repository
-- [x] Reproducible README and submission-ready architecture SVG
-- [x] Three additional Google model integrations with public prompts and hashes
-- [x] Feature, technology, data-source, findings, limitations, and disclosure copy
-- [x] 23/23 public acceptance, 190 tests, accessibility, and 10/10 exit test
-- [ ] Publish docs/public-build-story.md and add its public URL
-- [ ] Publish docs/social-post.md with #AllThingsAgenticHackathon and add its public URL
-- [ ] Final link and citation check immediately before Devpost submission
-- [ ] Freeze the submitted revision and keep it available through judging
+- [x] README with local setup and deployment instructions
+- [x] Submission-ready architecture SVG and Mermaid source
+- [x] Three additional Google model integrations with public provenance
+- [x] 23/23 public acceptance flow
+- [x] 202 standalone tests
+- [x] 20/20 letter fields and 6/6 evidence decisions
+- [x] Accessibility gate and 10/10 exit test
+- [ ] Public build story URL added to Devpost
+- [ ] Public social post URL added to Devpost
+- [ ] Final link, citation, and claim check
+- [ ] Freeze and preserve the submitted revision through judging
