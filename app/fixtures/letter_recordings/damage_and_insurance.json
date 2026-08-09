@@ -6,12 +6,12 @@
   "deficiencies": [
     {
       "kind": "damage_evidence",
-      "plain_language": "The inspection did not find disaster-related damage that made the home unsafe to live in.",
+      "plain_language": "The inspection did not find enough disaster-related damage to make the home unsafe to live in.",
       "quoted_text": "The inspection did not show disaster-caused damage that made the home unsafe to occupy."
     },
     {
       "kind": "insurance",
-      "plain_language": "The agency needs to see your insurance settlement or denial letter before they can evaluate uninsured losses.",
+      "plain_language": "The agency requires a copy of your insurance settlement or denial letter before they can evaluate uninsured losses.",
       "quoted_text": "We also need the insurance settlement or denial before we can consider uninsured losses."
     }
   ]

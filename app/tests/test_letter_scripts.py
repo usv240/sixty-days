@@ -1,4 +1,5 @@
 import json
+from pathlib import Path
 
 from scripts.make_letter_fixtures import LETTERS
 from scripts.record_letters import grade
@@ -46,5 +47,23 @@ def test_grader_reports_five_of_five_for_an_exact_extraction():
     assert all(scored["fields"].values())
 
 
-def test_fixture_dictionary_is_json_serializable():
+def test_fixture_dictionary_and_recording_report_are_consistent():
     json.dumps(LETTERS)
+    report_path = (
+        Path(__file__).resolve().parents[1]
+        / "fixtures"
+        / "letter_recordings"
+        / "_accuracy_report.json"
+    )
+    report = json.loads(report_path.read_text(encoding="utf-8"))
+    assert sum(item["correct"] for item in report) == 20
+    assert sum(item["total"] for item in report) == 20
+    assert {
+        item["fixture"]: item["redacted_identifiers"]
+        for item in report
+    } == {
+        "damage_and_insurance": 3,
+        "occupancy": 2,
+        "ownership": 3,
+        "short_window": 3,
+    }

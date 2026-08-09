@@ -19,7 +19,7 @@
       "insurance"
     ],
     "dropped_by_guard": [],
-    "redacted_identifiers": 1
+    "redacted_identifiers": 3
   },
   {
     "fixture": "occupancy",
@@ -39,7 +39,7 @@
       "occupancy"
     ],
     "dropped_by_guard": [],
-    "redacted_identifiers": 0
+    "redacted_identifiers": 2
   },
   {
     "fixture": "ownership",
@@ -59,7 +59,7 @@
       "ownership"
     ],
     "dropped_by_guard": [],
-    "redacted_identifiers": 1
+    "redacted_identifiers": 3
   },
   {
     "fixture": "short_window",
@@ -79,6 +79,6 @@
       "identity"
     ],
     "dropped_by_guard": [],
-    "redacted_identifiers": 1
+    "redacted_identifiers": 3
   }
 ]

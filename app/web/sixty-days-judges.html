@@ -50,7 +50,8 @@
 </div></section>
 <section><div class="wrap">
   <h2>Reproduce</h2>
-  <pre><code>python -m pytest -q
+  <pre><code>cd app
+python -m pytest -q
 python scripts/check_a11y.py
 python scripts/sixty_days_demo_flow.py --url https://SERVICE_URL
 curl -X POST -H "Content-Type: application/json" -d '{}' https://SERVICE_URL/exit-test</code></pre>
