@@ -6,7 +6,7 @@ Three properties this module exists to guarantee, all of which map to scoring li
    from the last completed step rather than the beginning. (Rules.md line 494, state management.)
 
 2. A step's side effects happen at most once. Every step carries an idempotency key derived from
-   the run and the step sequence, so a replay after a crash cannot page a pharmacist twice or
+   the run and the step sequence, so a replay after a crash cannot prepare the same escalation twice or
    file the same appeal twice. Rules.md line 838 warns about exactly this: "a resumable agent
    might order two laptops".
 

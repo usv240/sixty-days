@@ -1,12 +1,9 @@
 #!/usr/bin/env bash
 # Deploy the standalone Sixty Days service to Cloud Run.
 #
-# One script, used by every service in the fleet. Which agent a service runs is decided by the
-# environment it is given, not by a separate build.
-#
 # Usage:
-#   bash deploy.sh spine
-#   SIM_MODE=true bash deploy.sh spine
+#   bash deploy.sh
+#   SIM_MODE=true bash deploy.sh sixty-days
 #
 # Cost discipline, since the free trial on this billing account is closed:
 #   --min-instances 0   nothing is charged while idle

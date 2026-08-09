@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Sixty Days — hold the appeal clock</title>
 <meta name="description" content="A working console that reads a synthetic disaster-assistance letter, screens evidence framing, prepares applicant-controlled records requests, and builds a reviewable draft packet.">
+<meta name="theme-color" content="#f7f9fc">
 <link rel="stylesheet" href="/static/styles.css">
 </head>
 <body>
@@ -12,7 +13,7 @@
 <header class="site">
   <div class="wrap bar">
     <div class="brand">Sixty Days <span>— a deadline keeper for disaster appeals</span></div>
-    <nav aria-label="Sections"><a href="#workflow">How it works</a><a href="#console">Live workflow</a><a href="#research">Sources</a><a href="/judges">For judges</a><a href="https://day-three-109051079423.us-central1.run.app">Day Three</a></nav>
+    <nav aria-label="Sections"><a href="#problem">The problem</a><a href="#workflow">How it works</a><a href="#console">Live workflow</a><a href="#limits">Limits</a><a href="#architecture">Architecture</a><a href="#research">Sources</a><a href="/judges">For judges</a><a href="https://day-three-109051079423.us-central1.run.app">Day Three</a></nav>
     <button class="theme-toggle" id="theme-toggle" aria-pressed="false">Use dark mode</button>
   </div>
 </header>
@@ -54,6 +55,30 @@
   </div>
 </section>
 
+<section id="problem">
+  <div class="wrap">
+    <div class="section-heading">
+      <div><p class="eyebrow">The human problem</p><h2>The deadline is simple. The evidence hunt is not.</h2></div>
+      <p class="narrow">A decision letter can ask for records held by several different people
+        while the applicant is still recovering from the disaster.</p>
+    </div>
+    <div class="grid-3">
+      <div class="card"><h3>One letter, several obligations</h3><p>The reason, requested documents,
+        and deadline are mixed into formal language. Missing the exact reason means gathering the
+        wrong evidence.</p></div>
+      <div class="card"><h3>Evidence lives elsewhere</h3><p>Ownership, occupancy, insurance, and
+        damage records may come from different offices. The applicant remains responsible for
+        requesting and sending them.</p></div>
+      <div class="card"><h3>The clock keeps moving</h3><p>Sixty Days registers the whole reminder
+        ladder immediately, then keeps missing work visible instead of pretending a partial packet
+        is complete.</p></div>
+    </div>
+    <div class="callout narrow"><p><b>Who this is for:</b> a disaster survivor managing a dense
+      decision letter while rebuilding daily life. No real survivor story or private data is used;
+      every person, letter, and image in this demonstration is synthetic.</p></div>
+  </div>
+</section>
+
 <section id="workflow">
   <div class="wrap">
     <div class="section-heading">
@@ -86,6 +111,12 @@
         right. Disabled controls become available only when the case contains what they need.</p>
     </div>
     <div class="console-shell">
+    <ol class="workflow-progress" id="workflow-progress" aria-label="Suggested workflow progress">
+      <li data-step="1" class="is-active" aria-current="step"><b>Understand</b>Read the letter</li>
+      <li data-step="2"><b>Gather</b>Check evidence</li>
+      <li data-step="3"><b>Track</b>Prepare a request</li>
+      <li data-step="4"><b>Review</b>Build the draft</li>
+    </ol>
     <div class="console-intro">
       <p id="measurement">Loading measured Gemini fixture catalogues…</p>
       <a class="btn" href="/judges">Open judge evidence</a>
@@ -154,6 +185,23 @@
   </div>
 </section>
 
+<section id="limits">
+  <div class="wrap">
+    <h2>What this does not do</h2>
+    <div class="grid-3">
+      <div class="card"><h3>No legal or eligibility decision</h3><p>It organizes quoted reasons
+        and evidence tasks. It does not determine eligibility, predict acceptance, or replace
+        legal advice.</p></div>
+      <div class="card"><h3>No autonomous contact</h3><p>Requests are prepared with blanks for the
+        applicant to review and send. There is no contact, send, or submit endpoint.</p></div>
+      <div class="card"><h3>No evidence authentication</h3><p>Photo checks cover observable
+        framing only. Ready for review never means genuine, sufficient, approved, or accepted.</p></div>
+    </div>
+    <div class="callout danger narrow"><p><b>The PDF is a draft.</b> It is optional, not an agency
+      form, not submitted, and intentionally keeps every missing item visible.</p></div>
+  </div>
+</section>
+
 <section>
   <div class="wrap">
     <h2>What this build proves</h2>
@@ -178,6 +226,30 @@
         alert safeguards earlier.</p></div>
     </div>
     <p class="conformance-link"><a href="/sixty-days/conformance">Machine-checkable conformance report</a></p>
+  </div>
+</section>
+
+<section id="architecture">
+  <div class="wrap">
+    <div class="section-heading">
+      <div><p class="eyebrow">As-built architecture</p><h2>A bounded workflow with durable state</h2></div>
+      <p class="narrow">One Cloud Run service coordinates modular roles. Firestore stores structured
+        case and wake state; raw letters, photo bytes, and applicant narrative are omitted.</p>
+    </div>
+    <div class="architecture-map" aria-label="Sixty Days system architecture">
+      <div class="arch-node"><small>Inputs</small><strong>Synthetic letter and evidence</strong>
+        <span>Recorded Gemini outputs with adjacent ground truth</span></div>
+      <div class="arch-arrow" aria-hidden="true">&rarr;</div>
+      <div class="arch-node accent"><small>Cloud Run &middot; sixty-days</small>
+        <strong>Read, plan, schedule, screen, prepare, verify</strong>
+        <span>GenAI SDK, bounded routes, and the shared durable spine</span></div>
+      <div class="arch-arrow" aria-hidden="true">&rarr;</div>
+      <div class="arch-node"><small>Durable proof</small><strong>Firestore and Cloud Trace</strong>
+        <span>Cases, wakes, request status, packet metadata, and audit spans</span></div>
+    </div>
+    <p class="small muted narrow">Gemini 3.5 Flash and Gemma 4 MaaS are served from Vertex AI's
+      global endpoint. Identifiers are removed before structured downstream persistence. Storage
+      and compute are pinned to us-central1; model inference is not described as regional.</p>
   </div>
 </section>
 
@@ -207,9 +279,39 @@
       organizing draft for applicant review, not a required agency form.</p></div>
   </div>
 </section>
+
+<section id="faq">
+  <div class="wrap">
+    <h2>Questions a sceptic would ask</h2>
+    <details><summary>Does this file an appeal for me?</summary><p>No. It has no submission endpoint.
+      It prepares a reviewable draft and the applicant controls every external action.</p></details>
+    <details><summary>Does ready for review mean FEMA will accept the photo?</summary><p>No. It means
+      only that requested observable features are visible. Authenticity, sufficiency, and agency
+      acceptance are outside this system's scope.</p></details>
+    <details><summary>Why use a simulated clock?</summary><p>The demonstration compresses weeks into
+      minutes. The same durable wake registration and claim path runs on wall-clock time; the UI
+      labels every simulated advance.</p></details>
+    <details><summary>Where does AI make a decision?</summary><p>Gemini transcribes synthetic
+      documents and reports observable image features. Deterministic code verifies exact quotes,
+      routes requirements, schedules wakes, and preserves missing items.</p></details>
+    <details><summary>Is any real survivor information used?</summary><p>No. The fixtures are
+      synthetic and unbranded. The persistence layer also omits raw text, image bytes, names,
+      addresses, registration references, and applicant narrative.</p></details>
+    <details><summary>How can a judge verify the rules?</summary><p>The
+      <a href="/sixty-days/conformance">conformance report</a> maps each public rule to an official
+      source, implementation path, and passing test.</p></details>
+  </div>
+</section>
 </main>
 
-<footer class="site"><div class="wrap"><p>Built for the All Things Agentic Hackathon. Synthetic,
+<footer class="site"><div class="wrap">
+  <nav class="footer-links" aria-label="Project links">
+    <a href="https://github.com/usv240/sixty-days">Source code</a>
+    <a href="/judges">Judge brief</a>
+    <a href="/sixty-days/conformance">Conformance report</a>
+    <a href="https://day-three-109051079423.us-central1.run.app">Day Three</a>
+  </nav>
+  <p>Built for the All Things Agentic Hackathon. Synthetic,
 unbranded documents and images only. No government agency endorses this project.</p></div></footer>
 <script src="/static/sixty-days.js"></script>
 </body>

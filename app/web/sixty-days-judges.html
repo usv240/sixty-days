@@ -3,62 +3,117 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Sixty Days: for judges</title>
-<meta name="description" content="Deployment proof, measured evidence, safety limits, and reproduction steps for Sixty Days.">
+<meta name="theme-color" content="#f7f9fc">
+<title>Sixty Days: evidence for judges</title>
+<meta name="description" content="Rubric map, deployment proof, measured evidence, limits, and reproduction steps for Sixty Days.">
 <link rel="stylesheet" href="/static/styles.css">
 </head>
 <body>
 <a class="skip-link" href="#main">Skip to main content</a>
 <header class="site">
   <div class="wrap bar">
-    <div class="brand">Sixty Days <span>&mdash; for judges</span></div>
-    <nav aria-label="Pages"><a href="/">Sixty Days</a><a href="/sixty-days/conformance">Conformance</a></nav>
+    <div class="brand">Sixty Days <span>&mdash; judge evidence</span></div>
+    <nav aria-label="Judge sections"><a href="/">Product</a><a href="#rubric">Rubric</a><a href="#requirements">Requirements</a><a href="#proof">Proof</a><a href="#reproduce">Reproduce</a><a href="#limits">Limits</a></nav>
     <button class="theme-toggle" id="theme-toggle" aria-pressed="false">Use dark mode</button>
   </div>
 </header>
+
 <main id="main">
 <section class="hero"><div class="wrap">
-  <p class="eyebrow">The Taskmaster</p>
+  <p class="eyebrow">The Taskmaster &middot; Deployed on Google Cloud</p>
   <h1>A deadline keeper, not an appeal decider.</h1>
-  <p class="lede narrow">This deployed workflow reads a synthetic decision letter, derives the
-  deadline, routes supporting-document requirements, checks observable photo framing, prepares
-  applicant-controlled requests, and renders an optional draft packet.</p>
-  <div class="callout ok narrow"><p><b>Live proof:</b> 23/23 public acceptance checks, 20/20
-  recorded letter fields, 6/6 recorded evidence checks, and the shared 10/10 exit test.</p></div>
-</div></section>
-<section><div class="wrap">
-  <h2>What is real</h2>
-  <div class="grid-3">
-    <div class="card"><h3>Four letters</h3><p>Four genuine recorded Gemini 3.5 Flash calls are
-    graded against adjacent truth. Applicant names and FEMA registration references are redacted.</p></div>
-    <div class="card"><h3>Evidence and packet</h3><p>Observable framing checks return retake,
-    manual review, or ready for applicant review. The PDF is explicitly not submitted.</p></div>
-    <div class="card"><h3>Durable clock</h3><p>Eight deterministic wakes cover the deadline.
-    Due actions are recorded idempotently; no insurer, agency, or other third party is contacted.</p></div>
+  <p class="lede narrow">Sixty Days reads a synthetic disaster-assistance decision letter,
+    preserves the exact stated reason, organizes supporting evidence, prepares applicant-controlled
+    requests, tracks the deadline, and builds a reviewable draft packet. It never sends or submits.</p>
+  <div class="judge-metrics" aria-label="Verified project evidence">
+    <div class="judge-metric"><strong>23 / 23</strong><span>live acceptance flow</span></div>
+    <div class="judge-metric"><strong>187</strong><span>standalone tests</span></div>
+    <div class="judge-metric"><strong>20 / 20</strong><span>recorded letter fields</span></div>
+    <div class="judge-metric"><strong>6 / 6</strong><span>recorded evidence checks</span></div>
   </div>
+  <div class="callout ok narrow"><p><b>Public proof:</b> the shared end-to-end exit test also passes
+    10/10. Open the <a href="https://sixty-days-109051079423.us-central1.run.app">live product</a>
+    or inspect the <a href="https://github.com/usv240/sixty-days">public repository</a>.</p></div>
 </div></section>
-<section><div class="wrap">
-  <h2>Safety and claim boundaries</h2>
+
+<section id="rubric"><div class="wrap">
+  <div class="section-heading"><div><p class="eyebrow">Evaluation map</p><h2>Where each scoring claim is proven</h2></div><p class="narrow">Claims below point to executable behavior, measured recordings, or an explicit boundary.</p></div>
+  <div class="table-scroll" tabindex="0" aria-label="Rubric evidence table"><table>
+    <thead><tr><th>Criterion</th><th>What is distinctive</th><th>Evidence</th></tr></thead>
+    <tbody>
+      <tr><td><b>Innovation</b></td><td>A standing 60-day watch converts one letter into an eight-wake plan, evidence routes, and a partial-safe packet.</td><td>Run the four-stage console; inspect <code>sixty_days/deadline.py</code> and <code>packet.py</code>.</td></tr>
+      <tr><td><b>Taskmaster fit</b></td><td>The workflow completes connected work: understand, gather, track, and review, while preserving applicant control.</td><td>The public acceptance script verifies 23 linked behaviors.</td></tr>
+      <tr><td><b>Architecture</b></td><td>Gemini readers and evidence checks sit behind typed routes, deterministic clocks, durable Firestore state, redaction, and independent verification.</td><td>Architecture below, conformance report, and standalone test suite.</td></tr>
+      <tr><td><b>Production readiness</b></td><td>Deployed service, bounded autoscaling, health endpoint, structured observability, measured fixtures, accessibility gate, and replayable demo.</td><td>Live URL, Cloud Run facts, recording reports, and reproduction commands.</td></tr>
+    </tbody>
+  </table></div>
+</div></section>
+
+<section id="requirements"><div class="wrap">
+  <div class="section-heading"><div><p class="eyebrow">Mandatory technology</p><h2>Requirements are visible in the execution path</h2></div></div>
+  <div class="grid-3">
+    <div class="card"><h3>Gemini 3.5 Flash</h3><p>Vertex AI powers decision-letter transcription and observable evidence-photo checks. Four letter calls and two evidence calls are recorded and graded against adjacent truth.</p></div>
+    <div class="card"><h3>Google GenAI SDK</h3><p>The reader and recording scripts use the Google GenAI SDK with structured outputs. Deterministic fixture replay keeps public judging repeatable.</p></div>
+    <div class="card"><h3>Google Cloud</h3><p>Cloud Run serves the application; Firestore holds structured cases and wakes; Cloud Scheduler drives the shared due-wake worker; Cloud Trace receives spans.</p></div>
+  </div>
+  <div class="callout narrow"><p><b>Additional Google model:</b> Gemma 4 provides in-process identifier redaction before model-bound text leaves the trust boundary. Pattern checks remain as a deterministic backstop.</p></div>
+</div></section>
+
+<section id="proof"><div class="wrap">
+  <div class="section-heading"><div><p class="eyebrow">Deployment proof</p><h2>What is live, and what is shared</h2></div><p class="narrow">The product service and the scheduler worker are named separately to avoid implying a boundary that does not exist.</p></div>
+  <div class="architecture-map" role="img" aria-label="Decision letter and evidence enter the Sixty Days Cloud Run service, which uses Gemini and Gemma through Vertex AI, stores structured state in Firestore, receives due wake claims from a shared scheduler worker, and emits Cloud Trace spans.">
+    <div class="arch-node"><b>Synthetic inputs</b><span>Letters and evidence images</span></div><span class="arch-arrow" aria-hidden="true">&rarr;</span>
+    <div class="arch-node"><b>Cloud Run: sixty-days</b><span>Typed workflow and safety boundaries</span></div><span class="arch-arrow" aria-hidden="true">&rarr;</span>
+    <div class="arch-node"><b>Vertex AI + Firestore</b><span>Models, durable cases, wakes, and traces</span></div>
+  </div>
   <ul>
-    <li>Synthetic, unbranded fixtures only; no real survivor data.</li>
-    <li>No legal advice, eligibility prediction, autonomous sending, or submission endpoint.</li>
-    <li>FEMA says an appeal letter or form can be optional; the PDF is an organizing draft.</li>
-    <li>Provisioned service-account roles are not described as per-agent runtime identities.</li>
+    <li><b>Service:</b> <code>sixty-days</code> in <code>us-central1</code>, bounded to three instances and running as <code>sa-reason</code>.</li>
+    <li><b>Scheduler:</b> <code>spine-scan-due</code> invokes the shared spine worker, which claims due wakes from the same Firestore substrate. It is not represented as a second Sixty Days service.</li>
+    <li><b>Acceptance:</b> <code>scripts/sixty_days_demo_flow.py</code> performs 23 public HTTP checks; <code>/exit-test</code> exercises the shared 10-stage substrate.</li>
+    <li><b>Measured fixtures:</b> truth sits next to every synthetic input. Reports record 20/20 extracted fields and 6/6 evidence decisions.</li>
   </ul>
-  <p><a href="https://www.fema.gov/sites/default/files/documents/fema_ia-quick-reference_appeals.pdf">Current FEMA appeal quick reference</a>
-  &middot; <a href="https://www.gao.gov/products/gao-20-503">GAO-20-503</a></p>
+  <p><a href="/sixty-days/conformance">Open the machine-checkable conformance report</a>.</p>
 </div></section>
-<section><div class="wrap">
-  <h2>Reproduce</h2>
+
+<section id="reproduce"><div class="wrap">
+  <div class="section-heading"><div><p class="eyebrow">Reproducibility</p><h2>Run the same gates locally</h2></div></div>
   <pre><code>cd app
+python -m venv .venv
+.venv/bin/pip install -e ".[dev]"
 python -m pytest -q
 python scripts/check_a11y.py
 python scripts/sixty_days_demo_flow.py --url https://SERVICE_URL
 curl -X POST -H "Content-Type: application/json" -d '{}' https://SERVICE_URL/exit-test</code></pre>
+  <p>The expected standalone baseline is <b>187 tests</b>. Deployment and credentials are documented in the repository README and <code>deploy.sh</code>.</p>
+</div></section>
+
+<section id="findings"><div class="wrap">
+  <div class="section-heading"><div><p class="eyebrow">Findings and learnings</p><h2>The hard parts were trust boundaries, not prose generation</h2></div></div>
+  <div class="grid-3">
+    <div class="card"><h3>Quote before reasoning</h3><p>Keeping the exact decision reason beside every action prevents a polished packet from drifting away from what the letter actually said.</p></div>
+    <div class="card"><h3>Audit the redaction artifact</h3><p>An audit found all-caps applicant names and FEMA registration references missing from an older pattern set. Regression tests now enforce <code>PERSON</code> and <code>CASE_REF</code> coverage.</p></div>
+    <div class="card"><h3>Partial is safer than false-complete</h3><p>A packet may be generated with missing items visibly listed. The verifier refuses to turn absence into a confident claim.</p></div>
+  </div>
+</div></section>
+
+<section id="limits"><div class="wrap">
+  <div class="section-heading"><div><p class="eyebrow">Limits</p><h2>Deliberate non-capabilities</h2></div></div>
+  <ul>
+    <li>Synthetic, unbranded fixtures only; no real survivor data is used.</li>
+    <li>No legal advice, eligibility prediction, appeal strategy, or outcome forecast.</li>
+    <li>No insurer, agency, records office, or other third party is contacted.</li>
+    <li>No send or submission endpoint exists. The applicant reviews and controls every external action.</li>
+    <li>Photo checks are limited to observable framing and legibility, never damage valuation.</li>
+    <li>The generated PDF is an organizing draft, explicitly marked not submitted.</li>
+  </ul>
+  <p>Policy basis: <a href="https://www.fema.gov/sites/default/files/documents/fema_ia-quick-reference_appeals.pdf">FEMA appeal quick reference</a> and <a href="https://www.gao.gov/products/gao-20-503">GAO-20-503</a>.</p>
 </div></section>
 </main>
-<footer class="site"><div class="wrap"><p>Built for the All Things Agentic Hackathon. No government
-agency endorses this project.</p></div></footer>
+
+<footer class="site"><div class="wrap">
+  <p>Built for the All Things Agentic Hackathon. No government agency endorses this project.</p>
+  <div class="footer-links"><a href="https://github.com/usv240/sixty-days">GitHub</a><a href="/">Product</a><a href="/sixty-days/conformance">Conformance</a><a href="https://day-three-109051079423.us-central1.run.app">Day Three</a></div>
+</div></footer>
 <script>
 const toggle = document.querySelector("#theme-toggle");
 const themes = ["light", "dark"];

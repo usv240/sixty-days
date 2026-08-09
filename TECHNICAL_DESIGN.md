@@ -3,9 +3,10 @@
 **Status:** complete local build as of August 9, 2026. Read this with the repository-root
 `AS_BUILT.md`; executable tests and the deployed HTTP surface outrank narrative documents.
 
-Sixty Days shares the single `app/` service, deploy, Firestore project, clock, wake scheduler,
-redaction gate, verifier, tracing, and cost surface proven by Day Three. It is submitted separately
-in The Taskmaster category at its independent Cloud Run root.
+Sixty Days is a self-contained repository and independent `sixty-days` Cloud Run service. Its
+`app/spine/` is a reviewed snapshot of the same proven clock, wake, redaction, verification, and
+tracing substrate used by Day Three; it shares the Google Cloud project and Firestore substrate,
+not a product URL or repository. It is submitted separately in The Taskmaster category.
 
 ## 1. Product boundary
 
@@ -141,7 +142,8 @@ the partial-packet/final-alert safeguards move earlier. Third-party requests get
 - One submission-specific Cloud Run service. It uses the same tested container source and shared
   spine as Day Three, while exposing a distinct root, judges page, health identity, and URL.
 - Firestore for structured case/run/wake state.
-- Cloud Scheduler calls the scan-due route.
+- The existing `spine-scan-due` Cloud Scheduler job invokes a shared spine worker that claims due
+  wakes from the same Firestore substrate; it is not a second Sixty Days service.
 - Cloud Trace and Cloud Logging are wired and verified.
 - Vertex AI global endpoint serves Gemini and Gemma MaaS.
 - Five differentiated service accounts are provisioned as intended boundaries, but the deployed
@@ -194,5 +196,6 @@ python scripts/check_a11y.py
 python scripts/sixty_days_demo_flow.py --url https://SERVICE.run.app
 ```
 
-The local completion baseline is 279 tests, accessibility green, and 23/23 Sixty Days acceptance
-checks. Update these numbers only from real command output.
+The standalone completion baseline is 187 tests, accessibility green, and 23/23 Sixty Days
+acceptance checks. The combined integration workspace currently has 279 tests; never substitute
+that larger number for the standalone repository result. Update either number only from real output.

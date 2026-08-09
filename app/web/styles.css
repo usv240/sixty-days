@@ -393,6 +393,68 @@ footer.site {
 }
 .judge-hero h1 { max-width: none; }
 
+/* --- Architecture and evaluation proof -------------------------------- */
+
+.workflow-progress {
+  display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px;
+  list-style: none; margin: 0 0 18px; padding: 0;
+}
+.workflow-progress li {
+  position: relative; min-width: 0; padding: 13px 14px 13px 42px;
+  border: 1px solid var(--border); border-radius: 12px;
+  background: var(--surface); color: var(--text-muted); font-size: .8rem;
+}
+.workflow-progress li::before {
+  content: attr(data-step); position: absolute; left: 12px; top: 12px;
+  display: grid; place-items: center; width: 22px; height: 22px;
+  border-radius: 50%; background: var(--surface-2); color: var(--text);
+  font-weight: 760; font-variant-numeric: tabular-nums;
+}
+.workflow-progress li.is-active {
+  border-color: var(--accent); background: var(--accent-soft); color: var(--text);
+  box-shadow: 0 0 0 1px var(--accent);
+}
+.workflow-progress li.is-active::before,
+.workflow-progress li.is-complete::before {
+  background: var(--accent); color: var(--accent-text);
+}
+.workflow-progress b { display: block; color: var(--text); }
+
+.architecture-map {
+  display: grid; grid-template-columns: minmax(180px, 1fr) auto minmax(220px, 1.2fr) auto minmax(180px, 1fr);
+  align-items: stretch; gap: 12px; margin: 26px 0;
+}
+.arch-node {
+  display: flex; flex-direction: column; justify-content: center; min-width: 0;
+  padding: 20px; border: 1px solid var(--border); border-radius: var(--radius);
+  background: var(--surface); box-shadow: var(--shadow-soft);
+}
+.arch-node.accent {
+  border-color: color-mix(in srgb, var(--accent) 54%, var(--border));
+  background: var(--accent-soft);
+}
+.arch-node small {
+  color: var(--text-muted); font-size: .76rem; text-transform: uppercase;
+  letter-spacing: .07em; font-weight: 760;
+}
+.arch-node strong { margin: 5px 0; font-size: 1.02rem; }
+.arch-node span { color: var(--text-muted); font-size: .84rem; }
+.arch-arrow {
+  display: grid; place-items: center; color: var(--accent); font-weight: 800;
+  font-size: 1.35rem; min-width: 24px;
+}
+.judge-metrics {
+  display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-top: 26px;
+}
+.judge-metric {
+  padding: 18px; border: 1px solid var(--border); border-radius: var(--radius);
+  background: var(--surface); box-shadow: var(--shadow-soft);
+}
+.judge-metric b { display: block; color: var(--accent-strong); font-size: 1.45rem; }
+.judge-metric span { color: var(--text-muted); font-size: .8rem; }
+.footer-links { display: flex; flex-wrap: wrap; gap: 14px; margin-bottom: 12px; }
+.footer-links a { font-weight: 620; }
+
 @media (max-width: 900px) {
   .hero-layout { grid-template-columns: 1fr; gap: 32px; }
   .hero-proof { max-width: 620px; }
@@ -401,6 +463,10 @@ footer.site {
   .brand { width: 100%; }
   header.site nav { order: 3; width: 100%; overflow-x: auto; flex-wrap: nowrap; padding-bottom: 2px; }
   header.site nav a { white-space: nowrap; }
+  .architecture-map { grid-template-columns: 1fr; }
+  .arch-arrow { transform: rotate(90deg); min-height: 24px; }
+  .judge-metrics { grid-template-columns: 1fr 1fr; }
+  .workflow-progress { grid-template-columns: 1fr 1fr; }
 }
 
 @media (max-width: 620px) {
@@ -415,6 +481,7 @@ footer.site {
   .console-shell { padding: 10px; border-radius: 18px; }
   .stat-strip { display: grid; grid-template-columns: 1fr 1fr; }
   .stat { min-width: 0; }
+  .judge-metrics, .workflow-progress { grid-template-columns: 1fr; }
 }
 
 .sr-only {

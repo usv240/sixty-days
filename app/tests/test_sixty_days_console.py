@@ -14,6 +14,10 @@ def test_console_has_keyboard_reachable_controls_and_live_status():
         assert f'id="{element_id}"' in html
     assert 'aria-live="polite"' in html
     assert 'href="#main"' in html
+    for section_id in ("problem", "workflow", "console", "limits", "architecture", "faq"):
+        assert f'id="{section_id}"' in html
+    assert 'class="workflow-progress"' in html
+    assert "github.com/usv240/sixty-days" in html
 
 
 def test_console_states_the_safety_boundary_plainly():
@@ -43,6 +47,19 @@ def test_console_uses_the_measured_catalogue_not_a_hard_coded_score():
 def test_console_has_no_mojibake_and_distinguishes_review_from_acceptance():
     html = (WEB / "sixty-days.html").read_text(encoding="utf-8")
     script = (WEB / "sixty-days.js").read_text(encoding="utf-8")
+    judges = (WEB / "sixty-days-judges.html").read_text(encoding="utf-8")
+    for evidence in (
+        "Evaluation map",
+        "Mandatory technology",
+        "Deployment proof",
+        "Findings and learnings",
+        "Deliberate non-capabilities",
+        "187 tests",
+        "sixty-days-109051079423.us-central1.run.app",
+        "github.com/usv240/sixty-days",
+    ):
+        assert evidence in judges
+    assert "Service:</b> <code>spine</code>" not in judges
     assert "â" not in html + script
     assert "ready for applicant review" in html
     assert "never “FEMA will accept this.”" in html

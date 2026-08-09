@@ -1,0 +1,11 @@
+flowchart LR
+    A[Synthetic letter and evidence] --> B[Cloud Run: sixty-days]
+    B --> L[Letter reader and redaction]
+    L --> D[Deadline and requirement router]
+    D --> E[Evidence check and request preparation]
+    E --> P[Packet builder and verifier]
+    B <--> F[(Firestore: structured cases, requirements, wakes)]
+    L --> V[Vertex AI: Gemini 3.5 Flash and Gemma 4 MaaS]
+    S[Shared Cloud Scheduler worker] --> F
+    B --> T[Cloud Trace and Logging]
+    P --> H[Applicant-reviewed draft]

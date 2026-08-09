@@ -31,6 +31,16 @@ const stream = $("#stream");
 let runId = null;
 let currentCase = null;
 
+function setProgress(stage, finished = false) {
+  document.querySelectorAll("#workflow-progress li").forEach((item, index) => {
+    const number = index + 1;
+    item.classList.toggle("is-complete", number < stage || (finished && number <= stage));
+    item.classList.toggle("is-active", number === stage && !finished);
+    if (number === stage && !finished) item.setAttribute("aria-current", "step");
+    else item.removeAttribute("aria-current");
+  });
+}
+
 function log(agent, message, why = "", tone = "") {
   const event = document.createElement("div");
   event.className = `event ${tone}`;
@@ -155,6 +165,7 @@ $("#btn-open").addEventListener("click", async () => {
   for (const button of ["#btn-day3", "#btn-day52", "#btn-day58", "#btn-packet", "#btn-pdf"]) {
     $(button).disabled = false;
   }
+  setProgress(2);
 });
 
 $("#btn-screen").addEventListener("click", async () => {
@@ -172,6 +183,7 @@ $("#btn-screen").addEventListener("click", async () => {
   }
   const tone = data.decision === "ready_for_review" ? "accept" : "reject";
   log("evidence checker", data.decision.replaceAll("_", " "), data.guidance, tone);
+  setProgress(3);
 });
 
 $("#btn-prepare").addEventListener("click", async () => {
@@ -193,6 +205,7 @@ $("#btn-prepare").addEventListener("click", async () => {
   log("request preparer", "Draft prepared; nothing was sent.",
       `The applicant sends it. A no-reply check is registered for ${data.tracking.due_at}.`,
       "accept");
+  setProgress(4);
 });
 
 async function packetBody() {
@@ -209,6 +222,7 @@ $("#btn-packet").addEventListener("click", async () => {
     log("packet builder", data.detail || "Packet build failed.", "", "reject");
     return;
   }
+  setProgress(4, true);
   $("#packet-status").textContent = data.missing.length
     ? `Partial draft: ${data.missing.length} item(s) still listed as missing.`
     : "Draft ready for the applicant’s page-by-page review.";

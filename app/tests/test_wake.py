@@ -83,7 +83,7 @@ def test_wake_ids_are_stable_and_distinct():
 
 
 def test_a_wake_is_claimed_by_exactly_one_worker(clock):
-    """Duplicate delivery must not page a pharmacist twice."""
+    """Duplicate delivery must not prepare the same pharmacist escalation twice."""
     store = MemoryWakeStore()
     worker_a = WakeScheduler(store, clock)
     worker_b = WakeScheduler(store, clock)
