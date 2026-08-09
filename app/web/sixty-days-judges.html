@@ -27,13 +27,25 @@
     requests, tracks the deadline, and builds a reviewable draft packet. It never sends or submits.</p>
   <div class="judge-metrics" aria-label="Verified project evidence">
     <div class="judge-metric"><strong>23 / 23</strong><span>live acceptance flow</span></div>
-    <div class="judge-metric"><strong>187</strong><span>standalone tests</span></div>
+    <div class="judge-metric"><strong>190</strong><span>standalone tests</span></div>
     <div class="judge-metric"><strong>20 / 20</strong><span>recorded letter fields</span></div>
     <div class="judge-metric"><strong>6 / 6</strong><span>recorded evidence checks</span></div>
   </div>
-  <div class="callout ok narrow"><p><b>Public proof:</b> the shared end-to-end exit test also passes
-    10/10. Open the <a href="https://sixty-days-109051079423.us-central1.run.app">live product</a>
+  <div class="callout ok narrow"><p><b>Public proof:</b> the shared-substrate exit test passes
+    10/10, separately from the product-specific 23-step flow. Open the
+    <a href="https://sixty-days-109051079423.us-central1.run.app">live product</a>
     or inspect the <a href="https://github.com/usv240/sixty-days">public repository</a>.</p></div>
+  <div class="evaluator-path" aria-labelledby="fast-path-title">
+    <h2 id="fast-path-title">If you have sixty seconds</h2>
+    <p>Start the guided preset, inspect its eight registered wakes, compare the close and wide
+      evidence fixtures, and build a visibly partial packet. Then open the conformance map for the
+      official-source-to-code-to-test chain.</p>
+    <div class="evaluator-actions">
+      <a href="/#console">Run the guided workflow</a>
+      <a href="/sixty-days/conformance">Open conformance</a>
+      <a href="https://github.com/usv240/sixty-days">Inspect the repository</a>
+    </div>
+  </div>
 </div></section>
 
 <section id="rubric"><div class="wrap">
@@ -56,7 +68,12 @@
     <div class="card"><h3>Google GenAI SDK</h3><p>The reader and recording scripts use the Google GenAI SDK with structured outputs. Deterministic fixture replay keeps public judging repeatable.</p></div>
     <div class="card"><h3>Google Cloud</h3><p>Cloud Run serves the application; Firestore holds structured cases and wakes; Cloud Scheduler drives the shared due-wake worker; Cloud Trace receives spans.</p></div>
   </div>
-  <div class="callout narrow"><p><b>Additional Google model:</b> Gemma 4 provides in-process identifier redaction before model-bound text leaves the trust boundary. Pattern checks remain as a deterministic backstop.</p></div>
+  <div class="callout narrow"><p><b>Three additional Google models:</b> Gemma 4 reviews
+    already-pattern-redacted text for remaining person names; Gemini 3.1 Flash Image creates the
+    non-data-bearing first-use illustration; and Veo 3.1 Fast creates the optional four-second
+    motion briefing. Media prompts, model IDs, byte counts, and hashes are public in
+    <a href="/static/media/bonus-media-provenance.json">the provenance manifest</a>. Generated media
+    never becomes case evidence, enters a packet, or predicts an outcome.</p></div>
 </div></section>
 
 <section id="proof"><div class="wrap">
@@ -84,7 +101,7 @@ python -m pytest -q
 python scripts/check_a11y.py
 python scripts/sixty_days_demo_flow.py --url https://SERVICE_URL
 curl -X POST -H "Content-Type: application/json" -d '{}' https://SERVICE_URL/exit-test</code></pre>
-  <p>The expected standalone baseline is <b>187 tests</b>. Deployment and credentials are documented in the repository README and <code>deploy.sh</code>.</p>
+  <p>The expected standalone baseline is <b>190 tests</b>. Deployment and credentials are documented in the repository README and <code>deploy.sh</code>.</p>
 </div></section>
 
 <section id="findings"><div class="wrap">

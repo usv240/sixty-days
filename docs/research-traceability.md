@@ -31,7 +31,7 @@ the workflow stops for caseworker review rather than inventing a document reques
 
 - Four recorded Gemini letter calls grade 20/20 fields against adjacent synthetic truth.
 - Two recorded evidence-image calls grade 6/6 observable checks.
-- The standalone repository passes 187 tests.
+- The standalone repository passes 190 tests.
 - The deployed public acceptance flow passes 23/23.
 - The shared resilience exit test passes 10/10.
 

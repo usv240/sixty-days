@@ -10,7 +10,7 @@ service. Do not substitute the combined workspace's larger test count.
 - Judge evidence: `https://sixty-days-109051079423.us-central1.run.app/judges`
 - Public repository: `https://github.com/usv240/sixty-days`
 - Public acceptance: **23/23**
-- Standalone tests: **187 passed**
+- Standalone tests: **190 passed**
 - Recorded model measurements: **20/20 letter fields**, **6/6 evidence decisions**
 - Shared substrate exit test: **10/10**
 - Category: **The Taskmaster**
@@ -24,7 +24,7 @@ the backend runs on Google Cloud.
 ### Pre-flight
 
 1. Run `python scripts/sixty_days_demo_flow.py --url https://sixty-days-109051079423.us-central1.run.app` and save the 23/23 result.
-2. Run the standalone suite and accessibility gate; confirm 187 passing tests.
+2. Run the standalone suite and accessibility gate; confirm 190 passing tests.
 3. Use a fresh 1440x900 browser window, light theme, no bookmarks bar, and no extensions.
 4. Open the live app in the first tab and the `sixty-days` Cloud Run service in the second.
 5. Open Cloud Trace only if a fresh trace from this exact rehearsal has been inspected.
@@ -46,7 +46,7 @@ the backend runs on Google Cloud.
 | 2:04-2:28 | Prepare insurer request | “The agent prepares this insurer request and registers a no-reply wake. Notice the boundary: nothing was sent. The applicant reviews and sends every external request.” |
 | 2:28-2:53 | Build packet and download PDF | “The packet keeps the letter's exact reason next to the supporting evidence and lists anything still missing. A partial packet stays visibly partial. Current FEMA guidance also tells applicants to identify every submitted page, so this draft repeats its synthetic application and disaster references in every footer. It is explicitly marked draft and not submitted.” |
 | 2:53-3:14 | Advance simulated clock; show wake event | “Now time advances. The deadline watcher wakes, records the due action idempotently, and surfaces the missing work. That is asynchronous action over durable state, not a chat response.” |
-| 3:14-3:34 | Conformance and judge pages | “Every public rule links to an official FEMA source, implementation, and test. The standalone repository has one hundred and eighty-seven passing tests, a twenty-three-step live acceptance flow, and explicit legal and privacy boundaries.” |
+| 3:14-3:34 | Conformance and judge pages | “Every public rule links to an official FEMA source, implementation, and test. The standalone repository has one hundred and ninety passing tests, a twenty-three-step live acceptance flow, and explicit legal and privacy boundaries.” |
 | 3:34-3:52 | Cloud Run dashboard, service and revision visible | “This is the independent `sixty-days` Cloud Run service in `us-central1`, backed by Firestore, Vertex AI, Cloud Scheduler, and Cloud Trace. The public URL you just watched is this revision.” |
 
 Upload as **“Sixty Days - All Things Agentic Hackathon”**, public, with corrected English captions.
@@ -79,7 +79,7 @@ submits an appeal.
 
 ### Technologies
 
-Gemini 3.5 Flash and Gemma 4 MaaS through Vertex AI, Google GenAI SDK, FastAPI, Cloud Run,
+Gemini 3.5 Flash, Gemma 4 MaaS, Gemini 3.1 Flash Image, and Veo 3.1 Fast through Vertex AI, Google GenAI SDK, FastAPI, Cloud Run,
 Firestore, Cloud Scheduler, Cloud Trace/Logging, OpenTelemetry, Artifact Registry, and Cloud Build.
 Pub/Sub, autonomous third-party contact, and appeal submission are not part of the build.
 
@@ -110,8 +110,11 @@ no government agency endorses the project.
 - [ ] Live Cloud Run proof visible in the video
 - [x] Public hosted project, no credentials required
 - [x] Public standalone repository
-- [x] Reproducible README and architecture diagram
+- [x] Reproducible README and submission-ready architecture SVG
+- [x] Three additional Google model integrations with public prompts and hashes
 - [x] Feature, technology, data-source, findings, limitations, and disclosure copy
-- [x] 23/23 public acceptance, 187 tests, accessibility, and 10/10 exit test
+- [x] 23/23 public acceptance, 190 tests, accessibility, and 10/10 exit test
+- [ ] Publish docs/public-build-story.md and add its public URL
+- [ ] Publish docs/social-post.md with #AllThingsAgenticHackathon and add its public URL
 - [ ] Final link and citation check immediately before Devpost submission
 - [ ] Freeze the submitted revision and keep it available through judging

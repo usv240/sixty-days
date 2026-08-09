@@ -9,3 +9,5 @@ flowchart LR
     S[Shared Cloud Scheduler worker] --> F
     B --> T[Cloud Trace and Logging]
     P --> H[Applicant-reviewed draft]
+    M[Gemini 3.1 Flash Image and Veo 3.1 Fast] -. recorded at build time .-> O[Static onboarding media]
+    O -. outside case path .-> B

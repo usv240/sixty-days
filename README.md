@@ -16,7 +16,7 @@ prepares applicant-reviewable request drafts, and builds a partial-safe draft pa
 | Gate | Result |
 |---|---:|
 | Public acceptance flow | **23/23** |
-| Standalone tests | **187 passed** |
+| Standalone tests | **190 passed** |
 | Recorded letter fields | **20/20** |
 | Recorded evidence decisions | **6/6** |
 | Shared substrate exit test | **10/10** |
@@ -44,6 +44,11 @@ and deadline keeper, not a legal representative.
 
 ## Architecture
 
+![Sixty Days as-built architecture](docs/architecture.svg)
+
+The submission-ready SVG distinguishes the case workflow from recorded build-time onboarding
+media. The Mermaid source remains below for diffable architecture review.
+
 ```mermaid
 flowchart LR
     A[Synthetic letter and evidence] --> B[Cloud Run: sixty-days]
@@ -56,6 +61,8 @@ flowchart LR
     S[Shared Cloud Scheduler worker] --> F
     B --> T[Cloud Trace and Logging]
     P --> H[Applicant-reviewed draft]
+    M[Gemini 3.1 Flash Image and Veo 3.1 Fast] -. recorded at build time .-> O[Static onboarding media]
+    O -. outside case path .-> B
 ```
 
 The domain modules and copied spine execute in one `sixty-days` Cloud Run service. The
@@ -71,6 +78,10 @@ wall-clock time. A concurrent Day Three rehearsal therefore cannot move this clo
 Sixty Days demonstration wake.
 
 The source version of the diagram is in [`docs/architecture.mmd`](docs/architecture.mmd).
+
+The recorded media prompts, exact model IDs, byte counts, and SHA-256 hashes are in
+[the public provenance manifest](app/web/media/bonus-media-provenance.json).
+[BONUS_EVIDENCE.md](BONUS_EVIDENCE.md) maps every optional contribution to public proof.
 
 ## Reproduce locally
 

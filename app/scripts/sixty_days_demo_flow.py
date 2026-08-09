@@ -6,6 +6,7 @@
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import urllib.error
 import urllib.request
@@ -53,6 +54,14 @@ def main() -> int:
     parser.add_argument("--url", default="http://127.0.0.1:8080")
     args = parser.parse_args()
     api = API(args.url)
+
+    media = api.call("GET", "/static/media/bonus-media-provenance.json")
+    for record in (media["image"], media["video"]):
+        payload, _ = api.call_bytes("GET", f"/static/media/{record['asset']}")
+        if len(payload) != record["bytes"] or hashlib.sha256(payload).hexdigest() != record["sha256"]:
+            raise RuntimeError(f"bonus media integrity failed: {record['asset']}")
+    print("PASS  recorded Google onboarding media is public and hash-matched")
+
     checks = []
 
     def check(label: str, condition: bool, detail: str = "") -> None:

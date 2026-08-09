@@ -63,13 +63,16 @@ def test_console_has_no_mojibake_and_distinguishes_review_from_acceptance():
         "Deployment proof",
         "Findings and learnings",
         "Deliberate non-capabilities",
-        "187 tests",
+        "190 tests",
         "sixty-days-109051079423.us-central1.run.app",
         "github.com/usv240/sixty-days",
         "Research-to-design trace",
         "unsupported signed statement",
         "every page footer",
         "parallel rehearsal exposed a shared simulation clock",
+        "If you have sixty seconds",
+        "Gemini 3.1 Flash Image",
+        "Veo 3.1 Fast",
     ):
         assert evidence in judges
     assert "Service:</b> <code>spine</code>" not in judges

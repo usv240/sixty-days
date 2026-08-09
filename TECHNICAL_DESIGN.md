@@ -214,6 +214,6 @@ python scripts/check_a11y.py
 python scripts/sixty_days_demo_flow.py --url https://SERVICE.run.app
 ```
 
-The standalone completion baseline is 187 tests, accessibility green, and 23/23 Sixty Days
+The standalone completion baseline is 190 tests, accessibility green, and 23/23 Sixty Days
 acceptance checks. The combined integration workspace currently has 279 tests; never substitute
 that larger number for the standalone repository result. Update either number only from real output.

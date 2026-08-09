@@ -1,0 +1,21 @@
+{
+  "project": "Sixty Days",
+  "provider": "Google Vertex AI",
+  "image": {
+    "model": "gemini-3.1-flash-image",
+    "location": "global",
+    "prompt": "Create a premium editorial onboarding illustration for an applicant-controlled\ndisaster-assistance document workflow. Show an abstract decision letter, a durable calendar\ncheckpoint, a camera-framing card, and a clearly unfinished review packet moving along one calm\npath. Use warm ivory, deep navy, muted teal, and one restrained amber accent. Dimensional paper\nforms, wide 16:9 composition. No people, no damaged property, no government seals, no readable\ntext, no case numbers, no legal advice, no approval symbols, no logos, and no watermark.",
+    "asset": "sixty-days-visual-briefing.png",
+    "bytes": 1384003,
+    "sha256": "7e69fb0c185d202b4696a82990c83290ed0f658a9b31fa8d7545951a77b53fa1"
+  },
+  "recorded_at": "2026-08-09T22:56:36.779086+00:00",
+  "video": {
+    "model": "veo-3.1-fast-generate-001",
+    "location": "us-central1",
+    "prompt": "A four-second premium abstract workflow animation on a warm ivory background.\nAn unbranded letter opens, calendar checkpoints register, a camera-frame outline is checked, and\nan unfinished folder stops at a clear applicant review boundary. Deep navy, muted teal, restrained\namber, calm civic technology style, smooth slow camera motion. No people, no disaster spectacle,\nno readable text, no case numbers, no government marks, no approval stamp, no logo, no watermark,\nno audio.",
+    "asset": "sixty-days-deadline-briefing.mp4",
+    "bytes": 805684,
+    "sha256": "d6bdaa3139bde974874a33455a3ce41d9afced5c51e1f0890d442ae8b9a009cd"
+  }
+}
