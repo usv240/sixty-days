@@ -44,7 +44,7 @@ infrastructure reduces duplicated security and resilience logic.
 | Research basis | CDC stewardship guidance, CAH studies, low-isolate evidence, CLSI-oriented rules | FEMA appeal, ownership, occupancy, insurance, and page-identification guidance; GAO context |
 | Known domain limit | First ingested isolate can differ from earliest collected when reports arrive out of order | No legal or agency validation; photo checks cannot establish sufficiency or authenticity |
 | Public interface | Antibiogram and timed pharmacist-review console | Understand, Gather, Track, Review applicant console |
-| Public acceptance | 17-step Day Three flow | 23-step Sixty Days flow |
+| Public acceptance | 18-step Day Three flow | 24-step Sixty Days flow |
 | Deployment | day-three Cloud Run service and URL | sixty-days Cloud Run service and URL |
 | Repository | github.com/usv240/day-three | github.com/usv240/sixty-days |
 
@@ -58,7 +58,7 @@ Snapshot from the committed repositories:
 | Shared spine package | 10 Python files, 1,991 lines | 10 Python files, 1,991 lines |
 | Test suite | 15 Python files, 2,473 lines | 17 Python files, 2,282 lines |
 | Web surface | 5 files, 93,724 bytes | 4 files, 73,301 bytes |
-| Standalone test result | 201 passed | 202 passed |
+| Standalone test result | 201 passed | 205 passed |
 
 Line counts are descriptive evidence of separate implementation surfaces, not a quality score.
 

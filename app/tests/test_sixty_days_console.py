@@ -63,7 +63,7 @@ def test_console_has_no_mojibake_and_distinguishes_review_from_acceptance():
         "Deployment proof",
         "Findings and learnings",
         "Deliberate non-capabilities",
-        "202 tests",
+        "205 tests",
         "sixty-days-109051079423.us-central1.run.app",
         "github.com/usv240/sixty-days",
         "Research-to-design trace",
@@ -77,6 +77,6 @@ def test_console_has_no_mojibake_and_distinguishes_review_from_acceptance():
         assert evidence in judges
     assert "Service:</b> <code>spine</code>" not in judges
     assert "demo-prefixed packet references" in html
-    assert "â" not in html + script
+    assert "Ã¢" not in html + script
     assert "ready for applicant review" in html
-    assert "never “FEMA will accept this.”" in html
+    assert 'never “FEMA will accept this.”' in html

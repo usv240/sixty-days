@@ -38,8 +38,8 @@ The full source hierarchy and rejected claims are in
 |---|---:|---|
 | Recorded Gemini letter extraction | 20 of 20 fields | python scripts/record_letters.py and adjacent report |
 | Recorded evidence screening | 6 of 6 decisions | python scripts/record_evidence.py and adjacent report |
-| Standalone test suite | 202 passed | python -m pytest -q |
-| Public acceptance flow | 23 of 23 | python scripts/sixty_days_demo_flow.py with the public URL |
+| Standalone test suite | 205 passed | python -m pytest -q |
+| Public acceptance flow | 24 of 24 | python scripts/sixty_days_demo_flow.py with the public URL |
 | Shared-substrate exit test | 10 of 10 | POST /exit-test with an empty JSON body |
 | Accessibility gate | Pass in light and dark themes | python scripts/check_a11y.py |
 

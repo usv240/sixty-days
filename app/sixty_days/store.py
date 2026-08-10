@@ -114,6 +114,19 @@ class CaseStore:
 
         return self._mutate(case_id, change)
 
+    def record_due_action(self, case_id: str, action: dict[str, Any]) -> dict:
+        """Upsert a due action by wake id so a retry cannot duplicate visible work."""
+
+        def change(data: dict) -> None:
+            actions = [
+                item for item in data.get("due_actions", [])
+                if item.get("wake_id") != action["wake_id"]
+            ]
+            actions.append(dict(action))
+            data["due_actions"] = actions
+
+        return self._mutate(case_id, change)
+
     def _mutate(self, case_id: str, change) -> dict:
         document = self._collection.document(case_id)
         snapshot = document.get()

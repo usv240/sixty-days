@@ -98,6 +98,15 @@ def main() -> int:
 
     stored = api.call("GET", f"/sixty-days/cases/{opened['case_id']}")
     check("structured case persisted without raw transcript", "raw" not in stored and "transcription" not in stored)
+    advanced = api.call("POST", "/sim/advance", {"days": 38})
+    built = [wake for wake in advanced["woke"] if wake["kind"] == "build_partial"]
+    check(
+        "scheduled packet wake builds the partial packet automatically",
+        len(built) == 1
+        and built[0]["domain"]["action"] == "partial_packet_built"
+        and built[0]["domain"]["packet_status"] == "partial_draft",
+    )
+
 
     api.call("POST", "/sixty-days/demo/anchor", {"fixture": "damage_and_insurance"})
     damage = api.call("POST", "/sixty-days/cases", {

@@ -115,7 +115,7 @@ scheduler are disclosed in both repositories.
 
 Sixty Days has its own disaster-letter reader, deadline and requirement router, evidence-screening
 workflow, request preparation, partial-safe PDF builder, FEMA-oriented conformance, synthetic case
-fixtures, applicant boundary, repository, Cloud Run service, interface, and 23-step acceptance flow.
+fixtures, applicant boundary, repository, Cloud Run service, interface, and 24-step acceptance flow.
 Day Three has none of those domain modules.
 
 The two projects share infrastructure primitives. They do not claim separate infrastructure stacks,
@@ -124,7 +124,7 @@ and they do not solve the same user problem.
 ## Reproduce and inspect it
 
 The public repository contains the architecture SVG and Mermaid source, local and cloud spin-up
-instructions, truth-adjacent recordings, 202 standalone tests, a 23-step live acceptance flow,
+instructions, truth-adjacent recordings, 205 standalone tests, a 24-step live acceptance flow,
 accessibility checks, public conformance evidence, and the 10-clause shared-substrate exit test.
 
 Live product: https://sixty-days-109051079423.us-central1.run.app

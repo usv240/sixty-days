@@ -17,6 +17,6 @@ deployed from app/ without Day Three code.
 - Cloud Run service: sixty-days
 - Hosted URL: https://sixty-days-109051079423.us-central1.run.app
 - Public identity: sixty-days
-- Demo gate: 23/23
+- Demo gate: 24/24
 
 Initialize or push only after the independent test, accessibility, container, and demo gates pass.

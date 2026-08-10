@@ -19,10 +19,10 @@ decision.
 1. Press **Start guided demo with this letter**: the demo clock anchors to the synthetic letter date.
 2. Inspect the exact quoted decision reason, routed evidence needs, deadline, and eight registered wakes.
 3. Press **Screen close photo (expected retake)**: the observable framing check asks for a retake and selects the wider comparison.
-4. Screen the wider photo: it may become ready for applicant review, never “accepted by FEMA.”
+4. Screen the wider photo: it may become ready for applicant review, never "accepted by FEMA."
 5. Press **Prepare and track** using the clearly labelled do-not-send control, then inspect the draft with blanks and the no-reply wake.
 6. Add an applicant explanation, press **Check draft packet**, and download the clearly marked draft PDF.
-7. Advance the simulated days: watch the same durable wake path surface deadline work.
+7. Advance the simulated days: watch the scheduled safeguard build a partial packet snapshot automatically while preserving every missing item.
 
 Everything needed for the walkthrough is preset on the frontend. Disabled controls unlock only when
 their prerequisites exist, so the judge can follow the numbered stages without guessing.
@@ -31,8 +31,8 @@ their prerequisites exist, so the judge can follow the numbered stages without g
 
 | Gate | Reproducible result |
 |---|---:|
-| Deployed public acceptance flow | **23/23** |
-| Standalone automated tests | **202 passed** |
+| Deployed public acceptance flow | **24/24** |
+| Standalone automated tests | **205 passed** |
 | Recorded letter fields | **20/20** |
 | Recorded evidence decisions | **6/6** |
 | Shared-substrate exit test | **10/10** |
@@ -59,7 +59,7 @@ lawyer, caseworker, insurer, or filing service.
 | **2. Gather** | Routes ownership, occupancy, insurance, or damage evidence and checks only observable photo framing and legibility. | No photo is called authentic, sufficient, causal, valued, or agency-approved. |
 | **3. Track** | Prepares a records-request draft and registers a no-reply wake. | The applicant reviews and sends it; the service has no contact or send route. |
 | **4. Review** | Builds a partial-safe draft packet, repeats synthetic references in each footer, and lists every missing item. | The applicant verifies the draft and decides what, if anything, to submit. |
-| **5. Wake** | Registers the full day-3 through day-58 ladder up front and resumes only when work is due. | The app never claims a wake is an official filing or extension. |
+| **5. Wake** | Registers the full day-3 through day-58 ladder up front. Due wakes create typed case actions; the packet safeguard builds a partial snapshot from accepted evidence automatically. | No wake contacts a third party, submits a packet, or claims an official filing or extension. |
 | **6. Verify** | Rejects unsupported quotes, real-looking identifiers, and overconfident evidence claims. | It does not interpret law, predict eligibility, or forecast appeal success. |
 
 ## Architecture
@@ -79,6 +79,8 @@ flowchart LR
     B <--> F[(Firestore: structured cases, requirements, wakes)]
     L --> V[Vertex AI: Gemini 3.5 Flash and Gemma 4 MaaS]
     S[Shared Cloud Scheduler worker] --> F
+    F --> X[Deadline action executor]
+    X --> P
     B --> T[Cloud Trace and Logging]
     P --> H[Applicant-reviewed draft]
     M[Gemini 3.1 Flash Image and Veo 3.1 Fast] -. recorded at build time .-> O[Static onboarding media]
@@ -87,8 +89,9 @@ flowchart LR
 
 The domain modules and copied spine run inside one `sixty-days` Cloud Run service. It is not a fleet of
 pretend microservices. The shared `spine-scan-due` scheduler invokes a worker that claims due wakes
-from Firestore. Raw letter text, image bytes, and applicant narrative are deliberately omitted from
-durable case records.
+from Firestore. Each claimed wake creates one idempotent, typed case action. The packet safeguard
+actually builds and records a partial packet snapshot; no action sends or submits. Raw letter text,
+image bytes, and applicant narrative are deliberately omitted from durable case records.
 
 Only explicit `DEMO-*` application references and `DR-DEMO*` disaster references are accepted by
 the public packet workflow. Day Three and Sixty Days share durable infrastructure, but their public
@@ -119,7 +122,7 @@ hashes are public, and none of them creates evidence or makes an appeal decision
 - No legal advice, eligibility prediction, appeal strategy, or outcome forecast.
 - No send, contact, or submission endpoint; the applicant controls every external action.
 - Evidence screening is limited to observable framing and legibility, never authenticity or damage valuation.
-- A “ready for applicant review” result is not a claim that an agency will accept the evidence.
+- A "ready for applicant review" result is not a claim that an agency will accept the evidence.
 - Partial packets remain visibly partial; missing evidence is never converted into confidence.
 - The appeal letter or form remains optional, in line with the reviewed FEMA guidance.
 - Raw letters, photos, transcriptions, and applicant free text are omitted from Firestore.
@@ -134,7 +137,7 @@ the problem context. It is never presented as a current denial rate.
 ### Complete source list
 
 1. [FEMA: Individual Assistance Appeals Quick Reference](https://www.fema.gov/sites/default/files/documents/fema_ia-quick-reference_appeals.pdf) describes the 60-day appeal window, supporting-document examples, and an optional appeal form or letter; Sixty Days neither files nor calls its PDF official.
-2. [FEMA: 8 Tips for Appealing FEMA’s Decision](https://www.fema.gov/fact-sheet/8-tips-appealing-femas-decision-1) says the decision letter explains the reason and relevant documents; every routed requirement therefore begins with an exact verified quote.
+2. [FEMA: 8 Tips for Appealing FEMA's Decision](https://www.fema.gov/fact-sheet/8-tips-appealing-femas-decision-1) says the decision letter explains the reason and relevant documents; every routed requirement therefore begins with an exact verified quote.
 3. [FEMA: Verifying Home Ownership or Occupancy](https://www.fema.gov/fact-sheet/verifying-home-ownership-or-occupancy) lists multiple records and date contexts; the planner offers examples without calling any one document sufficient.
 4. [FEMA: Help for Survivors with Insurance](https://www.fema.gov/sites/default/files/documents/fema_insurance_qrg_20241010.pdf) distinguishes settlement information, denials, and policy evidence of exclusions or absent coverage; the applicant, not the service, contacts the insurer.
 5. [FEMA: IHP Application, Eligibility, Registration and Appeals](https://www.fema.gov/fact-sheet/fema-individuals-and-households-program-application-eligibility-registration-and-appeals) instructs applicants to put application and disaster references on submitted pages; the draft repeats validated synthetic references and asks the applicant to verify them.
@@ -168,7 +171,7 @@ curl -X POST -H "Content-Type: application/json" -d '{}' http://127.0.0.1:8000/e
 ```
 
 The guided control calls `/sixty-days/demo/anchor` before opening the selected fixture. It freezes
-the labelled simulation at that letter’s date without deleting case, wake, or audit records, so the
+the labelled simulation at that letter's date without deleting case, wake, or audit records, so the
 day-3 through day-58 sequence stays reproducible during judging. The close-photo preset automatically
 selects the wider comparison after the expected retake.
 

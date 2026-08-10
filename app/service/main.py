@@ -37,6 +37,8 @@ from spine.state import Runner, RunStatus, StepDef
 from spine.untrusted import prepare
 from spine.verify import Claim, ClaimKind, SourceRef, Verifier
 from spine.wake import Wake, WakeScheduler, WakeStatus
+from sixty_days.store import CaseStore
+from sixty_days.wake_actions import DeadlineActionExecutor
 
 settings = load_settings()
 settings.assert_region_pinned()
@@ -76,6 +78,7 @@ def record_due_action(wake: Wake) -> None:
     consume this due-action state under their own human-review boundaries.
     """
     with span("wake", "dispatch", **{"wake.id": wake.wake_id, "wake.kind": wake.kind}):
+        domain = DeadlineActionExecutor(CaseStore(client)).execute(wake)
         client.collection("wake_actions").document(wake.wake_id).set({
             "wake_id": wake.wake_id,
             "run_id": wake.run_id,
@@ -85,6 +88,7 @@ def record_due_action(wake: Wake) -> None:
             "recorded_at": clock.now(),
             "status": "due_action_recorded",
             "external_side_effect": False,
+            "domain": domain,
         })
 
 
@@ -222,7 +226,17 @@ def sim_advance(request: AdvanceRequest) -> dict[str, Any]:
     return {
         "simulated_now": now.isoformat(),
         "advanced_by_hours": delta.total_seconds() / 3600,
-        "woke": [{"wake_id": w.wake_id, "kind": w.kind, "run_id": w.run_id} for w in fired],
+        "woke": [
+            {
+                "wake_id": w.wake_id,
+                "kind": w.kind,
+                "run_id": w.run_id,
+                "domain": (
+                    client.collection("wake_actions").document(w.wake_id).get().to_dict() or {}
+                ).get("domain", {}),
+            }
+            for w in fired
+        ],
     }
 
 

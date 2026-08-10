@@ -27,8 +27,8 @@ street addresses, and PO boxes.
 
 Current proof:
 
-- 202 standalone tests
-- 23 of 23 public acceptance checks
+- 205 standalone tests
+- 24 of 24 public acceptance checks
 - 20 of 20 recorded letter fields
 - 6 of 6 recorded evidence decisions
 - 10 of 10 shared-substrate exit-test clauses
@@ -51,7 +51,7 @@ I created this post for the purposes of entering the All Things Agentic Hackatho
 
 Sixty Days is a deployed deadline agent for synthetic disaster-assistance appeals. It quotes the
 letter, registers eight wakes, prepares applicant-controlled requests, and keeps partial packets
-visibly partial. It never sends or submits. Proven by 202 tests and a 23 of 23 public flow.
+visibly partial. It never sends or submits. Proven by 205 tests and a 24 of 24 public flow.
 
 Live: https://sixty-days-109051079423.us-central1.run.app
 

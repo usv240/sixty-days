@@ -11,8 +11,8 @@ service. Do not substitute the larger combined-workspace count.
 - Conformance evidence: `https://sixty-days-109051079423.us-central1.run.app/sixty-days/conformance`
 - Public repository: `https://github.com/usv240/sixty-days`
 - Category: The Taskmaster
-- Public acceptance flow: 23/23
-- Standalone tests: 202 passed
+- Public acceptance flow: 24/24
+- Standalone tests: 205 passed
 - Recorded letter extraction: 20/20 fields
 - Recorded evidence screening: 6/6 decisions
 - Shared-substrate exit test: 10/10
@@ -37,8 +37,8 @@ edited around it, but the proof-of-action sequence should not be cut.
 
 1. From `app/`, run:
    `python scripts/sixty_days_demo_flow.py --url https://sixty-days-109051079423.us-central1.run.app`
-   and save the 23/23 result.
-2. Run `python -m pytest -q` and confirm 202 passed.
+   and save the 24/24 result.
+2. Run `python -m pytest -q` and confirm 205 passed.
 3. Run `python scripts/check_a11y.py` and confirm both themes pass.
 4. Use a fresh 1440 by 900 browser window in light mode. Hide bookmarks, extensions, notifications,
    personal accounts, and unrelated tabs.
@@ -64,8 +64,8 @@ Timings are targets. Keep at least five seconds of final margin.
 | 1:30 to 1:58 | Press **Screen close photo**, then screen the automatically selected wider comparison | "The close image receives an actionable retake because the requested context is missing. The wider comparison becomes ready for applicant review. That phrase is deliberate. The system checks only framing and legibility. It does not authenticate evidence, value damage, or predict agency acceptance. Two recorded calls score six out of six decisions." |
 | 1:58 to 2:20 | Prepare the insurer request | "The agent prepares an insurer request with blanks and registers a no-reply wake. Nothing is sent. The applicant reviews and sends every external request, and the service has no send endpoint." |
 | 2:20 to 2:48 | Add the applicant statement, check the packet, and download the PDF | "The packet keeps the letter's quoted reason beside the evidence and lists everything still missing. Every page repeats validated synthetic application and disaster references for applicant verification. The PDF is clearly marked draft, optional, and not submitted." |
-| 2:48 to 3:08 | Advance the simulated days and show the wake in the audit trail | "Now time advances. The deadline keeper resumes from durable state, records the due action idempotently, and surfaces the remaining work. That is asynchronous action over time, not a chat response." |
-| 3:08 to 3:30 | Show the architecture diagram, then the judge evidence page | "One Cloud Run service coordinates bounded modules. Firestore stores structured cases and wakes, while raw letters, photo bytes, and applicant narrative are omitted. Gemini performs measured extraction, Gemma reviews redaction, and the Verifier rejects unsupported or empty quotes. The standalone repository passes two hundred and two tests." |
+| 2:48 to 3:08 | Advance the simulated days and show the automatic packet snapshot | "Now time advances. The deadline keeper resumes from durable state. At the packet safeguard, it actually runs the packet builder against accepted evidence, stores a visibly partial snapshot with everything missing, and does not send or submit. That is asynchronous action over time, not a chat response." |
+| 3:08 to 3:30 | Show the architecture diagram, then the judge evidence page | "One Cloud Run service coordinates bounded modules. Firestore stores structured cases and wakes, while raw letters, photo bytes, and applicant narrative are omitted. Gemini performs measured extraction, Gemma reviews redaction, and the Verifier rejects unsupported or empty quotes. The standalone repository passes two hundred and five tests." |
 | 3:30 to 3:52 | Show the Cloud Run service, public URL, and current revision | "This is the independent sixty-days service running on Google Cloud in us-central1, with Firestore, Vertex AI, Cloud Scheduler, Cloud Trace, and scale-to-zero Cloud Run. The public URL you just watched is this deployed service." |
 
 Upload publicly to YouTube or Vimeo with the title:
@@ -178,8 +178,8 @@ No government agency endorses this project.
 - [x] README with local setup and deployment instructions
 - [x] Submission-ready architecture SVG and Mermaid source
 - [x] Three additional Google model integrations with public provenance
-- [x] 23/23 public acceptance flow
-- [x] 202 standalone tests
+- [x] 24/24 public acceptance flow
+- [x] 205 standalone tests
 - [x] 20/20 letter fields and 6/6 evidence decisions
 - [x] Accessibility gate and 10/10 exit test
 - [ ] Public build story URL added to Devpost

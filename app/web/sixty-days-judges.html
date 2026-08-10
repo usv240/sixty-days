@@ -12,7 +12,7 @@
 <a class="skip-link" href="#main">Skip to main content</a>
 <header class="site">
   <div class="wrap bar">
-    <div class="brand">Sixty Days <span>&mdash; judge evidence</span></div>
+    <div class="brand">Sixty Days <span>- judge evidence</span></div>
     <nav aria-label="Judge sections"><a href="/">Product</a><a href="#rubric">Rubric</a><a href="#requirements">Requirements</a><a href="#proof">Proof</a><a href="#reproduce">Reproduce</a><a href="#sources">Research</a><a href="#limits">Limits</a></nav>
     <button class="theme-toggle" id="theme-toggle" aria-pressed="false">Use dark mode</button>
   </div>
@@ -32,14 +32,14 @@
     <div class="judge-metric"><strong>6 / 6</strong><span>recorded evidence checks</span></div>
   </div>
   <div class="callout ok narrow"><p><b>Public proof:</b> the shared-substrate exit test passes
-    10/10, separately from the product-specific 23-step flow. Open the
+    10/10, separately from the product-specific 24-step flow. Open the
     <a href="https://sixty-days-109051079423.us-central1.run.app">live product</a>
     or inspect the <a href="https://github.com/usv240/sixty-days">public repository</a>.</p></div>
   <div class="evaluator-path" aria-labelledby="fast-path-title">
     <h2 id="fast-path-title">If you have sixty seconds</h2>
     <p>Start the guided preset, inspect its eight registered wakes, compare the close and wide
-      evidence fixtures, and build a visibly partial packet. Then open the conformance map for the
-      official-source-to-code-to-test chain.</p>
+      evidence fixtures, then advance time and watch the scheduled safeguard build a visibly partial
+      packet automatically. Open the conformance map for the official-source-to-code-to-test chain.</p>
     <div class="evaluator-actions">
       <a href="/#console">Run the guided workflow</a>
       <a href="/sixty-days/conformance">Open conformance</a>
@@ -53,7 +53,7 @@
   <div class="table-scroll" tabindex="0" aria-label="Rubric evidence table"><table>
     <thead><tr><th>Criterion</th><th>What is distinctive</th><th>Evidence</th></tr></thead>
     <tbody>
-      <tr><td><b>Innovation</b></td><td>A standing 60-day watch converts one letter into an eight-wake plan, evidence routes, and a partial-safe packet.</td><td>Run the four-stage console; inspect <code>sixty_days/deadline.py</code> and <code>packet.py</code>.</td></tr>
+      <tr><td><b>Innovation</b></td><td>A standing 60-day watch converts one letter into an eight-wake plan and evidence routes. When the packet safeguard becomes due, it executes PacketBuilder against current accepted evidence and stores a partial-safe snapshot without sending it.</td><td>Run the four-stage console; inspect <code>sixty_days/wake_actions.py</code>, <code>deadline.py</code>, and <code>packet.py</code>.</td></tr>
       <tr><td><b>Taskmaster fit</b></td><td>The workflow completes connected work: understand, gather, track, and review, while preserving applicant control.</td><td>The public acceptance script verifies 23 linked behaviors.</td></tr>
       <tr><td><b>Architecture</b></td><td>Gemini readers and evidence checks sit behind typed routes, deterministic clocks, durable Firestore state, redaction, and independent verification.</td><td>Architecture below, conformance report, and standalone test suite.</td></tr>
       <tr><td><b>Production readiness</b></td><td>Deployed service, bounded autoscaling, health endpoint, structured observability, measured fixtures, accessibility gate, and replayable demo.</td><td>Live URL, Cloud Run facts, recording reports, and reproduction commands.</td></tr>
@@ -101,7 +101,7 @@ python -m pytest -q
 python scripts/check_a11y.py
 python scripts/sixty_days_demo_flow.py --url https://SERVICE_URL
 curl -X POST -H "Content-Type: application/json" -d '{}' https://SERVICE_URL/exit-test</code></pre>
-  <p>The expected standalone baseline is <b>202 tests</b>. Deployment and credentials are documented in the repository README and <code>deploy.sh</code>.</p>
+  <p>The expected standalone baseline is <b>205 tests</b>. Deployment and credentials are documented in the repository README and <code>deploy.sh</code>.</p>
 </div></section>
 
 <section id="findings"><div class="wrap">

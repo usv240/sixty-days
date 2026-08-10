@@ -66,7 +66,7 @@ function addOptions(select, values) {
     option.value = typeof value === "string" ? value : value.key;
     option.textContent = typeof value === "string"
       ? value.replaceAll("_", " ")
-      : `${value.title} — ${value.routed_to}`;
+      : `${value.title} - ${value.routed_to}`;
     select.append(option);
   }
 }
@@ -323,8 +323,15 @@ async function advance(days, label) {
   const wakes = (data.woke || []).filter((wake) => wake.run_id === runId);
   if (!wakes.length) log("clock", `${label}: nothing due.`, "Silence is the expected state.");
   for (const wake of wakes) {
+    const domain = wake.domain || {};
     log("deadline keeper", `Woke itself: ${wake.kind}.`,
-        "The scheduler found this event due; nobody clicked an agent action.", "accept");
+        domain.detail || "The scheduler found this event due; nobody clicked an agent action.",
+        "accept");
+    if (domain.action === "partial_packet_built") {
+      $("#packet-status").textContent = `${domain.packet_status}: ${(domain.missing || []).join(" | ")}`;
+      log("packet builder", "Built the day-52 partial packet automatically.",
+          "The applicant still reviews it and nothing was submitted.", "accept");
+    }
   }
 }
 $("#btn-day3").addEventListener("click", () => advance(3, "Advanced 3 days"));

@@ -1,4 +1,4 @@
-# Sixty Days: Technical Design — As Built
+# Sixty Days: Technical Design â€" As Built
 
 **Status:** complete local build as of August 9, 2026. Read this with the repository-root
 `AS_BUILT.md`; executable tests and the deployed HTTP surface outrank narrative documents.
@@ -100,7 +100,7 @@ One Firestore document per case stores:
 
 The public API rejects references without those demo prefixes. The store deliberately omits raw
 letter text, model raw responses, photo bytes, photo transcriptions, real applicant
-names/addresses/registration numbers, and the applicant’s free-text packet statement. The
+names/addresses/registration numbers, and the applicant's free-text packet statement. The
 statement exists only long enough to render the response PDF.
 
 ## 5. Request preparation, never autonomous contact
@@ -120,7 +120,7 @@ for a survivor.
 ## 6. Packet grounding
 
 `DecisionLetterVerifier` is stricter than source existence. A system-authored sentence about the
-decision must reproduce one of the letter’s exact quoted reasons. A plausible paraphrase is
+decision must reproduce one of the letter's exact quoted reasons. A plausible paraphrase is
 rejected even when it cites a genuine letter artifact.
 
 The PDF:
@@ -138,9 +138,13 @@ dropped.
 ## 7. Deadline behavior
 
 The ladder is registered at case creation for days 3, 7, 14, 21, 30, 45, 52, and 58. If the
-letter’s printed deadline is earlier than letter date plus 60 days, the earlier date controls and
+letter's printed deadline is earlier than letter date plus 60 days, the earlier date controls and
 the partial-packet/final-alert safeguards move earlier. Third-party requests get their own
 21-day no-reply wake capped at the appeal deadline.
+
+A claimed wake is passed to `DeadlineActionExecutor` and becomes one idempotent, typed case action.
+At the packet safeguard, `PacketBuilder` runs against the accepted evidence that exists at that
+moment and records the resulting partial status and missing list. No wake contacts or submits.
 
 ## 8. Actual Google Cloud topology
 
@@ -157,8 +161,9 @@ the partial-packet/final-alert safeguards move earlier. Third-party requests get
 - Vertex AI global endpoint serves Gemini and Gemma MaaS.
 - Five differentiated service accounts are provisioned as intended boundaries, but the deployed
   service currently executes as `sa-reason`; do not claim per-agent runtime identity.
-- Pub/Sub is not provisioned and is not in the code. Scan-due claims and executes due wakes
-  directly.
+- Pub/Sub is not provisioned and is not in the code. Scan-due claims due wakes and invokes the
+  domain executor directly; every visible result is idempotent by wake ID and has
+  `external_side_effect: false`.
 - There is no Sixty Days Cloud Storage persistence, OpenFEMA ingestion, Secret Manager
   integration, or Veo explainer in this build.
 
@@ -187,8 +192,8 @@ There is deliberately no reset, delete, send, contact, submit, or close-as-submi
 
 - [FEMA Individual Assistance appeals quick reference](https://www.fema.gov/sites/default/files/documents/fema_ia-quick-reference_appeals.pdf)
   for the 60-day window, supporting-document examples, and the optional appeal form/letter.
-- [FEMA, 8 Tips for Appealing FEMA’s Decision](https://www.fema.gov/fact-sheet/8-tips-appealing-femas-decision-1)
-  for reading the letter’s reason and examples of insurance, occupancy, and ownership records.
+- [FEMA, 8 Tips for Appealing FEMA's Decision](https://www.fema.gov/fact-sheet/8-tips-appealing-femas-decision-1)
+  for reading the letter's reason and examples of insurance, occupancy, and ownership records.
 - [GAO-20-503](https://www.gao.gov/products/gao-20-503) for historical evidence that insufficient
   damage and missing supporting evidence were common ineligibility reasons. This is problem
   context, never an outcome claim.
@@ -214,6 +219,6 @@ python scripts/check_a11y.py
 python scripts/sixty_days_demo_flow.py --url https://SERVICE.run.app
 ```
 
-The standalone completion baseline is 202 tests, accessibility green, and 23/23 Sixty Days
+The standalone completion baseline is 205 tests, accessibility green, and 24/24 Sixty Days
 acceptance checks. The combined integration workspace currently has 291 tests; never substitute
 that larger number for the standalone repository result. Update either number only from real output.

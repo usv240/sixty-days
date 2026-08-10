@@ -31,19 +31,19 @@ the workflow stops for caseworker review rather than inventing a document reques
 
 - Four recorded Gemini letter calls grade 20/20 fields against adjacent synthetic truth.
 - Two recorded evidence-image calls grade 6/6 observable checks.
-- The standalone repository passes 202 tests.
-- The deployed public acceptance flow passes 23/23.
+- The standalone repository passes 205 tests.
+- The deployed public acceptance flow passes 24/24.
 - The shared resilience exit test passes 10/10.
 
-Photo automation evaluates only observable framing and legibility. A “ready for applicant review”
+Photo automation evaluates only observable framing and legibility. A "ready for applicant review"
 result does not establish authenticity, sufficiency, causation, valuation, or agency acceptance.
 
 ## Claims and designs deliberately rejected
 
-- A 5% appeal-rate statistic — source support did not survive audit.
-- “A wide photo proves the damage” — current official examples emphasize case-specific supporting
+- A 5% appeal-rate statistic â€" source support did not survive audit.
+- "A wide photo proves the damage" â€" current official examples emphasize case-specific supporting
   records; photos are optional context in this product.
-- “A signed statement proves no insurance” — removed from the insurer route because the reviewed
+- "A signed statement proves no insurance" â€" removed from the insurer route because the reviewed
   guide instead identifies settlement, denial, and coverage documents.
-- Autonomous insurer contact or appeal submission — no authority and no endpoint.
-- Eligibility or outcome prediction — outside the product's role and evidence.
+- Autonomous insurer contact or appeal submission â€" no authority and no endpoint.
+- Eligibility or outcome prediction â€" outside the product's role and evidence.

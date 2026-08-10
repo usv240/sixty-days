@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1600" height="900" viewBox="0 0 1600 900" role="img" aria-labelledby="title desc">
   <title id="title">Sixty Days as-built architecture</title>
-  <desc id="desc">A browser calls the Sixty Days Cloud Run service. Bounded workflow roles use a durable spine, Firestore, Cloud Scheduler, Cloud Trace, Gemini, and Gemma. Gemini Image and Veo generate recorded, static onboarding media outside the case path.</desc>
+  <desc id="desc">A browser calls the Sixty Days Cloud Run service. Bounded workflow roles use a durable spine, Firestore, Cloud Scheduler, a typed deadline action executor, Cloud Trace, Gemini, and Gemma. Image and video models generate recorded onboarding media outside the case path.</desc>
   <defs>
     <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#fafbf9"/><stop offset="1" stop-color="#e9f5f4"/></linearGradient>
     <filter id="shadow" x="-10%" y="-10%" width="120%" height="130%"><feDropShadow dx="0" dy="8" stdDeviation="12" flood-color="#102033" flood-opacity=".10"/></filter>
@@ -25,11 +25,11 @@
   <rect x="460" y="280" width="210" height="92" class="box"/><text x="480" y="314" class="body">Read · Route</text><text x="480" y="344" class="body">Plan · Schedule</text>
   <rect x="700" y="280" width="210" height="92" class="box"/><text x="720" y="314" class="body">Screen · Prepare</text><text x="720" y="344" class="body">Assemble · Verify</text>
   <rect x="460" y="398" width="450" height="140" class="box safe"/>
-  <text x="485" y="433" class="label">DURABLE SPINE</text><text x="485" y="470" class="body">Typed state · leases · eight-wake ladder</text>
-  <text x="485" y="500" class="body">redaction · quarantine · partial-safe render</text>
+  <text x="485" y="433" class="label">DURABLE SPINE</text><text x="485" y="470" class="body">Typed state / leases / eight-wake ladder</text>
+  <text x="485" y="500" class="body">deadline executor / automatic partial snapshot</text>
   <rect x="1030" y="170" width="480" height="238" class="box"/>
   <text x="1060" y="208" class="label">GOOGLE CLOUD · US-CENTRAL1</text><text x="1060" y="250" class="h">Durable services</text>
-  <text x="1060" y="292" class="body">Firestore · cases, requirements, wakes</text><text x="1060" y="326" class="body">Cloud Scheduler · due-wake worker</text>
+  <text x="1060" y="292" class="body">Firestore / cases, requirements, typed actions</text><text x="1060" y="326" class="body">Cloud Scheduler / due-work executor</text>
   <text x="1060" y="360" class="body">Cloud Trace and Logging · observable proof</text>
   <rect x="1030" y="458" width="480" height="180" class="box safe"/>
   <text x="1060" y="496" class="label">VERTEX AI · GLOBAL ENDPOINT</text><text x="1060" y="536" class="h">Case-path models</text>

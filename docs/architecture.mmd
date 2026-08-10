@@ -6,6 +6,8 @@ flowchart LR
     E --> P[Packet builder and verifier]
     B <--> F[(Firestore: structured cases, requirements, wakes)]
     L --> V[Vertex AI: Gemini 3.5 Flash and Gemma 4 MaaS]
+    F --> X[Deadline action executor]
+    X --> P
     S[Shared Cloud Scheduler worker] --> F
     B --> T[Cloud Trace and Logging]
     P --> H[Applicant-reviewed draft]
