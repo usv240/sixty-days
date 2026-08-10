@@ -185,6 +185,8 @@ receives HTTP 411.
 - `app/tests/`: unit, integration, safety, claim, and UI-contract tests
 - `app/scripts/`: fixture creation, recording, grading, accessibility, demo, and deployment verification
 - `docs/research-traceability.md`: official source-to-guardrail decisions and rejected claims
+- [Validation evidence](VALIDATION_EVIDENCE.md): research-to-test evidence, adversarial checks, and explicit limits
+- [Project differentiation](PROJECT_DIFFERENTIATION.md): concrete separation from the other submission and shared-spine disclosure
 - `SUBMISSION_KIT.md`: evidence-backed video and Devpost plan
 
 ## Disclosure
