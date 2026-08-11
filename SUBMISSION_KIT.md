@@ -162,8 +162,8 @@ No government agency endorses this project.
 - Additional Google models: three integrated models provide the maximum model-integration bonus
   evidence. Prompts, model IDs, sizes, and hashes are public in `BONUS_EVIDENCE.md` and the media
   provenance manifest.
-- Build story: publish `docs/public-build-story.md` on a public platform. It must say that the
-  piece was created for the purpose of entering the All Things Agentic Hackathon.
+- Build story: [A Deadline Does Not Care That You Are Still Recovering](https://dev.to/ujwal240/a-deadline-does-not-care-that-you-are-still-recovering-3080)
+  is public and contains the required hackathon-purpose disclosure.
 - Social post: publish `docs/social-post.md` on an eligible social platform with the exact hashtag
   `#AllThingsAgenticHackathon`.
 
@@ -182,7 +182,8 @@ No government agency endorses this project.
 - [x] 205 standalone tests
 - [x] 20/20 letter fields and 6/6 evidence decisions
 - [x] Accessibility gate and 10/10 exit test
-- [ ] Public build story URL added to Devpost
+- [x] Public build story published: https://dev.to/ujwal240/a-deadline-does-not-care-that-you-are-still-recovering-3080
+- [ ] Add the public build story URL to the Sixty Days Devpost submission
 - [ ] Public social post URL added to Devpost
 - [ ] Final link, citation, and claim check
 - [ ] Freeze and preserve the submitted revision through judging

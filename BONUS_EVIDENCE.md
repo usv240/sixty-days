@@ -19,11 +19,11 @@ Run python scripts/record_bonus_media.py from app to regenerate both assets with
 Default Credentials. Tests in app/tests/test_bonus_media.py verify integrity, public labels, model
 IDs, absence of autoplay, and separation from case state.
 
-## Public build content: 0.2 after publication
+## Public build content: published evidence for up to 0.2
 
-The publication-ready, project-specific draft is docs/public-build-story.md. It begins with the
-required hackathon-purpose disclosure. It must be published publicly, not unlisted, and its final
-URL must be added to Devpost before the deadline.
+[A Deadline Does Not Care That You Are Still Recovering](https://dev.to/ujwal240/a-deadline-does-not-care-that-you-are-still-recovering-3080)
+is public on DEV Community and contains the required hackathon-purpose disclosure. Add this exact
+URL to the Sixty Days Devpost submission. Judges determine whether the contribution earns the bonus.
 
 ## Social publication: 0.2 after publication
 
@@ -34,5 +34,6 @@ and paste the final public post URL into Devpost.
 ## Maximum score path
 
 A 5.0 core score plus 0.6 model points, 0.2 public-build-content points, and 0.2 social points equals
-the Rules maximum of 6.0. The model evidence is built. The final 0.4 depends on external publication
-and accurate Devpost links.
+the Rules maximum of 6.0. The model evidence is built and the build content is public. The remaining
+publication step is the social post; every public evidence URL must also be entered accurately in
+Devpost. Judges determine all bonus awards.
