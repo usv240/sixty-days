@@ -50,7 +50,7 @@ Measured results:
 
 - letters: 20/20 graded fields across four recorded model calls;
 - evidence: 6/6 observable checks across two recorded model calls;
-- standalone repository: 205 tests (291 in the separate combined integration workspace);
+- standalone repository: 205 tests (300 in the separate combined integration workspace);
 - Sixty Days executable flow: 24/24;
 - accessibility: WCAG gate green in light and dark themes.
 
