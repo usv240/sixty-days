@@ -51,6 +51,8 @@ clock = (
 )
 state_store = FirestoreStateStore(client)
 wake_store = FirestoreWakeStore(client)
+beta_clock = RealClock()
+beta_wake_scheduler = WakeScheduler(wake_store, beta_clock, lease_seconds=settings.lease_seconds)
 worker_id = f"worker_{os.environ.get('K_REVISION', 'local')}_{uuid.uuid4().hex[:6]}"
 
 tracing_active = setup_tracing(settings.project_id, "spine")
@@ -79,13 +81,15 @@ def record_due_action(wake: Wake) -> None:
     """
     with span("wake", "dispatch", **{"wake.id": wake.wake_id, "wake.kind": wake.kind}):
         domain = DeadlineActionExecutor(CaseStore(client)).execute(wake)
+        run = state_store.get_run(wake.run_id)
+        recorded_clock = beta_clock if run is not None and run.project_id == "sixty-days-beta" else clock
         client.collection("wake_actions").document(wake.wake_id).set({
             "wake_id": wake.wake_id,
             "run_id": wake.run_id,
             "kind": wake.kind,
             "payload": wake.payload,
             "due_at": wake.due_at,
-            "recorded_at": clock.now(),
+            "recorded_at": recorded_clock.now(),
             "status": "due_action_recorded",
             "external_side_effect": False,
             "domain": domain,
@@ -94,8 +98,12 @@ def record_due_action(wake: Wake) -> None:
 
 # Sixty Days mounts on the proven shared spine copied into this repository.
 from service.sixty_days_routes import build_sixty_days_router  # noqa: E402
+from service.beta_routes import build_beta_router  # noqa: E402
+from spine.api_access import ApiKeyAuthenticator  # noqa: E402
 
 app.include_router(build_sixty_days_router(client, clock, scheduler, runner))
+beta_auth = ApiKeyAuthenticator.from_environment()
+app.include_router(build_beta_router(client, beta_clock, lambda: beta_wake_scheduler, runner, beta_auth, project_id=settings.project_id, model_location=settings.model_location))
 _WEB = Path(__file__).resolve().parent.parent / "web"
 public_surface = "sixty-days"
 if _WEB.is_dir():
@@ -133,6 +141,8 @@ def health() -> dict[str, Any]:
         "sim_mode": settings.sim_mode,
         "replay_mode": settings.replay_mode,
         "tracing": tracing_active,
+        "beta_api": "configured" if beta_auth.enabled else "not_provisioned",
+        "beta_clock": "wall-clock",
         "worker": worker_id,
         "now": clock.now().isoformat(),
     }
@@ -142,7 +152,17 @@ def health() -> dict[str, Any]:
 def scan_due(limit: int = 50) -> dict[str, Any]:
     """Called by Cloud Scheduler. The only reason a sleeping agent ever wakes."""
     with span("run", "scan-due", **{"scan.limit": limit}):
-        executed = scheduler().dispatch_due(record_due_action, limit=limit)
+        def is_beta(wake: Wake) -> bool:
+            run = state_store.get_run(wake.run_id)
+            return run is not None and run.project_id == "sixty-days-beta"
+
+        demo = scheduler().dispatch_due(
+            record_due_action, limit=limit, predicate=lambda wake: not is_beta(wake)
+        )
+        beta = beta_wake_scheduler.dispatch_due(
+            record_due_action, limit=limit, predicate=is_beta
+        )
+        executed = [*demo, *beta]
         return {
             "now": clock.now().isoformat(),
             "executed": [

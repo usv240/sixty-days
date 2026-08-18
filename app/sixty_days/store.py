@@ -26,6 +26,7 @@ class CaseStore:
         disaster_ref: str,
         letter: Letter,
         requirements: list[Requirement],
+        tenant_id: str | None = None,
     ) -> None:
         self._collection.document(case.case_id).set(
             {
@@ -57,6 +58,7 @@ class CaseStore:
                     for item in requirements
                 ],
                 "status": "gathering",
+                "tenant_id": tenant_id,
                 "created_at": datetime.now(timezone.utc),
             }
         )
@@ -67,6 +69,13 @@ class CaseStore:
 
     def all(self) -> list[dict]:
         return [{"case_id": doc.id, **(doc.to_dict() or {})} for doc in self._collection.stream()]
+
+    def get_for_tenant(self, case_id: str, tenant_id: str) -> dict | None:
+        found = self.get(case_id)
+        return found if found is not None and found.get("tenant_id") == tenant_id else None
+
+    def all_for_tenant(self, tenant_id: str) -> list[dict]:
+        return [item for item in self.all() if item.get("tenant_id") == tenant_id]
 
     def record_evidence(self, case_id: str, result: dict[str, Any], fixture: str) -> dict:
         def change(data: dict) -> None:

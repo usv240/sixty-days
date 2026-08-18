@@ -1,10 +1,13 @@
 flowchart LR
-    A[Synthetic letter and evidence] --> B[Cloud Run: sixty-days]
+    A[Synthetic judge letter and evidence] --> B[Cloud Run: sixty-days]
+    API[Approved API client] --> K[Hash-only API key and server-derived tenant]
+    K --> DI[De-identified /v1 letter intake]
     B --> L[Letter reader and redaction]
+    DI --> L
     L --> D[Deadline and requirement router]
     D --> E[Evidence check and request preparation]
     E --> P[Packet builder and verifier]
-    B <--> F[(Firestore: structured cases, requirements, wakes)]
+    B <--> F[(Firestore: tenant cases, requirements, and wakes)]
     L --> V[Vertex AI: Gemini 3.5 Flash and Gemma 4 MaaS]
     F --> X[Deadline action executor]
     X --> P

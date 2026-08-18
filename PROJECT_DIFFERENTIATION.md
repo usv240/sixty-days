@@ -54,11 +54,11 @@ Snapshot from the committed repositories:
 
 | Surface | Day Three | Sixty Days |
 |---|---:|---:|
-| Project-specific domain package | 7 Python files, 1,361 lines | 7 Python files, 1,338 lines |
-| Shared spine package | 10 Python files, 1,991 lines | 10 Python files, 1,991 lines |
-| Test suite | 15 Python files, 2,473 lines | 17 Python files, 2,282 lines |
-| Web surface | 5 files, 93,724 bytes | 4 files, 73,301 bytes |
-| Standalone test result | 201 passed | 205 passed |
+| Project-specific domain package | 11 Python files, 1,733 lines | 8 Python files, 1,260 lines |
+| Shared spine package | 11 Python files, 1,735 lines | 11 Python files, 1,735 lines |
+| Test suite | 24 Python files, 2,622 lines | 20 Python files, 2,068 lines |
+| Web surface | 5 files, 96,892 bytes | 4 files, 74,626 bytes |
+| Standalone test result | 240 passed | 215 passed |
 
 Line counts are descriptive evidence of separate implementation surfaces, not a quality score.
 

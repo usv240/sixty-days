@@ -32,7 +32,7 @@ their prerequisites exist, so the judge can follow the numbered stages without g
 | Gate | Reproducible result |
 |---|---:|
 | Deployed public acceptance flow | **24/24** |
-| Standalone automated tests | **205 passed** |
+| Standalone automated tests | **215 passed** |
 | Recorded letter fields | **20/20** |
 | Recorded evidence decisions | **6/6** |
 | Shared-substrate exit test | **10/10** |
@@ -71,16 +71,19 @@ generated at build time. It never sees a letter, image, case reference, or appli
 
 ```mermaid
 flowchart LR
-    A[Synthetic letter and evidence] --> B[Cloud Run: sixty-days]
+    A[Synthetic judge letter and evidence] --> B[Cloud Run: sixty-days]
+    API[Approved API client] --> K[Hash-only API key and server-derived tenant]
+    K --> DI[De-identified /v1 letter intake]
     B --> L[Letter reader and redaction]
+    DI --> L
     L --> D[Deadline and requirement router]
     D --> E[Evidence check and request preparation]
     E --> P[Packet builder and verifier]
-    B <--> F[(Firestore: structured cases, requirements, wakes)]
+    B <--> F[(Firestore: tenant cases, requirements, and wakes)]
     L --> V[Vertex AI: Gemini 3.5 Flash and Gemma 4 MaaS]
-    S[Shared Cloud Scheduler worker] --> F
     F --> X[Deadline action executor]
     X --> P
+    S[Shared Cloud Scheduler worker] --> F
     B --> T[Cloud Trace and Logging]
     P --> H[Applicant-reviewed draft]
     M[Gemini 3.1 Flash Image and Veo 3.1 Fast] -. recorded at build time .-> O[Static onboarding media]
@@ -145,6 +148,44 @@ the problem context. It is never presented as a current denial rate.
 
 For the official-source hierarchy, exact source-to-guardrail mapping, and rejected claims, read the
 [research traceability ledger](docs/research-traceability.md).
+
+## Use it through the API
+
+The public web console remains a synthetic, credential-free judge experience. The protected `/v1`
+surface accepts de-identified determination-letter text for applicant-controlled preparation.
+Every key derives a private tenant on the server. A caller cannot select another tenant in JSON.
+
+The raw letter and model response are processed in memory and not persisted. Stored case state is
+limited to pseudonymous references, verified reason quotes, deadlines, requirements, wake records,
+and draft status. The API can prepare a third-party request and a packet draft, but it has no send,
+contact, filing, submission, legal-advice, or outcome-prediction operation.
+
+Full provisioning and rotation instructions are in [the beta API guide](docs/api-beta.md).
+
+Create a key:
+
+```bash
+cd app
+python scripts/create_beta_key.py --tenant aid_group_one --label "Aid group one"
+```
+
+Store the printed hash-only JSON as the `BETA_API_KEY_HASHES` Secret Manager value and expose it
+to Cloud Run. Give the plaintext key only to the intended API user.
+
+```bash
+curl -H "X-API-Key: $SIXTY_DAYS_API_KEY" \
+  https://sixty-days-109051079423.us-central1.run.app/v1
+
+curl -X POST \
+  -H "X-API-Key: $SIXTY_DAYS_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{"document":"DE-IDENTIFIED DETERMINATION LETTER ...","applicant_ref":"SUBJECT-001","disaster_ref":"DR-TEST-001","acknowledge_deidentified":true}' \
+  https://sixty-days-109051079423.us-central1.run.app/v1/cases
+```
+
+Open `/docs`, select **Authorize**, and enter the key for interactive schemas. The API rejects
+obvious direct identifiers before model processing, but an API key does not make arbitrary personal
+documents safe. This beta is for synthetic or deliberately de-identified text only.
 
 ## Reproduce locally
 

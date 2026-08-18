@@ -21,6 +21,7 @@ SERVICE_ACCOUNT="${SERVICE_ACCOUNT:-sa-reason@${PROJECT_ID}.iam.gserviceaccount.
 SIM_MODE="${SIM_MODE:-true}"
 REPLAY_MODE="${REPLAY_MODE:-true}"
 PUBLIC_PROJECT="sixty-days"
+BETA_API_SECRET="${BETA_API_SECRET:-}"
 
 # WSL resolves the Windows Cloud SDK's extensionless `gcloud` through Linux Python, which uses a
 # separate unauthenticated config under the WSL home. A Windows launcher must be invoked by a
@@ -42,6 +43,11 @@ run_gcloud() {
     "${GCLOUD_BIN}" "$@"
   fi
 }
+
+BETA_SECRET_ARGS=()
+if [[ -n "${BETA_API_SECRET}" ]]; then
+  BETA_SECRET_ARGS=(--set-secrets "BETA_API_KEY_HASHES=${BETA_API_SECRET}:latest")
+fi
 
 # Storage and compute resources are pinned here. Vertex model endpoints used by this build are
 # available at global, so this check must not be described as pinning every byte or endpoint.
@@ -66,7 +72,8 @@ run_gcloud run deploy "${SERVICE}" \
   --memory 512Mi \
   --timeout 300 \
   --allow-unauthenticated \
-  --set-env-vars "GOOGLE_CLOUD_PROJECT=${PROJECT_ID},REGION=${REGION},SIM_MODE=${SIM_MODE},REPLAY_MODE=${REPLAY_MODE},PUBLIC_PROJECT=${PUBLIC_PROJECT}" \
+  --update-env-vars "GOOGLE_CLOUD_PROJECT=${PROJECT_ID},REGION=${REGION},SIM_MODE=${SIM_MODE},REPLAY_MODE=${REPLAY_MODE},PUBLIC_PROJECT=${PUBLIC_PROJECT}" \
+  "${BETA_SECRET_ARGS[@]}" \
   --labels "hackathon=all-things-agentic,component=${SERVICE}"
 
 URL="$(run_gcloud run services describe "${SERVICE}" --project "${PROJECT_ID}" --region "${REGION}" --format 'value(status.url)' | tr -d '\r')"

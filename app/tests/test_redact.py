@@ -15,6 +15,7 @@ from spine.redact import (
 
 REPORT = """MERCY CRITICAL ACCESS HOSPITAL
 Patient: Harold Jennings      MRN: 8842910
+Accession: 26-004182
 DOB: 04/12/1951               Phone: (406) 555-0173
 Address: 118 Cedar Lane
 Email: h.jennings51@example.com
@@ -34,7 +35,7 @@ def redactor():
 def test_all_identifier_kinds_are_removed(redactor):
     result = redactor.redact(REPORT)
     for identifier in (
-        "Harold Jennings", "8842910", "04/12/1951", "(406) 555-0173",
+        "Harold Jennings", "8842910", "26-004182", "04/12/1951", "(406) 555-0173",
         "118 Cedar Lane", "h.jennings51@example.com", "521-44-9083",
     ):
         assert identifier not in result.text, f"{identifier!r} leaked through the gate"
@@ -52,6 +53,7 @@ def test_pseudonyms_are_stable_and_labeled(redactor):
     result = redactor.redact(REPORT)
     assert "PERSON_1" in result.text
     assert "MRN_1" in result.text
+    assert "ACCESSION_1" in result.text
     assert "SSN_1" in result.text
     assert "DOB_1" in result.text
 

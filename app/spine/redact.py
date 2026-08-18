@@ -58,7 +58,13 @@ class RedactionError(RuntimeError):
 # Order matters: more specific shapes first, so an SSN is not half-eaten by the phone pattern.
 _PATTERNS: tuple[tuple[str, re.Pattern[str]], ...] = (
     ("SSN", re.compile(r"\b\d{3}-\d{2}-\d{4}\b")),
-    ("MRN", re.compile(r"\b(?:MRN|MR#|Medical Record(?: No\.?| Number)?)[:\s#]*([A-Z]?\d{5,10})\b", re.I)),
+    ("MRN", re.compile(r"\b(?:MRN|MR#|Medical Record(?: No\.?| Number)?)[:\s#]*([A-Z]?\d{5,10})\b", re.I)),    # Laboratory accession numbers link a specimen to a patient even when the name and MRN are
+    # absent. Keep the label narrow so ordinary phrases such as "Laboratory Medicine" survive.
+    ("ACCESSION", re.compile(
+        r"\b(?:Accession(?: No\.?| Number| ID)?|Lab(?:oratory)? (?:ID|No\.?|Number))"
+        r"[:\s#]*([A-Z0-9][A-Z0-9-]{3,24})\b",
+        re.I,
+    )),
     # No leading \b: a word boundary before "(" can never match, since both the preceding space
     # and the paren are non-word characters. (?<!\d) guards against eating the tail of a longer
     # number instead.

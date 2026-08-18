@@ -75,7 +75,7 @@ def build_sixty_days_router(client, clock, scheduler, runner) -> APIRouter:
 
     def require_case(case_id: str) -> dict[str, Any]:
         found = cases.get(case_id)
-        if found is None:
+        if found is None or found.get("tenant_id") is not None:
             raise HTTPException(status_code=404, detail=f"no case {case_id}")
         return found
 
@@ -266,14 +266,11 @@ def build_sixty_days_router(client, clock, scheduler, runner) -> APIRouter:
 
     @router.get("/cases")
     def list_cases() -> dict[str, Any]:
-        return {"cases": cases.all()}
+        return {"cases": [item for item in cases.all() if item.get("tenant_id") is None]}
 
     @router.get("/cases/{case_id}")
     def get_case(case_id: str) -> dict[str, Any]:
-        found = cases.get(case_id)
-        if found is None:
-            raise HTTPException(status_code=404, detail=f"no case {case_id}")
-        return found
+        return require_case(case_id)
 
     @router.post("/cases/{case_id}/evidence/check")
     def check_evidence(case_id: str, request: EvidenceCheckRequest) -> dict[str, Any]:

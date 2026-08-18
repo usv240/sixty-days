@@ -12,7 +12,7 @@ service. Do not substitute the larger combined-workspace count.
 - Public repository: `https://github.com/usv240/sixty-days`
 - Category: The Taskmaster
 - Public acceptance flow: 24/24
-- Standalone tests: 205 passed
+- Standalone tests: 215 passed
 - Recorded letter extraction: 20/20 fields
 - Recorded evidence screening: 6/6 decisions
 - Shared-substrate exit test: 10/10
@@ -38,7 +38,7 @@ edited around it, but the proof-of-action sequence should not be cut.
 1. From `app/`, run:
    `python scripts/sixty_days_demo_flow.py --url https://sixty-days-109051079423.us-central1.run.app`
    and save the 24/24 result.
-2. Run `python -m pytest -q` and confirm 205 passed.
+2. Run `python -m pytest -q` and confirm 215 passed.
 3. Run `python scripts/check_a11y.py` and confirm both themes pass.
 4. Use a fresh 1440 by 900 browser window in light mode. Hide bookmarks, extensions, notifications,
    personal accounts, and unrelated tabs.
