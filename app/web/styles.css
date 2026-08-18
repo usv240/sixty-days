@@ -22,6 +22,9 @@
   --danger: #a33131;
   --danger-soft: #fdecec;
   --focus: #0b57c7;
+  --code-bg: #101926;
+  --code-text: #e7eef8;
+  --code-border: #26364a;
   --radius: 16px;
   --radius-sm: 10px;
   --shadow: 0 18px 50px rgba(23, 43, 77, .10), 0 2px 8px rgba(23, 43, 77, .06);
@@ -599,9 +602,12 @@ footer.site {
 .clean-list li::before { content: ""; position: absolute; left: 2px; top: 21px; width: 8px; height: 8px; border-radius: 50%; background: var(--accent); }
 .developer-code {
   overflow-x: auto; margin: 18px 0 30px; padding: 20px;
-  background: #101926; color: #e7eef8; border: 1px solid #26364a; border-radius: var(--radius);
+  background: var(--code-bg); color: var(--code-text); border: 1px solid var(--code-border); border-radius: var(--radius);
   box-shadow: var(--shadow-soft); font: .86rem/1.65 ui-monospace, "Cascadia Code", Consolas, monospace;
   white-space: pre-wrap; overflow-wrap: anywhere;
+}
+.developer-code code {
+  color: inherit; background: transparent; padding: 0; border-radius: 0; font: inherit;
 }
 .developer-next { margin-top: 54px; }
 .dev-notes { display: grid; grid-template-columns: 1.1fr 1fr 1fr; gap: 32px; }
