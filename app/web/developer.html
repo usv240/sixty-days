@@ -3,91 +3,128 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Sixty Days: developer access</title>
-<meta name="description" content="Create a temporary key, interpret deliberately deidentified decision letters, track deadlines, and prepare incomplete packet drafts for human review.">
+<title>Sixty Days: developer quickstart</title>
+<meta name="description" content="Use the same preparation and deadline workflow shown in the public demo, with a tenant-scoped key and deliberately deidentified decision-letter text.">
 <meta name="theme-color" content="#f7f9fc">
 <link rel="stylesheet" href="/static/styles.css">
 </head>
 <body>
 <a class="skip-link" href="#main">Skip to main content</a>
 <header class="site"><div class="wrap bar">
-  <div class="brand">Sixty Days <span>- Appeal workflow beta</span></div>
-  <nav aria-label="Developer navigation"><a href="/">Product</a><a href="/docs">API reference</a><a href="/judges">For judges</a></nav>
+  <div class="brand">Sixty Days <span>Appeal workflow beta</span></div>
+  <nav aria-label="Developer navigation"><a href="/">Product</a><a href="/#console">Public demo</a><a href="#create-key">Get a key</a><a href="/docs">API docs</a><a href="/judges">Judge evidence</a></nav>
   <button class="theme-toggle" id="theme-toggle" aria-pressed="false">Use dark mode</button>
 </div></header>
 <main id="main">
 <section class="developer-hero"><div class="wrap">
-  <p class="eyebrow">Developer access</p>
+  <p class="eyebrow">Developer quickstart</p>
   <h1>Build an applicant-controlled appeal workflow.</h1>
-  <p class="lede">Create a temporary key, interpret deliberately deidentified decision letters, track deadlines, and prepare incomplete packet drafts for human review.</p>
+  <p class="lede">Use the same preparation and deadline workflow shown in the public demo, with a tenant-scoped key and deliberately deidentified decision-letter text.</p>
+  <div class="btn-row">
+    <a class="btn btn-primary" href="#create-key">Create a temporary key</a>
+    <a class="btn" href="/docs">Browse API docs</a>
+    <a class="text-link dev-demo-link" href="/#console">Try the public demo without a key</a>
+  </div>
   <div class="access-facts" aria-label="Access facts">
     <span id="access-mode">Checking issuance status</span>
-    <span id="key-lifetime">Seven day lifetime</span>
+    <span id="key-lifetime">168 hour lifetime</span>
     <span>One project scope</span>
     <span>Tenant-isolated</span>
   </div>
 </div></section>
-<section><div class="wrap dev-grid">
-  <div class="dev-panel">
-    <p class="step-label">Step 1 of 3</p>
-    <h2>Create a temporary key</h2>
-    <p>Ask the project owner for an invitation code. The invitation only unlocks issuance. Your API key is generated separately and shown once.</p>
-    <form id="key-form">
-      <label for="tenant-id">Workspace ID</label>
-      <input id="tenant-id" name="tenant_id" value="aid_group_demo" pattern="[a-z0-9][a-z0-9_-]+" minlength="2" maxlength="48" required aria-describedby="tenant-help">
-      <p class="field-help" id="tenant-help">Lowercase letters, numbers, hyphens, and underscores.</p>
-      <label for="label">Workspace label</label>
-      <input id="label" name="label" value="Aid group demo" minlength="2" maxlength="80" required>
-      <label for="invitation-code">Invitation code</label>
-      <input id="invitation-code" name="invitation_code" type="password" autocomplete="off" required>
-      <label class="check-row"><input name="acknowledge_terms" type="checkbox" required><span>I will submit only synthetic or deliberately deidentified letter text. I understand that the API prepares and tracks drafts but never sends a request or submits an appeal.</span></label>
-      <button class="btn-primary" type="submit">Generate seven-day key</button>
-    </form>
-    <p id="developer-status" class="developer-status" role="status" aria-live="polite">No API key has been created in this browser.</p>
-    <div id="key-result" class="key-result" hidden>
-      <h3>Save this key now</h3>
-      <p>The plaintext value is not stored by the service and will not be shown again.</p>
-      <label for="api-key">API key</label>
-      <input id="api-key" readonly>
-      <p class="field-help">Expires: <strong id="key-expires"></strong></p>
-      <div class="btn-row">
-        <button id="copy-key" type="button">Copy key</button>
-        <button id="test-key" type="button">Test connection</button>
-        <button id="revoke-key" type="button">Revoke key</button>
+
+<section class="developer-orientation"><div class="wrap">
+  <div class="section-heading"><div><p class="eyebrow">Choose your path</p><h2>Start with the access you already have.</h2></div><p>Judges never need credentials. API keys are only for invited integrations.</p></div>
+  <div class="path-choice">
+    <article class="path-card"><span class="path-number">01</span><h3>Evaluating the product</h3><p>Run the complete synthetic workflow with no account, invitation, or API key.</p><a href="/#console">Open public demo</a></article>
+    <article class="path-card"><span class="path-number">02</span><h3>Invited to the beta</h3><p>Use the private invitation code once here to create a separate seven-day API key.</p><a href="#create-key">Generate a key</a></article>
+    <article class="path-card"><span class="path-number">03</span><h3>Already have a key</h3><p>Load it into this page session, verify the connection, then use the documented endpoint.</p><a href="#verify">Verify an existing key</a></article>
+  </div>
+</div></section>
+
+<section id="create-key"><div class="wrap">
+  <div class="section-heading dev-section-heading"><div><p class="step-label">Step 1 of 3</p><h2>Create a temporary key</h2></div><p>The invitation code unlocks issuance. It is not the API key and cannot call an endpoint.</p></div>
+  <div class="dev-grid">
+    <div class="dev-panel">
+      <form id="key-form">
+        <label for="tenant-id">Workspace ID</label>
+        <input id="tenant-id" name="tenant_id" value="aid_group_demo" pattern="[a-z0-9][a-z0-9_-]+" minlength="2" maxlength="48" required aria-describedby="tenant-help">
+        <p class="field-help" id="tenant-help">Lowercase letters, numbers, hyphens, and underscores.</p>
+        <label for="label">Workspace label</label>
+        <input id="label" name="label" value="Aid group demo" minlength="2" maxlength="80" required>
+        <label for="invitation-code">Private invitation code</label>
+        <input id="invitation-code" name="invitation_code" type="password" autocomplete="off" required aria-describedby="invite-help">
+        <p class="field-help" id="invite-help">Supplied privately by the project owner. Never publish it.</p>
+        <label class="check-row"><input name="acknowledge_terms" type="checkbox" required><span>I will submit only synthetic or deliberately deidentified letter text. I understand that the API prepares and tracks drafts but never sends a request or submits an appeal.</span></label>
+        <button class="btn-primary" type="submit">Generate seven-day API key</button>
+      </form>
+      <p id="developer-status" class="developer-status" role="status" aria-live="polite">No API key is loaded in this browser session.</p>
+      <div id="key-result" class="key-result" hidden>
+        <h3>Save this key now</h3>
+        <p>The plaintext value is shown once by the service. It is not stored in source, Secret Manager, or browser storage.</p>
+        <label for="api-key">New API key</label>
+        <input id="api-key" readonly>
+        <p class="field-help">Expires: <strong id="key-expires"></strong></p>
+        <div class="btn-row"><button id="copy-key" type="button">Copy key</button><a class="btn" href="#verify">Continue to verification</a></div>
       </div>
     </div>
+    <aside class="dev-panel boundary-panel">
+      <p class="step-label">Access and safety</p>
+      <h2>Two secrets, two different jobs</h2>
+      <dl class="definition-pair">
+        <div><dt>Invitation code</dt><dd>Allows an invited tester to mint a temporary project key. It never accesses project data.</dd></div>
+        <div><dt>API key</dt><dd>Authenticates requests, determines the tenant and scope, expires automatically, and can be revoked.</dd></div>
+      </dl>
+      <h3>Product boundary</h3>
+      <p>This API supports applicant-controlled preparation. It rejects detected identifiers, persists no raw letter text, and has no endpoint that contacts an insurer, agency, or third party.</p>
+      <ul class="clean-list">
+        <li>Only a SHA-256 key digest is persisted.</li>
+        <li>The key expires automatically after seven days.</li>
+        <li>No credential is placed in browser storage.</li>
+        <li>The public judge workflow stays credential-free.</li>
+      </ul>
+    </aside>
   </div>
-  <aside class="dev-panel boundary-panel">
-    <p class="step-label">Safety contract</p>
-    <h2>What this key can do</h2>
-    <p>This API supports applicant-controlled preparation. It rejects detected identifiers, persists no raw letter text, and has no endpoint that contacts an insurer, agency, or third party.</p>
-    <ul class="clean-list">
-      <li>The server derives the tenant from the key.</li>
-      <li>Only a SHA-256 key digest is persisted.</li>
-      <li>The key expires automatically after seven days.</li>
-      <li>You can revoke it from this page at any time.</li>
-    </ul>
-  </aside>
 </div></section>
-<section><div class="wrap">
-  <p class="step-label">Step 2 of 3</p>
-  <h2>Verify the connection</h2>
-  <p>Use the smallest authenticated request first. The response returns the project, tenant, scope boundary, and API version.</p>
-  <pre class="developer-code" id="curl-example"><code>curl -H "X-API-Key: YOUR_API_KEY" "SERVICE_URL/v1"</code></pre>
-  <p class="step-label developer-next">Step 3 of 3</p>
-  <h2>Call the project workflow</h2>
-  <pre class="developer-code"><code>curl -X POST "SERVICE_URL/v1/cases" \
+
+<section id="verify"><div class="wrap">
+  <div class="section-heading dev-section-heading"><div><p class="step-label">Step 2 of 3</p><h2>Load and verify the key</h2></div><p>Generated keys are loaded automatically. Existing key holders can paste one here. It remains only in page memory.</p></div>
+  <div class="dev-verify-grid">
+    <div class="dev-panel">
+      <p id="connection-status" class="developer-status developer-status-compact" role="status" aria-live="polite">No API key is loaded in this browser session.</p>
+      <label for="active-api-key">API key for this browser session</label>
+      <input id="active-api-key" type="password" autocomplete="off" placeholder="Paste an existing key or generate one above">
+      <div class="btn-row"><button class="btn-primary" id="use-key" type="button">Use this key</button><button id="test-key" type="button">Test connection</button><button id="clear-key" type="button">Clear from page</button><button id="revoke-key" type="button">Revoke key</button></div>
+      <p class="small muted">Revocation is permanent. Clearing removes the value only from this page session.</p>
+    </div>
+    <div class="code-shell">
+      <div class="code-toolbar"><span>Connection check</span><button type="button" data-copy-code="#curl-example code">Copy request</button></div>
+      <pre class="developer-code" id="curl-example"><code>curl -H "X-API-Key: YOUR_API_KEY" "SERVICE_URL/v1"</code></pre>
+    </div>
+  </div>
+</div></section>
+
+<section id="workflow"><div class="wrap">
+  <div class="section-heading dev-section-heading"><div><p class="step-label">Step 3 of 3</p><h2>Call the project workflow</h2></div><p>The example follows this project's real input contract and safety boundary.</p></div>
+  <div class="code-shell">
+    <div class="code-toolbar"><span>Project request</span><button type="button" data-copy-code="#workflow-example code">Copy request</button></div>
+    <pre class="developer-code" id="workflow-example"><code>curl -X POST "SERVICE_URL/v1/cases" \
   -H "X-API-Key: YOUR_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{"subject_ref":"SUBJECT-101","disaster_ref":"DR-101","acknowledge_deidentified":true,"letter_text":"DECISION LETTER\\nDate: August 1, 2026\\nDecision: Ineligible\\nReason: Proof of occupancy was not provided.\\nYou may appeal within 60 days."}'</code></pre>
-  <div class="btn-row"><a class="btn btn-primary" href="/docs">Open interactive API reference</a><a class="btn" href="/">Return to product</a></div>
+  </div>
+  <div class="api-docs-guide">
+    <div><p class="step-label">Interactive reference</p><h2>Use the API docs without guessing.</h2><p>Open the schema, select <b>Authorize</b>, paste the API key, then expand an endpoint to see its exact request and response model.</p><div class="btn-row"><a class="btn btn-primary" href="/docs">Open API docs</a><a class="btn" href="https://github.com/usv240/sixty-days/blob/main/docs/api-beta.md">Read provisioning guide</a><a class="btn" href="/#console">Return to public demo</a></div></div>
+    <ol class="docs-steps"><li><b>Authorize</b><span>Paste the temporary API key into the X-API-Key field.</span></li><li><b>Inspect</b><span>Review required fields and safety acknowledgements before executing.</span></li><li><b>Execute</b><span>Start with GET /v1, then call the project-specific workflow.</span></li></ol>
+  </div>
 </div></section>
+
 <section><div class="wrap dev-notes">
-  <div><h2>Use it responsibly</h2><p>Temporary access is intended for evaluation and small beta integrations. Do not place the key in frontend source, Git, screenshots, or public posts.</p></div>
-  <div><h3>Need permanent access?</h3><p>Operator-issued keys use the same scoped boundary but are rotated through Google Secret Manager. See the repository API guide for provisioning and revocation.</p></div>
-  <div><h3>Before broader rollout</h3><p>Place API Gateway in front of the service for per-consumer quotas, abuse controls, and formal onboarding. The current Cloud Run cap bounds infrastructure cost but is not a substitute for quotas.</p></div>
+  <div><h2>Keep the key private</h2><p>Do not place it in frontend source, Git, screenshots, videos, or public posts. Clear it from this page when finished.</p></div>
+  <div><h3>Need operator-managed access?</h3><p>The repository provisioning guide covers hash-only Secret Manager keys, rotation, and revocation.</p></div>
+  <div><h3>Before broader rollout</h3><p>Add API Gateway quotas, rate limits, abuse controls, and formal onboarding. The current deployment is an invited beta.</p></div>
 </div></section>
 </main>
-<footer class="site"><div class="wrap"><div class="footer-links"><a href="/">Product</a><a href="/docs">API reference</a><a href="/judges">Judge evidence</a></div><p>Independent hackathon beta. Invitation access does not change the product's disclosed safety limits.</p></div></footer>
+<footer class="site"><div class="wrap"><div class="footer-links"><a href="/">Product</a><a href="/#console">Public demo</a><a href="/docs">API docs</a><a href="/judges">Judge evidence</a><a href="https://github.com/usv240/sixty-days/blob/main/docs/api-beta.md">Provisioning guide</a></div><p>Independent hackathon beta. Invitation access does not change the product's disclosed safety limits.</p></div></footer>
 <script src="/static/developer.js"></script>
 </body></html>

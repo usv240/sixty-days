@@ -13,7 +13,7 @@
 <header class="site">
   <div class="wrap bar">
     <div class="brand">Sixty Days <span>- a deadline keeper for disaster appeals</span></div>
-    <nav aria-label="Sections"><a href="#problem">The problem</a><a href="#workflow">How it works</a><a href="#console">Live workflow</a><a href="/developer">Developer API</a><a href="#limits">Limits</a><a href="#architecture">Architecture</a><a href="#research">Sources</a><a href="/judges">For judges</a><a href="https://day-three-109051079423.us-central1.run.app">Day Three</a></nav>
+    <nav aria-label="Primary"><a href="#problem">Overview</a><a href="#console">Live demo</a><a href="/developer">Developer API</a><a href="/docs">API docs</a><a href="/judges">Judge evidence</a></nav>
     <button class="theme-toggle" id="theme-toggle" aria-pressed="false">Use dark mode</button>
   </div>
 </header>
@@ -30,8 +30,9 @@
           or submitting on the applicant’s behalf.</p>
         <div class="btn-row">
           <a class="btn btn-primary" href="#console">Open a synthetic case</a>
-          <a class="btn" href="#workflow">See the four-stage plan</a>
+          <a class="btn" href="/judges">Follow the judge path</a>
         </div>
+        <p class="hero-tertiary">The public case needs no key. Building an integration? <a href="/developer">Create an invited API key</a> or <a href="/docs">inspect the API docs</a>.</p>
         <div class="stat-strip">
           <div class="stat"><b>4.4 million</b><span>applicants referred to the Individuals and
             Households Program, 2016-2018 <a href="#ref-scale" aria-label="Reference: GAO-20-503">[1]</a></span></div>
@@ -56,7 +57,7 @@
       </div>
       <aside class="hero-proof" aria-label="Live proof">
         <span class="proof-label">Verified public build</span>
-        <strong class="proof-value">23 / 23</strong>
+        <strong class="proof-value">24 / 24</strong>
         <span class="muted">live acceptance checks passing</span>
         <ul class="proof-list">
           <li><b>20/20</b> recorded decision-letter fields correct</li>
@@ -228,6 +229,18 @@
   </div>
 </section>
 
+<section id="api" class="integration-section">
+  <div class="wrap">
+    <div class="section-heading"><div><p class="eyebrow">Use it beyond the demo</p><h2>An applicant-controlled API, explained before credentials.</h2></div><p>The public synthetic case is the fastest evaluation path. The API is an optional deidentified beta for approved integrations.</p></div>
+    <div class="api-onboarding-grid">
+      <article class="path-card"><span class="path-number">No credentials</span><h3>Evaluate publicly</h3><p>Open a synthetic letter, inspect exact reason quotes, prepare a request, and build a visibly incomplete packet.</p><a href="#console">Run the public demo</a></article>
+      <article class="path-card"><span class="path-number">Invited access</span><h3>Create a seven-day key</h3><p>A private invitation code unlocks key creation. The separate API key determines the tenant and project scope.</p><a href="/developer">Open Developer quickstart</a></article>
+      <article class="path-card"><span class="path-number">Exact contract</span><h3>Read the API docs</h3><p>Use the interactive schema to authorize with X-API-Key and inspect case, request, packet, and deadline operations.</p><a href="/docs">Browse API docs</a></article>
+    </div>
+    <p class="integration-boundary"><b>API boundary:</b> synthetic or deliberately deidentified letters only. It prepares and tracks drafts but never contacts, sends, files, or submits.</p>
+  </div>
+</section>
+
 <section id="limits">
   <div class="wrap">
     <h2>What this does not do</h2>
@@ -365,6 +378,7 @@
   <nav class="footer-links" aria-label="Project links">
     <a href="https://github.com/usv240/sixty-days">Source code</a>
     <a href="/developer">Developer API</a>
+     <a href="/docs">API docs</a>
     <a href="/judges">Judge brief</a>
     <a href="/sixty-days/conformance">Conformance report</a>
     <a href="https://day-three-109051079423.us-central1.run.app">Day Three</a>

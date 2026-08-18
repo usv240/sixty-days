@@ -109,6 +109,50 @@ def main() -> int:
         print("    FAIL  generic inline-code styling can override the request block")
     print()
 
+    print("First-use navigation and developer journey\n")
+    landing_path = next(
+        (WEB / name for name in ("index.html", "sixty-days.html", "downstream.html")
+         if (WEB / name).exists()),
+        None,
+    )
+    landing = landing_path.read_text(encoding="utf-8") if landing_path else ""
+    header_nav = re.search(r"<header.*?<nav[^>]*>(.*?)</nav>", landing, re.S)
+    nav_links = re.findall(r"<a\s+[^>]*href=", header_nav.group(1) if header_nav else "")
+    landing_ok = (
+        header_nav is not None
+        and len(nav_links) <= 5
+        and 'href="/developer"' in header_nav.group(1)
+        and 'href="/docs"' in header_nav.group(1)
+        and 'href="/judges"' in header_nav.group(1)
+        and 'id="api"' in landing
+    )
+    if landing_ok:
+        print(f"    PASS  landing navigation has {len(nav_links)} focused links and an API section")
+    else:
+        failures.append("landing navigation is overloaded or missing a core user path")
+        print("    FAIL  landing must expose demo, developer, docs, and judge paths in five links")
+
+    developer = (WEB / "developer.html").read_text(encoding="utf-8")
+    developer_js = (WEB / "developer.js").read_text(encoding="utf-8")
+    required_journey = (
+        'id="create-key"',
+        'id="verify"',
+        'id="workflow"',
+        'id="active-api-key"',
+        'data-copy-code=',
+        'href="/docs"',
+    )
+    journey_ok = all(token in developer for token in required_journey)
+    storage_ok = not any(
+        token in developer_js for token in ("localStorage", "sessionStorage", "document.cookie")
+    )
+    if journey_ok and storage_ok:
+        print("    PASS  create, verify, call, copy, and docs paths exist without browser credential storage")
+    else:
+        failures.append("developer quickstart is incomplete or stores credentials in the browser")
+        print("    FAIL  developer journey or credential-storage boundary is incomplete")
+    print()
+
     print("Glossary coverage\n")
     if glossary_path.exists():
         glossary = json.loads(glossary_path.read_text(encoding="utf-8"))
