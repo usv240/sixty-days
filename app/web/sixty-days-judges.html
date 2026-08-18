@@ -13,7 +13,7 @@
 <header class="site">
   <div class="wrap bar">
     <div class="brand">Sixty Days <span>- judge evidence</span></div>
-    <nav aria-label="Judge sections"><a href="/">Product</a><a href="#rubric">Rubric</a><a href="#requirements">Requirements</a><a href="#proof">Proof</a><a href="#reproduce">Reproduce</a><a href="#sources">Research</a><a href="#limits">Limits</a></nav>
+    <nav aria-label="Judge sections"><a href="/">Product</a><a href="/developer">Developer API</a><a href="#rubric">Rubric</a><a href="#requirements">Requirements</a><a href="#proof">Proof</a><a href="#reproduce">Reproduce</a><a href="#sources">Research</a><a href="#limits">Limits</a></nav>
     <button class="theme-toggle" id="theme-toggle" aria-pressed="false">Use dark mode</button>
   </div>
 </header>
@@ -101,7 +101,7 @@ python -m pytest -q
 python scripts/check_a11y.py
 python scripts/sixty_days_demo_flow.py --url https://SERVICE_URL
 curl -X POST -H "Content-Type: application/json" -d '{}' https://SERVICE_URL/exit-test</code></pre>
-  <p>The expected standalone baseline is <b>215 tests</b>. Deployment and credentials are documented in the repository README and <code>deploy.sh</code>.</p>
+  <p>The expected standalone baseline is <b>219 tests</b>. Deployment and credentials are documented in the repository README and <code>deploy.sh</code>.</p>
 </div></section>
 
 <section id="findings"><div class="wrap">
@@ -155,7 +155,7 @@ curl -X POST -H "Content-Type: application/json" -d '{}' https://SERVICE_URL/exi
 
 <footer class="site"><div class="wrap">
   <p>Built for the All Things Agentic Hackathon. No government agency endorses this project.</p>
-  <div class="footer-links"><a href="https://github.com/usv240/sixty-days">GitHub</a><a href="/">Product</a><a href="/sixty-days/conformance">Conformance</a><a href="https://day-three-109051079423.us-central1.run.app">Day Three</a></div>
+  <div class="footer-links"><a href="https://github.com/usv240/sixty-days">GitHub</a><a href="/">Product</a><a href="/developer">Developer API</a><a href="/sixty-days/conformance">Conformance</a><a href="https://day-three-109051079423.us-central1.run.app">Day Three</a></div>
 </div></footer>
 <script>
 const toggle = document.querySelector("#theme-toggle");

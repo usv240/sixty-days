@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="en" data-project="sixty-days" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sixty Days: developer access</title>
+<meta name="description" content="Create a temporary key, interpret deliberately deidentified decision letters, track deadlines, and prepare incomplete packet drafts for human review.">
+<meta name="theme-color" content="#f7f9fc">
+<link rel="stylesheet" href="/static/styles.css">
+</head>
+<body>
+<a class="skip-link" href="#main">Skip to main content</a>
+<header class="site"><div class="wrap bar">
+  <div class="brand">Sixty Days <span>- Appeal workflow beta</span></div>
+  <nav aria-label="Developer navigation"><a href="/">Product</a><a href="/docs">API reference</a><a href="/judges">For judges</a></nav>
+  <button class="theme-toggle" id="theme-toggle" aria-pressed="false">Use dark mode</button>
+</div></header>
+<main id="main">
+<section class="developer-hero"><div class="wrap">
+  <p class="eyebrow">Developer access</p>
+  <h1>Build an applicant-controlled appeal workflow.</h1>
+  <p class="lede">Create a temporary key, interpret deliberately deidentified decision letters, track deadlines, and prepare incomplete packet drafts for human review.</p>
+  <div class="access-facts" aria-label="Access facts">
+    <span id="access-mode">Checking issuance status</span>
+    <span id="key-lifetime">Seven day lifetime</span>
+    <span>One project scope</span>
+    <span>Tenant-isolated</span>
+  </div>
+</div></section>
+<section><div class="wrap dev-grid">
+  <div class="dev-panel">
+    <p class="step-label">Step 1 of 3</p>
+    <h2>Create a temporary key</h2>
+    <p>Ask the project owner for an invitation code. The invitation only unlocks issuance. Your API key is generated separately and shown once.</p>
+    <form id="key-form">
+      <label for="tenant-id">Workspace ID</label>
+      <input id="tenant-id" name="tenant_id" value="aid_group_demo" pattern="[a-z0-9][a-z0-9_-]+" minlength="2" maxlength="48" required aria-describedby="tenant-help">
+      <p class="field-help" id="tenant-help">Lowercase letters, numbers, hyphens, and underscores.</p>
+      <label for="label">Workspace label</label>
+      <input id="label" name="label" value="Aid group demo" minlength="2" maxlength="80" required>
+      <label for="invitation-code">Invitation code</label>
+      <input id="invitation-code" name="invitation_code" type="password" autocomplete="off" required>
+      <label class="check-row"><input name="acknowledge_terms" type="checkbox" required><span>I will submit only synthetic or deliberately deidentified letter text. I understand that the API prepares and tracks drafts but never sends a request or submits an appeal.</span></label>
+      <button class="btn-primary" type="submit">Generate seven-day key</button>
+    </form>
+    <p id="developer-status" class="developer-status" role="status" aria-live="polite">No API key has been created in this browser.</p>
+    <div id="key-result" class="key-result" hidden>
+      <h3>Save this key now</h3>
+      <p>The plaintext value is not stored by the service and will not be shown again.</p>
+      <label for="api-key">API key</label>
+      <input id="api-key" readonly>
+      <p class="field-help">Expires: <strong id="key-expires"></strong></p>
+      <div class="btn-row">
+        <button id="copy-key" type="button">Copy key</button>
+        <button id="test-key" type="button">Test connection</button>
+        <button id="revoke-key" type="button">Revoke key</button>
+      </div>
+    </div>
+  </div>
+  <aside class="dev-panel boundary-panel">
+    <p class="step-label">Safety contract</p>
+    <h2>What this key can do</h2>
+    <p>This API supports applicant-controlled preparation. It rejects detected identifiers, persists no raw letter text, and has no endpoint that contacts an insurer, agency, or third party.</p>
+    <ul class="clean-list">
+      <li>The server derives the tenant from the key.</li>
+      <li>Only a SHA-256 key digest is persisted.</li>
+      <li>The key expires automatically after seven days.</li>
+      <li>You can revoke it from this page at any time.</li>
+    </ul>
+  </aside>
+</div></section>
+<section><div class="wrap">
+  <p class="step-label">Step 2 of 3</p>
+  <h2>Verify the connection</h2>
+  <p>Use the smallest authenticated request first. The response returns the project, tenant, scope boundary, and API version.</p>
+  <pre class="developer-code" id="curl-example"><code>curl -H "X-API-Key: YOUR_API_KEY" "SERVICE_URL/v1"</code></pre>
+  <p class="step-label developer-next">Step 3 of 3</p>
+  <h2>Call the project workflow</h2>
+  <pre class="developer-code"><code>curl -X POST "SERVICE_URL/v1/cases" \
+  -H "X-API-Key: YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{"subject_ref":"SUBJECT-101","disaster_ref":"DR-101","acknowledge_deidentified":true,"letter_text":"DECISION LETTER\\nDate: August 1, 2026\\nDecision: Ineligible\\nReason: Proof of occupancy was not provided.\\nYou may appeal within 60 days."}'</code></pre>
+  <div class="btn-row"><a class="btn btn-primary" href="/docs">Open interactive API reference</a><a class="btn" href="/">Return to product</a></div>
+</div></section>
+<section><div class="wrap dev-notes">
+  <div><h2>Use it responsibly</h2><p>Temporary access is intended for evaluation and small beta integrations. Do not place the key in frontend source, Git, screenshots, or public posts.</p></div>
+  <div><h3>Need permanent access?</h3><p>Operator-issued keys use the same scoped boundary but are rotated through Google Secret Manager. See the repository API guide for provisioning and revocation.</p></div>
+  <div><h3>Before broader rollout</h3><p>Place API Gateway in front of the service for per-consumer quotas, abuse controls, and formal onboarding. The current Cloud Run cap bounds infrastructure cost but is not a substitute for quotas.</p></div>
+</div></section>
+</main>
+<footer class="site"><div class="wrap"><div class="footer-links"><a href="/">Product</a><a href="/docs">API reference</a><a href="/judges">Judge evidence</a></div><p>Independent hackathon beta. Invitation access does not change the product's disclosed safety limits.</p></div></footer>
+<script src="/static/developer.js"></script>
+</body></html>

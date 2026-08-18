@@ -13,7 +13,7 @@ import json
 import os
 import re
 from dataclasses import dataclass
-from typing import Any
+from typing import Any, Callable
 
 from fastapi import HTTPException, Security
 from fastapi.security import APIKeyHeader
@@ -34,6 +34,7 @@ class ApiPrincipal:
     label: str
     scopes: frozenset[str]
     key_id: str
+    key_digest: str
 
 
 def hash_api_key(api_key: str) -> str:
@@ -44,21 +45,30 @@ def hash_api_key(api_key: str) -> str:
 class ApiKeyAuthenticator:
     """Resolve a presented key to a server-controlled tenant and scope set."""
 
-    def __init__(self, entries: dict[str, dict[str, Any]] | None = None) -> None:
+    def __init__(
+        self,
+        entries: dict[str, dict[str, Any]] | None = None,
+        dynamic_lookup: Callable[[str], dict[str, Any] | None] | None = None,
+    ) -> None:
         self._entries = self._validate(entries or {})
+        self._dynamic_lookup = dynamic_lookup
 
     @classmethod
-    def from_environment(cls, name: str = "BETA_API_KEY_HASHES") -> "ApiKeyAuthenticator":
+    def from_environment(
+        cls,
+        name: str = "BETA_API_KEY_HASHES",
+        dynamic_lookup: Callable[[str], dict[str, Any] | None] | None = None,
+    ) -> "ApiKeyAuthenticator":
         raw = os.environ.get(name, "").strip()
         if not raw:
-            return cls()
+            return cls(dynamic_lookup=dynamic_lookup)
         try:
             parsed = json.loads(raw)
         except json.JSONDecodeError as exc:
             raise RuntimeError(f"{name} must be valid JSON") from exc
         if not isinstance(parsed, dict):
             raise RuntimeError(f"{name} must be a JSON object")
-        return cls(parsed)
+        return cls(parsed, dynamic_lookup=dynamic_lookup)
 
     @classmethod
     def from_plaintext(
@@ -69,7 +79,7 @@ class ApiKeyAuthenticator:
 
     @property
     def enabled(self) -> bool:
-        return bool(self._entries)
+        return bool(self._entries) or self._dynamic_lookup is not None
 
     def __call__(self, api_key: str | None = Security(API_KEY_HEADER)) -> ApiPrincipal:
         if not self.enabled:
@@ -88,6 +98,16 @@ class ApiKeyAuthenticator:
         for known, entry in self._entries.items():
             if hmac.compare_digest(digest, known):
                 matched = (known, entry)
+        if matched is None and self._dynamic_lookup is not None:
+            try:
+                dynamic = self._dynamic_lookup(digest)
+            except Exception as exc:
+                raise HTTPException(
+                    status_code=503,
+                    detail="API key verification is temporarily unavailable.",
+                ) from exc
+            if dynamic is not None:
+                matched = (digest, self._validate({digest: dynamic})[digest])
         if matched is None:
             raise HTTPException(
                 status_code=401,
@@ -100,6 +120,7 @@ class ApiKeyAuthenticator:
             label=entry["label"],
             scopes=frozenset(entry["scopes"]),
             key_id=known[:12],
+            key_digest=known,
         )
 
     @staticmethod

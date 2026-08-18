@@ -32,7 +32,7 @@ their prerequisites exist, so the judge can follow the numbered stages without g
 | Gate | Reproducible result |
 |---|---:|
 | Deployed public acceptance flow | **24/24** |
-| Standalone automated tests | **215 passed** |
+| Standalone automated tests | **219 passed** |
 | Recorded letter fields | **20/20** |
 | Recorded evidence decisions | **6/6** |
 | Shared-substrate exit test | **10/10** |
@@ -160,9 +160,14 @@ limited to pseudonymous references, verified reason quotes, deadlines, requireme
 and draft status. The API can prepare a third-party request and a packet draft, but it has no send,
 contact, filing, submission, legal-advice, or outcome-prediction operation.
 
-Full provisioning and rotation instructions are in [the beta API guide](docs/api-beta.md).
+Full provisioning, expiry, and rotation instructions are in [the beta API guide](docs/api-beta.md).
 
-Create a key:
+Invited developers can open [the live Developer page](https://sixty-days-109051079423.us-central1.run.app/developer), enter the invitation
+code supplied by the project owner, and generate a tenant-scoped key that expires after seven days.
+The plaintext key is shown once and remains only in page memory. The page includes a connection
+test, a copyable project request, immediate revocation, and a link to the interactive OpenAPI schema.
+
+Operators can also create a non-expiring key through Secret Manager:
 
 ```bash
 cd app
