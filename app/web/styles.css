@@ -706,3 +706,40 @@ footer.site {
   .docs-steps li { grid-template-columns: 1fr; gap: 2px; }
   .code-toolbar { align-items: flex-start; }
 }
+/* Compact laptop mode. Width alone does not describe a 1366x768 or 1440x900 viewport. */
+@media (min-width: 700px) and (max-height: 900px) {
+  .bar { min-height: 60px; }
+  section { padding: 48px 0; }
+  .hero { padding: 62px 0 52px; }
+  .hero-layout { gap: 36px; }
+  h1 { font-size: clamp(2.35rem, 5vw, 3.9rem); }
+  .hero-proof { padding: 20px; }
+  .proof-list { margin-top: 12px; }
+  .proof-list li { padding: 8px 0; }
+  .stat-strip { margin-top: 18px; }
+  .stat { padding: 14px 16px; }
+  .section-heading { margin-bottom: 20px; }
+  .journey { margin: 20px 0; }
+  .journey-step { min-height: 130px; padding: 18px; }
+  .card { padding: 20px; }
+  .pane { padding: 16px; }
+  .console-shell { padding: 14px; }
+  .judge-hero { padding: 58px 0 48px; }
+  .model-briefing { margin-top: 24px; padding: 14px; }
+  .briefing-copy { padding: 12px; }
+  .briefing-media { min-height: 240px; }
+  .briefing-media img, .briefing-media video { min-height: 220px; }
+  .evaluator-path { margin-top: 18px; padding: 16px; }
+  .developer-hero { padding: 60px 0 46px; }
+  .developer-orientation { padding: 44px 0; }
+  .access-facts { margin-top: 18px; }
+  .path-choice { gap: 14px; margin-top: 18px; }
+  .dev-panel { padding: 26px; }
+  .api-docs-guide { margin-top: 20px; padding: 28px; }
+  .developer-code { padding: 18px; line-height: 1.55; }
+  footer.site { padding: 26px 0 34px; }
+}
+
+@media (min-width: 981px) and (max-height: 900px) {
+  .path-card { min-height: 190px; padding: 20px; }
+}

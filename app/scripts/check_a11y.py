@@ -153,6 +153,25 @@ def main() -> int:
         print("    FAIL  developer journey or credential-storage boundary is incomplete")
     print()
 
+    print("Compact laptop layout\n")
+    compact_query = "@media (min-width: 700px) and (max-height: 900px)"
+    compact_start = css.find(compact_query)
+    compact_end = css.find("@media (min-width: 981px) and (max-height: 900px)", compact_start)
+    compact_css = css[compact_start:compact_end] if compact_start >= 0 and compact_end > compact_start else ""
+    compact_tokens = (
+        "section { padding: 48px 0; }",
+        ".hero { padding: 62px 0 52px; }",
+        ".judge-hero { padding: 58px 0 48px; }",
+        ".developer-hero { padding: 60px 0 46px; }",
+        ".console-shell { padding: 14px; }",
+    )
+    compact_ok = all(token in compact_css for token in compact_tokens) and "display: none" not in compact_css
+    if compact_ok:
+        print("    PASS  short laptop viewports reduce travel without hiding content")
+    else:
+        failures.append("compact laptop layout is missing, incomplete, or hides content")
+        print("    FAIL  short laptop viewports retain desktop spacing or hide content")
+    print()
     print("Glossary coverage\n")
     if glossary_path.exists():
         glossary = json.loads(glossary_path.read_text(encoding="utf-8"))
