@@ -98,9 +98,9 @@ Veo, and per-agent runtime identities are not part of this build and must not ap
 ## 7. Submission checklist
 
 - Deploy and run `scripts/sixty_days_demo_flow.py` against the public project-number URL.
-- Run the 10/10 shared exit test and Day Three 18/18 regression after deploy.
+- Run the 10/10 resilience exit test and this submission's acceptance flow after deploy.
 - Verify the independent Sixty Days root and its PDF route from a clean, unauthenticated client.
-- Link Sixty Days from Day Three and Judges only after the public 24/24 flow is green.
+- Keep public navigation limited to this submission after the 24/24 flow is green.
 - Capture Cloud Run revision, Trace evidence, and the measured fixture catalogues.
 - Use no agency seals, marks, or language implying endorsement.
-- Build the Sixty Days Devpost submission and video separately from Day Three.
+- Build the Devpost submission and video as a standalone evaluation path.

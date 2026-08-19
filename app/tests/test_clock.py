@@ -35,16 +35,16 @@ def test_advance_moves_time_forward():
     assert 52 * 3600 - 2 < moved < 52 * 3600 + 2
 
 
-def test_sixty_days_compresses_into_one_call():
-    """The whole point of the component: Sixty Days' deadline in a four minute video."""
+def test_long_deadline_compresses_into_one_call():
+    """A long deadline can be demonstrated without pretending real time passed."""
     clock = SimulatedClock(MemoryClockStateStore())
     start = clock.now()
     clock.advance(timedelta(days=60))
     assert (clock.now() - start).days == 60
 
 
-def test_five_week_course_advances_in_steps():
-    """Day Three's wake ladder: hour 48, day 6, day 14, day 30."""
+def test_multi_week_schedule_advances_in_steps():
+    """A multi-week wake ladder advances deterministically in several steps."""
     clock = SimulatedClock(MemoryClockStateStore())
     start = clock.now()
     for step in (timedelta(hours=48), timedelta(days=4), timedelta(days=8), timedelta(days=16)):

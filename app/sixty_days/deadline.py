@@ -5,7 +5,7 @@ of the date on the decision letter. A survivor in the aftermath of a disaster ma
 case-specific evidence from several sources while that clock runs, so the agent holds the schedule:
 it registers every contact it will ever make at intake, then sleeps.
 
-Design decisions that matter, all inherited from Day Three's wake ladder:
+Design decisions that matter for the wake ladder:
 
 * **Registered up front.** A crash between contacts cannot lose the rest of the schedule.
 * **Deterministic ids.** Re-running registration after a restart is a no-op, so nobody in crisis

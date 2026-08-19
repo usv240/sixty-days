@@ -40,7 +40,7 @@ class FirestoreClockStateStore(ClockStateStore):
 
     Without a shared store each instance would have its own idea of the time, and a wake would
     fire on one instance and not another. Different submissions must not share a demo clock:
-    advancing Sixty Days while Day Three is being judged would otherwise move both timelines.
+    advancing one evaluation session must never move another session's timeline.
     """
 
     def __init__(self, client: firestore.Client, namespace: str = "shared") -> None:

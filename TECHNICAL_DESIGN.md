@@ -4,9 +4,8 @@
 `AS_BUILT.md`; executable tests and the deployed HTTP surface outrank narrative documents.
 
 Sixty Days is a self-contained repository and independent `sixty-days` Cloud Run service. Its
-`app/spine/` is a reviewed snapshot of the same proven clock, wake, redaction, verification, and
-tracing substrate used by Day Three; it shares the Google Cloud project and Firestore substrate,
-not a product URL or repository. It is submitted separately in The Taskmaster category.
+`app/spine/` is a reviewed snapshot of the proven clock, wake, redaction, verification, and tracing
+substrate. The submission owns its product URL and repository and targets The Taskmaster category.
 
 ## 1. Product boundary
 
@@ -148,8 +147,7 @@ moment and records the resulting partial status and missing list. No wake contac
 
 ## 8. Actual Google Cloud topology
 
-- One submission-specific Cloud Run service. It uses the same tested container source and shared
-  spine as Day Three, while exposing a distinct root, judges page, health identity, and URL.
+- One submission-specific Cloud Run service with its own root, judges page, health identity, and URL.
 - Firestore for structured case/run/wake state.
 - The existing `spine-scan-due` Cloud Scheduler job invokes a shared spine worker that claims due
   wakes from the same Firestore substrate; it is not a second Sixty Days service.

@@ -5,7 +5,7 @@ letters can identify case-specific missing evidence, and GAO found missing suppo
 among common historical ineligibility reasons. The product provides one translation and one
 clock without predicting eligibility or an appeal outcome.
 
-Two rules carried over from Day Three, both load bearing:
+Two rules are load bearing:
 
 1. **Nothing is extracted that cannot be quoted.** Every deficiency must quote the letter, which
    means the system structurally cannot invent a reason FEMA did not give.

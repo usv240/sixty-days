@@ -35,7 +35,7 @@ def test_a_wake_fires_when_its_time_arrives(scheduler, clock):
 
 
 def test_the_five_week_ladder_fires_in_order(scheduler, clock):
-    """Day Three registers the whole course at once so the schedule survives a crash."""
+    """The complete wake ladder is registered up front so it survives a crash."""
     ladder = [
         ("deescalation_review", timedelta(hours=48)),
         ("iv_to_oral_review", timedelta(days=5)),

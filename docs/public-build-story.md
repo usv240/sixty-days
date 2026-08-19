@@ -71,10 +71,9 @@ The letter date creates a deterministic deadline and eight durable wakes. A Clou
 claims due Firestore records in production. The guided preset anchors a clearly labelled simulation
 clock so a judge can see the sequence in minutes without deleting stored audit evidence.
 
-Parallel acceptance testing exposed cross-project interference when Day Three and Sixty Days shared
-one simulation clock. The fix introduced separate per-project clock documents and owning-project
-filters for simulated claims. The production wall-clock worker remains shared and intentionally
-unfiltered.
+Parallel acceptance testing exposed interference when concurrent sessions shared one simulation
+clock. The fix introduced namespaced clock documents and owning-run filters for simulated claims.
+The production wall-clock worker remains intentionally unfiltered.
 
 The system also survives repeated failure, concurrent wake dispatch, cancelled work, and deadline
 windows from 60 days to zero without duplicating wake IDs or hiding a partial packet.
@@ -107,19 +106,12 @@ provenance manifest records each prompt, exact model ID, location, byte count, a
 
 The models serve comprehension and privacy without gaining authority over the applicant's case.
 
-## Shared substrate, substantially different work
+## Architecture ownership
 
-Sixty Days and Day Three reuse the same reviewed durable spine for runs, wakes, claims, redaction,
-verification, tracing, and Firestore adapters. The infrastructure reuse and shared production
-scheduler are disclosed in both repositories.
-
-Sixty Days has its own disaster-letter reader, deadline and requirement router, evidence-screening
-workflow, request preparation, partial-safe PDF builder, FEMA-oriented conformance, synthetic case
-fixtures, applicant boundary, repository, Cloud Run service, interface, and 24-step acceptance flow.
-Day Three has none of those domain modules.
-
-The two projects share infrastructure primitives. They do not claim separate infrastructure stacks,
-and they do not solve the same user problem.
+The repository contains its reviewed durable runtime substrate for runs, wakes, claims, redaction,
+verification, tracing, and Firestore adapters. Its domain layer adds a disaster-letter reader,
+deadline and requirement routing, evidence screening, request preparation, a partial-safe PDF builder,
+FEMA-oriented conformance, synthetic case fixtures, and the 24-step public acceptance flow.
 
 ## Reproduce and inspect it
 

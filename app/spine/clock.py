@@ -1,8 +1,7 @@
 """The injectable clock.
 
-This is the keystone of the whole system. Day Three watches a patient for roughly five weeks,
-Sixty Days holds a sixty day deadline, and Downstream spans multi week authoring sessions. A four
-minute demo cannot wait for any of that.
+This is the keystone of the system. Durable workflows may span hours, weeks, or months, while a
+short evaluation cannot wait for real time to pass.
 
 `SimulatedClock` lets a demo compress real elapsed time while the agents genuinely react, using
 *the same code path* that runs against wall clock time in production. Nothing is faked: wake rows,

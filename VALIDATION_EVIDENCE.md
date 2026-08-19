@@ -104,6 +104,3 @@ An applicant or practitioner usability study remains future work.
 - Evidence authenticity, causation, or damage valuation
 - Government integration or endorsement
 - Production use with real applicant information
-
-See [PROJECT_DIFFERENTIATION.md](PROJECT_DIFFERENTIATION.md) for the evidence that this submission
-is substantially different from Day Three despite shared infrastructure primitives.

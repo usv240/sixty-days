@@ -97,9 +97,8 @@ actually builds and records a partial packet snapshot; no action sends or submit
 image bytes, and applicant narrative are deliberately omitted from durable case records.
 
 Only explicit `DEMO-*` application references and `DR-DEMO*` disaster references are accepted by
-the public packet workflow. Day Three and Sixty Days share durable infrastructure, but their public
-services, repositories, and simulation clocks are separate; simulated wake claims are filtered by
-the owning project.
+the public packet workflow. Simulation clocks are namespaced per public evaluation, and simulated
+wake claims are filtered by the owning project.
 
 - [Diffable Mermaid source](docs/architecture.mmd)
 - [Recorded media provenance: prompts, model IDs, sizes, and SHA-256 hashes](app/web/media/bonus-media-provenance.json)

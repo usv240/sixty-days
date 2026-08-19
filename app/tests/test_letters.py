@@ -1,6 +1,6 @@
 """Sixty Days letter interpretation and evidence-routing tests.
 
-The safety property is the same one proven by Day Three intake: a deficiency is usable only
+The safety property is strict: a deficiency is usable only
 when its source text really appears in the letter.  Routing also has to produce a concrete next
 action for every category; silently returning no plan would strand an applicant.
 """

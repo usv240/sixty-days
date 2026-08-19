@@ -81,8 +81,8 @@ _PATTERNS: tuple[tuple[str, re.Pattern[str]], ...] = (
     )),
     # Labeled person names.
     #
-    # Two bugs lived here and both leaked real identifiers, found by auditing the Sixty Days
-    # letter fixtures:
+    # Two bugs lived here and both leaked real identifiers, found by auditing realistic
+    # decision-letter fixtures:
     #   1. The label list only knew clinical words, so "Applicant:" was never matched.
     #   2. The name shape required Titlecase, but government letters print names in ALL CAPS,
     #      so "Applicant: DEVON CARTER" matched nothing even once the label was added.

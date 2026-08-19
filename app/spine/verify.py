@@ -60,8 +60,8 @@ class Record:
     allergy forbids calling penicillin safe. A recorded resistant result forbids calling that
     organism susceptible to that drug.
 
-    In Day Three these come from structured patient data and finalised susceptibility results,
-    not from prose, which is why the rule can be exact.
+    These values come from structured domain data and finalised source results, not from prose,
+    which is why the rule can be exact.
     """
 
     key: str

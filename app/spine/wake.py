@@ -1,9 +1,7 @@
 """Sleep until T.
 
-This is what makes an agent's normal state silence. Day Three registers a five week ladder of
-wakes at the start of an antibiotic course, Sixty Days holds a sixty day appeal window, and
-Downstream nudges an owner between sessions. All three sleep, cost nothing while sleeping, and
-act on their own when the time comes.
+This is what makes an agent's normal state silence. Workflows register their complete wake ladders
+up front, sleep without consuming compute, and resume only when durable work becomes due.
 
 In production a Cloud Scheduler cron calls `/internal/scan-due`, which finds due wakes, claims
 each in a transaction, invokes an idempotent handler directly, then marks it complete. Locally the
