@@ -27,9 +27,72 @@ $("#theme-toggle").addEventListener("click", () => {
 });
 applyTheme();
 
+/* --- Plain-language popovers -------------------------------------------- */
+
+// Some words on this page cannot be avoided: appeal, decision letter, reminder, draft packet.
+// Rather than assume them or bury a glossary in a footer, each is explained where it is met.
+let glossary = {};
+const popover = $("#popover");
+let openTrigger = null;
+
+fetch("/static/glossary.json").then((r) => r.json()).then((g) => { glossary = g; }).catch(() => {});
+
+function closePopover() {
+  popover.hidden = true;
+  if (openTrigger) { openTrigger.setAttribute("aria-expanded", "false"); openTrigger = null; }
+}
+
+document.addEventListener("click", (event) => {
+  const trigger = event.target.closest(".info");
+  if (!trigger) { if (!event.target.closest("#popover")) closePopover(); return; }
+  event.preventDefault();
+  const entry = glossary[trigger.dataset.info];
+  if (!entry) return;
+  if (openTrigger === trigger) { closePopover(); return; }
+
+  popover.replaceChildren();
+  const title = document.createElement("h4");
+  title.textContent = entry.title;
+  const plain = document.createElement("p");
+  plain.textContent = entry.plain;
+  const why = document.createElement("p");
+  why.className = "why";
+  const whyLabel = document.createElement("b");
+  whyLabel.textContent = "Why it matters here: ";
+  why.append(whyLabel, document.createTextNode(entry.why));
+  const link = document.createElement("a");
+  link.href = entry.url;
+  link.target = "_blank";
+  link.rel = "noopener";
+  link.textContent = `Source: ${entry.source}`;
+  popover.append(title, plain, why, link);
+  popover.hidden = false;
+
+  const rect = trigger.getBoundingClientRect();
+  const width = Math.min(340, window.innerWidth - 32);
+  popover.style.width = `${width}px`;
+  let left = rect.left + window.scrollX;
+  left = Math.max(16, Math.min(left, window.innerWidth - width - 16));
+  popover.style.left = `${left}px`;
+  popover.style.top = `${rect.bottom + window.scrollY + 8}px`;
+
+  trigger.setAttribute("aria-expanded", "true");
+  openTrigger = trigger;
+});
+
+document.addEventListener("keydown", (event) => {
+  if (event.key === "Escape" && !popover.hidden) {
+    const trigger = openTrigger;
+    closePopover();
+    if (trigger) trigger.focus();
+  }
+});
+
 const stream = $("#stream");
 let runId = null;
 let currentCase = null;
+
+const STEP_STATE_LABEL = { complete: "Done", current: "Current", upcoming: "Upcoming" };
 
 function setProgress(stage, finished = false) {
   document.querySelectorAll("#workflow-progress li").forEach((item, index) => {
@@ -39,6 +102,30 @@ function setProgress(stage, finished = false) {
     if (number === stage && !finished) item.setAttribute("aria-current", "step");
     else item.removeAttribute("aria-current");
   });
+  // The stage cards collapse everything except the current step, so the rail and the console
+  // can never disagree about what the applicant is supposed to do next.
+  document.querySelectorAll(".control-group[data-workflow-step]").forEach((group) => {
+    const number = Number(group.dataset.workflowStep);
+    const state = number < stage || (finished && number <= stage)
+      ? "complete"
+      : number === stage ? "current" : "upcoming";
+    group.dataset.state = state;
+    // A completed run would otherwise collapse every stage and leave nothing to act on, so the
+    // last stage stays open with its controls available for a second look.
+    group.classList.toggle("is-open", finished && number === stage);
+    const badge = group.querySelector(".step-state");
+    if (badge) badge.textContent = STEP_STATE_LABEL[state];
+  });
+}
+
+function refreshActivityAffordance() {
+  const wrap = document.querySelector(".stream-wrap");
+  const toggle = $("#activity-toggle");
+  if (!wrap || !toggle) return;
+  const clipped = stream.scrollHeight > stream.clientHeight + 2;
+  const expanded = stream.classList.contains("is-expanded");
+  toggle.hidden = !clipped && !expanded;
+  wrap.classList.toggle("is-complete", expanded || !clipped);
 }
 
 function log(agent, message, why = "", tone = "") {
@@ -57,6 +144,70 @@ function log(agent, message, why = "", tone = "") {
   }
   event.append(badge, content);
   stream.prepend(event);
+  refreshActivityAffordance();
+}
+
+// The judge should be able to see exactly what the agent was handed, before it is handed over.
+// Previewing on selection rather than on submit is what makes the input auditable rather than
+// implied: the picture on screen is the same bytes the model reads.
+function previewSource(kind, fixture) {
+  const image = $(`#${kind}-image`);
+  const frame = image.closest(".source-frame");
+  const state = $(`#${kind}-state`);
+  const caption = $(`#${kind}-caption`);
+  const label = String(fixture || "").replaceAll("_", " ");
+
+  const zoom = $(`#${kind}-zoom`);
+
+  if (!fixture) {
+    image.hidden = true;
+    image.removeAttribute("src");
+    zoom.hidden = true;
+    frame.classList.remove("is-loading");
+    state.textContent = kind === "letter"
+      ? "Select a letter to preview it."
+      : "Select a photo to preview it.";
+    return;
+  }
+
+  const source = kind === "letter"
+    ? `/sixty-days/fixtures/${fixture}/image`
+    : `/sixty-days/evidence/fixtures/${fixture}/image`;
+
+  caption.textContent = kind === "letter" ? `Decision letter: ${label}` : `Evidence photo: ${label}`;
+  state.textContent = "Loading the synthetic fixture…";
+  frame.classList.add("is-loading");
+  image.hidden = true;
+
+  image.onload = () => {
+    frame.classList.remove("is-loading");
+    image.hidden = false;
+    zoom.href = source;
+    zoom.hidden = false;
+    state.textContent = kind === "letter"
+      ? "The exact page Gemini 3.5 Flash transcribes."
+      : "The exact photograph the framing check screens.";
+  };
+  image.onerror = () => {
+    frame.classList.remove("is-loading");
+    image.hidden = true;
+    zoom.hidden = true;
+    state.textContent = "This fixture preview could not be loaded.";
+  };
+  image.src = source;
+}
+
+function showEvidenceVerdict(text, tone) {
+  const verdict = $("#evidence-verdict");
+  if (!text) {
+    verdict.hidden = true;
+    verdict.textContent = "";
+    verdict.className = "source-verdict";
+    return;
+  }
+  verdict.className = `source-verdict ${tone}`;
+  verdict.textContent = text;
+  verdict.hidden = false;
 }
 
 function addOptions(select, values) {
@@ -68,6 +219,102 @@ function addOptions(select, values) {
       ? value.replaceAll("_", " ")
       : `${value.title} - ${value.routed_to}`;
     select.append(option);
+  }
+}
+
+// Wall-clock proof, kept separate from the simulated demo clock on purpose: conflating the two
+// is exactly the overstatement this project refuses to make elsewhere.
+// Internal names are for the code. People get sentences.
+const WAKE_IN_PLAIN = {
+  understood_check: "checked whether the summary actually made sense",
+  nudge: "listed what is still missing",
+  replan: "changed the approach, because the same request had failed repeatedly",
+  escalate: "surfaced the free legal-aid option, leaving the choice with the applicant",
+  build_partial: "assembled a draft from whatever has been gathered so far",
+  final_alert: "gave the final warning, two days before the deadline",
+  packet_safeguard: "assembled a draft from whatever has been gathered so far",
+};
+
+function plainWake(kind) {
+  const key = String(kind || "");
+  if (WAKE_IN_PLAIN[key]) return WAKE_IN_PLAIN[key];
+  if (key.startsWith("chase:")) {
+    const what = key.slice("chase:".length).replaceAll("_", " ");
+    return `followed up, because there was still no reply about the ${what}`;
+  }
+  return key.replaceAll("_", " ").replaceAll(":", ": ");
+}
+
+async function refreshLiveBudget() {
+  const { ok, data } = await api("/sixty-days/live-check/budget");
+  const label = $("#live-check-budget");
+  const button = $("#btn-live-check");
+  if (!ok) { label.textContent = "Live-call allowance unavailable."; return; }
+  const left = data.your_calls_left ?? 0;
+  button.disabled = !data.allowed;
+  label.textContent = data.allowed
+    ? `${left} of ${data.your_calls_allowed_today} live calls left for you today. Takes 10 to 30 seconds.`
+    : data.reason;
+}
+
+$("#btn-live-check").addEventListener("click", async () => {
+  const button = $("#btn-live-check");
+  const result = $("#live-check-result");
+  button.disabled = true;
+  button.textContent = "Calling Gemini 3.5 Flash…";
+  result.hidden = true;
+  const { ok, data } = await api("/sixty-days/live-check", {});
+  button.textContent = "Read the letter live";
+  if (!ok) {
+    result.className = "live-result fail";
+    result.textContent = data.detail || "The live call did not complete.";
+    result.hidden = false;
+    await refreshLiveBudget();
+    return;
+  }
+  const perfect = data.correct === data.total;
+  result.className = `live-result ${perfect ? "pass" : "fail"}`;
+  result.replaceChildren();
+  const headline = document.createElement("b");
+  headline.textContent = `${data.correct} of ${data.total} fields correct, live`;
+  const detail = document.createElement("div");
+  const failed = Object.entries(data.fields || {})
+    .filter(([, value]) => !value).map(([key]) => key.replaceAll("_", " "));
+  detail.textContent = perfect
+    ? "Same fields, same truth file, and the same scoring as the published recorded run."
+    : `Missed: ${failed.join(", ")}. Reported as measured, not hidden.`;
+  const meta = document.createElement("div");
+  meta.className = "live-meta";
+  meta.textContent =
+    `${data.model} on Vertex AI - ${data.elapsed_ms} ms - ` +
+    `${data.redacted_identifiers} identifier(s) redacted before the model saw the text - ` +
+    "image only, no transcript supplied - nothing stored.";
+  result.append(headline, detail, meta);
+  result.hidden = false;
+  log("live model call", `${data.correct}/${data.total} fields correct on a live Vertex call.`,
+      "No case was created and nothing was stored.", perfect ? "accept" : "reject");
+  await refreshLiveBudget();
+});
+
+async function refreshScheduler() {
+  const pill = $("#scheduler-pill");
+  const text = $("#scheduler-text");
+  const { ok, data } = await api("/sixty-days/scheduler");
+  pill.classList.remove("is-running", "is-stale");
+  if (!ok || !data.status) {
+    text.textContent = "Scheduler status unavailable";
+    return;
+  }
+  if (data.status === "running") {
+    pill.classList.add("is-running");
+    const seconds = data.seconds_since_last_scan ?? 0;
+    const ago = seconds < 90 ? `${seconds}s ago` : `${Math.round(seconds / 60)} min ago`;
+    text.textContent = `Real scheduler woke this service ${ago}`;
+  } else if (data.status === "stale") {
+    pill.classList.add("is-stale");
+    text.textContent = "Real scheduler has not reported recently";
+  } else {
+    text.textContent = "Real scheduler registered, no scan recorded yet";
   }
 }
 
@@ -96,7 +343,17 @@ async function boot() {
   addOptions($("#evidence-fixture"), evidence.data.fixtures);
   $("#fixture").value = "damage_and_insurance";
   $("#evidence-fixture").value = "damage_close_bad";
+  previewSource("letter", $("#fixture").value);
+  previewSource("evidence", $("#evidence-fixture").value);
 }
+
+$("#fixture").addEventListener("change", (event) => {
+  previewSource("letter", event.target.value);
+});
+$("#evidence-fixture").addEventListener("change", (event) => {
+  previewSource("evidence", event.target.value);
+  showEvidenceVerdict("", "");
+});
 
 function renderPlan(data) {
   const target = $("#case-plan");
@@ -141,12 +398,12 @@ function resetDemoUi() {
   log("demo preset", "Preparing a fresh synthetic case.",
       "No stored case or audit record is deleted.");
   $("#case-plan").replaceChildren();
-  $("#letter-image").hidden = true;
-  $("#evidence-image").hidden = true;
+  showEvidenceVerdict("", "");
   $("#prepared-request").textContent = "";
   $("#packet-status").textContent = "No packet built.";
   $("#applicant-statement").value = "";
   $("#evidence-fixture").value = "damage_close_bad";
+  previewSource("evidence", "damage_close_bad");
   $("#btn-screen").textContent = "Screen close photo (expected retake)";
   $("#request-requirement").replaceChildren();
   $("#request-requirement").disabled = true;
@@ -186,18 +443,18 @@ $("#btn-open").addEventListener("click", async () => {
   }
   currentCase = data;
   runId = data.run_id;
-  $("#letter-image").src = `/sixty-days/fixtures/${fixture}/image`;
-  $("#letter-image").hidden = false;
+  previewSource("letter", fixture);
   const plannedSend = new Date(`${data.letter_date}T09:00:00Z`);
   plannedSend.setUTCDate(plannedSend.getUTCDate() + 5);
   $("#requested-on").value = plannedSend.toISOString().slice(0, 10);
   renderPlan(data);
-  log("letter reader", `${data.deficiencies.length} quoted reason(s) survived verification.`,
-      `${data.redacted} identifier(s) removed before downstream storage.`, "accept");
-  log("evidence planner", `${data.requirements.length} concrete item(s) routed.`,
-      data.requirements.map((item) => `${item.key} → ${item.routed_to}`).join("; "), "accept");
-  log("deadline keeper", `${data.wakes.length} wakes registered through ${data.deadline}.`,
-      "The agent is now asleep.", "accept");
+  log("letter reader", `Found ${data.deficiencies.length} reason(s) the letter actually gives.`,
+      `Each one is copied word for word from the letter. ${data.redacted} personal detail(s) were removed first.`,
+      "accept");
+  log("evidence planner", `Worked out ${data.requirements.length} document(s) to gather, and who has each one.`,
+      data.requirements.map((item) => `${item.title} - ask ${item.routed_to}`).join("; "), "accept");
+  log("deadline keeper", `Set ${data.wakes.length} reminders for itself, up to the ${data.deadline} deadline.`,
+      "It now waits. It will wake itself up on each of those dates without being asked.", "accept");
 
   const requestable = data.requirements.filter(
     (item) => item.source === "third_party" || item.source === "public_record"
@@ -221,8 +478,7 @@ $("#btn-open").addEventListener("click", async () => {
 $("#btn-screen").addEventListener("click", async () => {
   if (!currentCase) return;
   const fixture = $("#evidence-fixture").value;
-  $("#evidence-image").src = `/sixty-days/evidence/fixtures/${fixture}/image`;
-  $("#evidence-image").hidden = false;
+  previewSource("evidence", fixture);
   const { ok, data } = await api(
     `/sixty-days/cases/${currentCase.case_id}/evidence/check`,
     { fixture, requirement_key: "photo_wide" },
@@ -233,8 +489,10 @@ $("#btn-screen").addEventListener("click", async () => {
   }
   const tone = data.decision === "ready_for_review" ? "accept" : "reject";
   log("evidence checker", data.decision.replaceAll("_", " "), data.guidance, tone);
+  showEvidenceVerdict(`${data.decision.replaceAll("_", " ")}. ${data.guidance}`, tone);
   if (fixture === "damage_close_bad") {
     $("#evidence-fixture").value = "damage_wide_good";
+    previewSource("evidence", "damage_wide_good");
     $("#btn-screen").textContent = "Screen wider comparison (expected review)";
     log("demo preset", "The wider comparison is selected for the next click.",
         "This makes the retake-to-review difference visible without hidden setup.");
@@ -260,8 +518,8 @@ $("#btn-prepare").addEventListener("click", async () => {
   $("#prepared-request").textContent =
     `${data.subject}. Status: ${data.status}; delivery: ${data.delivery}. ` +
     `If there is no reply, the next check is ${data.tracking.due_at}.`;
-  log("request preparer", "Draft prepared; nothing was sent.",
-      `The applicant sends it. A no-reply check is registered for ${data.tracking.due_at}.`,
+  log("request preparer", "Wrote the request. It was not sent.",
+      `You send it yourself. If there is no reply by ${data.tracking.due_at}, it will check back.`,
       "accept");
   setProgress(4);
 });
@@ -284,8 +542,8 @@ $("#btn-packet").addEventListener("click", async () => {
   $("#packet-status").textContent = data.missing.length
     ? `Partial draft: ${data.missing.length} item(s) still listed as missing.`
     : "Draft ready for the applicant’s page-by-page review.";
-  log("packet verifier", `${data.verified_statements.length} letter statement(s) quote-grounded.`,
-      `${data.missing.length} missing item(s) remain visible; the packet is not submitted.`,
+  log("packet verifier", `Checked ${data.verified_statements.length} statement(s) against the letter's own words.`,
+      `${data.missing.length} item(s) are still missing, and the draft says so. Nothing was submitted.`,
       "accept");
 });
 
@@ -321,16 +579,17 @@ async function advance(days, label) {
   }
   await refreshClock();
   const wakes = (data.woke || []).filter((wake) => wake.run_id === runId);
-  if (!wakes.length) log("clock", `${label}: nothing due.`, "Silence is the expected state.");
+  if (!wakes.length) log("clock", `${label}: nothing was due yet.`,
+    "Most days there is nothing to do. Staying quiet is the normal state.");
   for (const wake of wakes) {
     const domain = wake.domain || {};
-    log("deadline keeper", `Woke itself: ${wake.kind}.`,
-        domain.detail || "The scheduler found this event due; nobody clicked an agent action.",
+    log("deadline keeper", `It woke up on its own and ${plainWake(wake.kind)}.`,
+        domain.detail || "The clock reached this date. Nobody pressed anything.",
         "accept");
     if (domain.action === "partial_packet_built") {
       $("#packet-status").textContent = `${domain.packet_status}: ${(domain.missing || []).join(" | ")}`;
-      log("packet builder", "Built the day-52 partial packet automatically.",
-          "The applicant still reviews it and nothing was submitted.", "accept");
+      log("packet builder", "Built a draft appeal packet by itself.",
+          "It still shows everything that is missing, and nothing was sent to anyone.", "accept");
     }
   }
 }
@@ -338,6 +597,26 @@ $("#btn-day3").addEventListener("click", () => advance(3, "Advanced 3 days"));
 $("#btn-day52").addEventListener("click", () => advance(49, "Advanced 49 more days"));
 $("#btn-day58").addEventListener("click", () => advance(6, "Advanced 6 more days"));
 
+$("#letter-image").closest(".source-frame").classList.add("is-letter");
+
+$("#activity-toggle").addEventListener("click", () => {
+  const expanded = stream.classList.toggle("is-expanded");
+  $("#activity-toggle").setAttribute("aria-expanded", String(expanded));
+  $("#activity-toggle").textContent = expanded
+    ? "Collapse the activity history"
+    : "Show the full activity history";
+  refreshActivityAffordance();
+});
+
+// Starting over is the one control a judge needs at every point, including after the run ends.
+$("#btn-restart").addEventListener("click", () => {
+  $("#btn-open").click();
+});
+
+refreshActivityAffordance();
 boot();
 refreshClock();
+refreshScheduler();
+refreshLiveBudget();
 setInterval(refreshClock, 15000);
+setInterval(refreshScheduler, 20000);

@@ -126,8 +126,11 @@ header.site nav { display: flex; gap: 4px; flex-wrap: wrap; }
 header.site nav a {
   padding: 6px 10px; border-radius: 8px; text-decoration: none;
   color: var(--text-muted); font-size: .9rem;
+  min-height: 34px; display: inline-flex; align-items: center;
 }
 header.site nav a:hover { background: var(--surface); color: var(--text); }
+/* The default 13px checkbox is an awkward target on a phone, and this one gates key issuance. */
+.check-row input[type="checkbox"] { width: 22px; height: 22px; flex: 0 0 auto; }
 
 /* --- Buttons ------------------------------------------------------------ */
 
@@ -220,7 +223,7 @@ button[disabled] { opacity: .5; cursor: not-allowed; }
   pointer-events: none;
 }
 .hero .wrap { position: relative; z-index: 1; }
-.hero-layout { display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(280px, .6fr); gap: 64px; align-items: center; }
+.hero-layout { display: grid; grid-template-columns: minmax(0, 1fr); gap: 40px; align-items: start; }
 .hero-copy { min-width: 0; }
 .hero .lede { font-size: clamp(1.08rem, 2.2vw, 1.28rem); color: var(--text-muted); max-width: 58ch; }
 .hero-proof {
@@ -265,9 +268,32 @@ button[disabled] { opacity: .5; cursor: not-allowed; }
 
 /* --- Console ------------------------------------------------------------ */
 
-.console { display: grid; gap: 16px; grid-template-columns: 1fr; }
-@media (min-width: 900px)  { .console { grid-template-columns: 300px 1fr; } }
-@media (min-width: 1200px) { .console { grid-template-columns: 280px 1fr 360px; } }
+/* One named-area grid drives every breakpoint, so a stage never lands in a column that
+   cannot hold it. Areas, not column counts, are what change as the viewport narrows. */
+.console {
+  display: grid; gap: 14px; align-items: stretch;
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-areas: "controls" "source" "activity" "case";
+}
+@media (min-width: 860px) {
+  .console {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    grid-template-areas: "controls controls" "source activity" "case case";
+  }
+}
+@media (min-width: 1240px) {
+  .console {
+    grid-template-columns: minmax(330px, 1.05fr) minmax(0, 1.1fr) minmax(260px, .85fr);
+    grid-template-areas: "controls controls controls" "source activity case";
+  }
+  /* Row two stretches so the three panes share a baseline. Without this a tall document
+     preview leaves the activity and case panes floating over an empty band. */
+  .source-pane, .activity-pane, .case-pane { align-self: stretch; }
+}
+.controls-pane { grid-area: controls; }
+.source-pane   { grid-area: source; }
+.activity-pane { grid-area: activity; }
+.case-pane     { grid-area: case; }
 
 .pane {
   background: var(--surface); border: 1px solid var(--border);
@@ -282,10 +308,202 @@ button[disabled] { opacity: .5; cursor: not-allowed; }
 }
 textarea.control { resize: vertical; }
 .fixture-image {
-  display: block; width: 100%; max-height: 360px; object-fit: contain; margin-top: 14px;
-  border: 1px solid var(--border-strong); border-radius: 8px; background: var(--bg);
+  display: block; width: 100%; height: 100%; max-height: 100%;
+  object-fit: contain; background: var(--bg);
 }
 .fixture-image[hidden] { display: none; }
+
+/* --- Guided stages ------------------------------------------------------ */
+
+.pane-heading {
+  display: flex; align-items: flex-start; justify-content: space-between; gap: 18px;
+  margin-bottom: 14px;
+}
+.pane-heading.compact { align-items: center; margin-bottom: 6px; }
+.pane-heading.compact h3 { margin: 0; }
+.pane-lede { margin: 0 0 10px; color: var(--text-muted); font-size: .84rem; line-height: 1.45; }
+
+/* One line of console furniture instead of three stacked blocks. A judge should reach a control
+   without scrolling, because the whole demo is press-this-watch-that. */
+/* One row carries the clock, the live scheduler proof, the measured-fixture line, and the three
+   controls. Stacked as two rows they cost 92px of a 656px console for content that fits on one. */
+.console-head {
+  display: flex; align-items: center; gap: 10px 14px; flex-wrap: wrap;
+  margin-bottom: 10px;
+}
+.console-head .guide-tools { margin-left: auto; }
+.clock-inline {
+  display: inline-flex; align-items: baseline; gap: 8px; margin: 0;
+  background: var(--accent-soft); border: 1px solid var(--border);
+  border-radius: 999px; padding: 6px 14px; white-space: nowrap;
+}
+.clock-inline span {
+  color: var(--text-muted); font-size: .72rem; font-weight: 740;
+  letter-spacing: .06em; text-transform: uppercase;
+}
+.measurement-inline { flex: 1 1 200px; margin: 0; color: var(--text-muted); font-size: .8rem; }
+/* The demo clock is simulated and says so, which fairly invites the question of whether anything
+   runs on its own. This answers it in the product: wall-clock evidence, refreshed in place. */
+.scheduler-pill {
+  display: inline-flex; align-items: center; gap: 8px; flex: 0 0 auto;
+  padding: 6px 12px; border: 1px solid var(--border); border-radius: 999px;
+  background: var(--surface); color: var(--text-muted);
+  font-size: .78rem; font-weight: 640; text-decoration: none; white-space: nowrap;
+}
+.scheduler-pill:hover { border-color: var(--accent); color: var(--text); }
+.scheduler-dot {
+  width: 8px; height: 8px; border-radius: 50%; background: var(--text-muted); flex: 0 0 auto;
+}
+.scheduler-pill.is-running .scheduler-dot { background: var(--ok); }
+.scheduler-pill.is-stale .scheduler-dot { background: var(--warn); }
+.console-bar .btn { flex: 0 0 auto; }
+.console-notes { flex: 0 0 auto; color: var(--text-muted); font-size: .8rem; }
+/* Open, the disclosure needs the full row; closed it is just another chip. */
+.console-head .console-notes[open] { flex: 1 1 100%; order: 9; }
+.console-notes summary { font-weight: 640; font-size: .84rem; white-space: nowrap; }
+.console-notes p { margin: 8px 0 0; max-width: 88ch; }
+
+/* Side by side, so the two inputs cost one preview's height instead of two. */
+.source-pair { display: grid; gap: 14px; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.pane-heading h3 { margin: 0 0 4px; }
+.pane-heading p { max-width: 62ch; margin: 0; color: var(--text-muted); font-size: .84rem; line-height: 1.45; }
+.guide-tools { display: flex; align-items: center; gap: 8px; }
+.guide-tools #btn-restart { min-height: 32px; padding: 4px 12px; font-size: .76rem; }
+.console-evidence-link {
+  color: var(--text-muted); font-size: .8rem; font-weight: 660;
+  text-underline-offset: 3px; white-space: nowrap;
+}
+.console-evidence-link:hover { color: var(--accent); }
+.sequence-hint {
+  flex: 0 0 auto; padding: 5px 10px; border: 1px solid var(--border);
+  border-radius: 999px; background: var(--surface-2); color: var(--text-muted);
+  font-size: .74rem; font-weight: 740; white-space: nowrap;
+}
+
+/* Only the active stage is rendered here. The numbered rail directly above already carries
+   the 1-2-3-4 progress, so repeating four chips inside the pane duplicated that rail and left a
+   tall empty band beside whichever card was open. */
+.guided-controls { display: grid; gap: 10px; grid-template-columns: minmax(0, 1fr); }
+.guided-controls .control-group {
+  min-width: 0; margin: 0; padding: 11px 13px;
+  border: 1px solid var(--border); border-radius: var(--radius-sm, 10px);
+  background: color-mix(in srgb, var(--surface-2) 72%, var(--surface));
+  transition: border-color .18s ease, background .18s ease;
+}
+.guided-controls .control-group[data-state="current"] {
+  border-color: var(--accent); background: var(--accent-soft);
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--accent) 30%, transparent);
+}
+.guided-controls .control-group[data-state="complete"] { background: var(--surface); }
+/* Collapsing every non-current stage is what keeps the next action unambiguous. */
+.guided-controls .control-group:not([data-state="current"]):not(.is-open) { display: none; }
+/* The final stage stays open once the run completes, so the console always offers a next move. */
+.guided-controls .control-group.is-open { border-color: var(--border-strong); }
+
+/* A full-width stage would otherwise be one tall column of controls. */
+.control-group .stage-fields {
+  display: grid; gap: 0 18px; align-items: start;
+  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+}
+.control-group .stage-fields > .stage-actions { align-self: end; }
+.stage-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+.stage-actions button { flex: 1 1 170px; }
+.guided-controls .stage-actions button { width: auto; }
+.control-group .stage-note { grid-column: auto; align-self: start; }
+.control-group .stage-fields > div[aria-live], 
+.control-group #prepared-request, 
+.control-group #packet-status { grid-column: 1 / -1; }
+.step-summary { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.step-summary .control-kicker { margin: 0; }
+.step-state {
+  flex: 0 0 auto; padding: 3px 8px; border-radius: 999px;
+  background: var(--surface); color: var(--text-muted);
+  font-size: .66rem; font-weight: 720; text-transform: uppercase; letter-spacing: .04em;
+}
+.control-group[data-state="current"] .step-state { background: var(--accent); color: var(--accent-text, #fff); }
+.control-group[data-state="complete"] .step-state { background: var(--ok-soft); color: var(--ok); }
+.guided-controls label { display: block; margin-top: 10px; font-size: .8rem; font-weight: 640; }
+.guided-controls .control { margin: 6px 0 8px; min-height: 40px; }
+.guided-controls button:not(.info) { width: 100%; min-height: 40px; margin: 0 0 7px; padding: 8px 10px; }
+.control-help { margin: 2px 0 6px; color: var(--text-muted); font-size: .76rem; line-height: 1.4; }
+.controls-note { margin: 12px 0 0; color: var(--text-muted); font-size: .78rem; line-height: 1.45; }
+
+/* --- Source documents --------------------------------------------------- */
+
+.source-figure { margin: 0; min-width: 0; }
+/* Kicker, name, and the full-size link share one line so the previews sit high enough to be
+   visible in the same screen as the control that produced them. */
+.source-figure figcaption {
+  display: flex; flex-wrap: wrap; align-items: baseline; gap: 2px 8px; margin-bottom: 6px;
+}
+.source-figure figcaption b { font-size: .88rem; flex: 1 1 auto; }
+.source-note { display: block; margin: 6px 0 0; font-size: .74rem; }
+.source-kicker {
+  color: var(--accent); font-size: .68rem; font-weight: 750;
+  letter-spacing: .08em; text-transform: uppercase;
+}
+.source-note { color: var(--text-muted); line-height: 1.35; }
+/* A fixed aspect ratio means the pane does not jump as images of different shapes load. */
+/* A fixed height rather than an aspect ratio: the pane must not grow with the column width, or
+   the previews drop below the fold and the console stops fitting one screen. */
+.source-frame {
+  position: relative; display: grid; place-items: center;
+  width: 100%; height: 128px; overflow: hidden;
+  border: 1px solid var(--border-strong); border-radius: 10px;
+  background: var(--bg);
+}
+.source-frame.is-letter { height: 128px; }
+/* Deliberately a thumbnail: the console has to stay one screen tall so a control and its result
+   are visible together. Anyone who wants to read the page opens it full size. */
+.source-zoom { font-size: .76rem; font-weight: 650; text-underline-offset: 3px; }
+.source-zoom[hidden] { display: none; }
+.source-placeholder {
+  margin: 0; padding: 16px; text-align: center;
+  color: var(--text-muted); font-size: .82rem;
+}
+.source-frame img:not([hidden]) + .source-placeholder { display: none; }
+.source-frame.is-loading::after {
+  content: ""; position: absolute; inset: 0;
+  background: color-mix(in srgb, var(--surface-2) 70%, transparent);
+}
+.source-verdict {
+  margin: 10px 0 0; padding: 9px 11px; border-radius: 8px;
+  border-left: 3px solid var(--border-strong); background: var(--surface-2);
+  font-size: .82rem; line-height: 1.45;
+}
+.source-verdict[hidden] { display: none; }
+.source-verdict.accept { border-left-color: var(--ok); background: var(--ok-soft); }
+.source-verdict.reject { border-left-color: var(--warn); background: var(--warn-soft); }
+.source-boundary {
+  margin: 10px 0 0; padding-top: 10px; border-top: 1px solid var(--border);
+  color: var(--text-muted); font-size: .76rem; line-height: 1.45;
+}
+
+/* --- Activity ----------------------------------------------------------- */
+
+.advance-controls { margin-top: 12px; padding-top: 10px; border-top: 1px solid var(--border); }
+
+/* The one control on the page that spends real money and answers the one question a recording
+   cannot: whether the integration is live. */
+.live-proof { margin-top: 14px; padding-top: 12px; border-top: 1px solid var(--border); }
+.live-proof button { width: 100%; min-height: 38px; margin-top: 4px; }
+.live-result {
+  margin-top: 10px; padding: 10px 12px; border-radius: 8px;
+  border-left: 3px solid var(--border-strong); background: var(--surface-2);
+  font-size: .82rem; line-height: 1.45;
+}
+.live-result[hidden] { display: none; }
+.live-result.pass { border-left-color: var(--ok); background: var(--ok-soft); }
+.live-result.fail { border-left-color: var(--warn); background: var(--warn-soft); }
+.live-result b { display: block; font-size: .95rem; }
+.live-result .live-meta { color: var(--text-muted); font-size: .76rem; }
+.advance-label {
+  display: block; margin-bottom: 6px; color: var(--text-muted);
+  font-size: .72rem; font-weight: 740; letter-spacing: .06em; text-transform: uppercase;
+}
+/* One row of three. Wrapping these onto two rows cost height the console could not spare. */
+.advance-controls .btn-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+.advance-controls button { min-width: 0; min-height: 38px; padding: 6px 8px; }
 .card.compact { padding: 12px; margin-bottom: 10px; }
 .eyebrow {
   color: var(--accent); font-size: .78rem; font-weight: 750;
@@ -303,7 +521,15 @@ textarea.control { resize: vertical; }
 
 /* --- Antibiogram grid --------------------------------------------------- */
 
-.table-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+/* A scroll container inside a grid or flex parent still refuses to shrink without min-width:0,
+   so the table pushed the whole page sideways on a phone rather than scrolling inside its box. */
+.table-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; max-width: 100%; min-width: 0; }
+.table-scroll table { min-width: 32rem; }
+
+/* Command blocks must scroll inside themselves. Wrapping them would split shell tokens across
+   lines, which is worse than a sideways scroll on a command a reader is going to copy. */
+pre { max-width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+pre code { display: block; padding: 0; background: none; white-space: pre; }
 table.grid { border-collapse: collapse; width: 100%; font-size: .875rem; min-width: 480px; }
 table.grid th, table.grid td {
   /* border-strong, not border: these rules are how you tell which drug a number belongs to. */
@@ -329,7 +555,25 @@ td.changed { animation: flash 1.1s ease-out; }
 
 /* --- Activity stream ---------------------------------------------------- */
 
-.stream { display: flex; flex-direction: column; gap: 8px; max-height: 460px; overflow-y: auto; }
+.stream-wrap { position: relative; }
+.stream {
+  display: flex; flex-direction: column; gap: 8px;
+  min-height: 150px; max-height: 420px; overflow-y: auto;
+  scrollbar-gutter: stable;
+}
+/* The fade marks the cut as a scroll boundary. Without it a clipped sentence reads as a bug. */
+.stream-wrap::after {
+  content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 34px;
+  pointer-events: none; border-radius: 0 0 8px 8px;
+  background: linear-gradient(to bottom, transparent, var(--surface));
+}
+.stream-wrap.is-complete::after { display: none; }
+.activity-toggle {
+  width: 100%; min-height: 38px; margin-top: 10px; padding: 7px 10px;
+  background: var(--surface-2); color: var(--text); font-size: .78rem;
+}
+.activity-toggle[hidden] { display: none; }
+.stream.is-expanded { max-height: none; }
 .event {
   display: grid; grid-template-columns: auto 1fr; gap: 10px; align-items: start;
   border: 1px solid var(--border); border-radius: 8px; padding: 10px 12px;
@@ -534,11 +778,99 @@ footer.site {
 .judge-metric b { display: block; color: var(--accent-strong); font-size: 1.45rem; }
 .judge-metric span { color: var(--text-muted); font-size: .8rem; }
 .footer-links { display: flex; flex-wrap: wrap; gap: 14px; margin-bottom: 12px; }
-.footer-links a { font-weight: 620; }
+/* Footer links are the last navigation on the page and are often reached on a phone. */
+.footer-links a { font-weight: 620; min-height: 34px; display: inline-flex; align-items: center; }
+
+/* The header is sticky, so an anchor jump or scrollIntoView would otherwise land with the
+   first row of content hidden underneath it. */
+html { scroll-padding-top: 76px; }
+
+/* The console is one screen on any monitor.
+
+   Fixed pixel heights only ever fit the screens someone remembered to test, so this measures
+   itself against the viewport instead. The chrome (rail, bar, active stage) takes its natural
+   height, the pane row takes whatever is left, and each pane scrolls inside itself. The console
+   can therefore never push its own results below the fold: a control and the thing it changes
+   stay visible together at 720px and at 1440px alike.
+
+   `dvh` rather than `vh` because mobile browsers change viewport height as their chrome hides,
+   and `min-height: 0` throughout because a flex or grid child otherwise refuses to shrink below
+   its content and quietly reintroduces the overflow this exists to prevent. */
+@media (min-width: 861px) and (min-height: 700px) {
+  #run {
+    display: flex; flex-direction: column;
+    max-height: calc(100dvh - 5.5rem);
+  }
+  #run .console { flex: 1 1 auto; min-height: 0; }
+  #run .pane { display: flex; flex-direction: column; min-height: 0; }
+  #run .source-pane, #run .case-pane { overflow-y: auto; }
+  #run .activity-pane { overflow: hidden; }
+  #run .stream-wrap { flex: 1 1 auto; display: flex; min-height: 0; }
+  #run .stream { flex: 1 1 auto; min-height: 0; max-height: none; }
+  #run .advance-controls { flex: 0 0 auto; }
+  #run .source-pair { flex: 0 0 auto; }
+  /* The previews absorb whatever vertical slack is left rather than being told a height. A
+     ceiling stops a tall monitor turning thumbnails into hero images; the floor keeps them
+     legible on a short one. Full size is one click away at every size. */
+  #run .source-pane { overflow-y: auto; }
+  #run .source-pair { flex: 1 1 auto; min-height: 0; }
+  #run .source-figure { display: flex; flex-direction: column; min-height: 0; }
+  #run .source-figure figcaption,
+  #run .source-note,
+  #run .source-verdict { flex: 0 0 auto; }
+  #run .source-boundary { flex: 0 0 auto; }
+  #run .source-frame,
+  #run .source-frame.is-letter {
+    flex: 1 1 auto; height: auto; min-height: 72px; max-height: 190px;
+  }
+}
+
+/* On a laptop-height screen the images are the evidence and the prose around them is not. The
+   per-figure helper text and the long-form boundary line give way first; the synthetic-data claim
+   itself is kept, shortened rather than dropped, because that one is not decoration. */
+@media (min-width: 861px) and (min-height: 700px) and (max-height: 950px) {
+  #run .source-note { display: none; }
+  /* Kicker, name, and link on one line. Stacked they cost 63px of a 118px pane -- more than the
+     image they label. The stage number is already on the rail above. */
+  #run .source-figure figcaption {
+    flex-wrap: nowrap; align-items: baseline; margin-bottom: 4px; gap: 6px;
+  }
+  #run .source-kicker { display: none; }
+  #run .source-zoom { flex: 0 0 auto; }
+  #run .source-figure figcaption b {
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%;
+  }
+  #run .source-boundary {
+    margin-top: 8px; padding-top: 8px;
+    font-size: .72rem; line-height: 1.3;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  #run .pane-lede { display: none; }
+  #run .pane-heading.compact { margin-bottom: 8px; }
+}
+
+/* On the shortest single-screen displays the stage helper prose yields too: the button
+   label and the boundary copy elsewhere on the page already carry the meaning. */
+@media (min-width: 861px) and (min-height: 700px) and (max-height: 790px) {
+  #run .control-help { display: none; }
+  #run .guided-controls .control-group { padding: 9px 11px; }
+  #run .console-notes { display: none; }
+}
+
+@media (min-width: 861px) and (min-height: 700px) and (max-width: 1239px) {
+  /* controls / source + activity / case */
+  #run .console { grid-template-rows: auto minmax(0, 1fr) auto; }
+}
+
+@media (min-width: 1240px) and (min-height: 700px) {
+  #run .console { grid-template-rows: auto minmax(0, 1fr); }
+}
+
+a.brand { text-decoration: none; color: inherit; }
+a.brand:hover span, a.brand:focus-visible span { color: var(--accent); }
 
 @media (max-width: 900px) {
   .hero-layout { grid-template-columns: 1fr; gap: 32px; }
-  .hero-proof { max-width: 620px; }
   .journey { grid-template-columns: 1fr 1fr; }
   .bar { align-items: flex-start; height: auto; padding-top: 14px; padding-bottom: 14px; flex-wrap: wrap; }
   .brand { width: 100%; }
@@ -571,6 +903,17 @@ footer.site {
   .briefing-media img, .briefing-media video { min-height: 220px; }
   .briefing-copy { padding: 8px; }
   .judge-metrics, .workflow-progress { grid-template-columns: 1fr; }
+  .source-pair { grid-template-columns: 1fr; }
+  .console-head { align-items: stretch; }
+  .console-head .guide-tools { margin-left: 0; width: 100%; justify-content: space-between; }
+  .advance-controls .btn-row { grid-template-columns: 1fr; }
+  .control-group .stage-fields { grid-template-columns: 1fr; }
+  .stage-actions button { flex: 1 1 100%; }
+  .pane-heading { flex-direction: column; gap: 10px; }
+  .guide-tools { width: 100%; justify-content: flex-start; }
+  .advance-controls button { min-width: 0; width: 100%; }
+  .source-frame, .source-frame.is-letter { height: auto; min-height: 200px; }
+  .source-frame img:not([hidden]) { max-height: 62vh; }
 }
 
 .sr-only {
@@ -725,6 +1068,53 @@ footer.site {
   max-width: none; margin: 22px 0 0; padding: 14px 16px;
   border-left: 4px solid var(--accent); background: var(--accent-soft); border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
 }
+/* The first thing a reader with no context meets. Deliberately three short paragraphs:
+   the problem, what it does, and what it refuses to do. */
+.info {
+  position: relative;
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 17px; height: 17px; margin-left: 4px; padding: 0; vertical-align: baseline;
+  border: 1px solid var(--border-strong); border-radius: 50%;
+  background: var(--surface-2); color: var(--text-muted);
+  font-size: .66rem; font-weight: 750; line-height: 1; cursor: help;
+}
+/* The circle stays small so it sits inside a sentence without breaking the line, while the
+   actual touch target is a 30px square centred on it. WCAG's inline exception would allow the
+   small target; a thumb still deserves the larger one. */
+.info::after {
+  content: ""; position: absolute; top: 50%; left: 50%;
+  width: 30px; height: 30px; transform: translate(-50%, -50%);
+}
+
+.info:hover, .info[aria-expanded="true"] {
+  background: var(--accent); color: var(--accent-text); border-color: var(--accent);
+}
+.popover {
+  position: absolute; z-index: 60; padding: 14px 16px;
+  border: 1px solid var(--border-strong); border-radius: var(--radius);
+  background: var(--surface); box-shadow: var(--shadow);
+}
+.popover h4 { margin: 0 0 6px; font-size: .95rem; }
+.popover p { margin: 0 0 8px; font-size: .875rem; line-height: 1.5; }
+.popover .why { color: var(--text-muted); }
+.popover a { font-size: .8rem; }
+.popover[hidden] { display: none; }
+
+.plain-box {
+  margin: 26px 0 4px; padding: 20px 22px;
+  border: 1px solid var(--border); border-left: 3px solid var(--accent);
+  border-radius: 0 var(--radius) var(--radius) 0;
+  background: var(--surface); max-width: 68ch;
+}
+.plain-box h2 {
+  margin: 0 0 10px; font-size: .78rem; font-weight: 750;
+  letter-spacing: .08em; text-transform: uppercase; color: var(--accent);
+}
+.plain-box p { margin: 0 0 10px; font-size: .98rem; line-height: 1.6; }
+.plain-box p:last-child { margin-bottom: 0; }
+.plain-box b { color: var(--text); }
+.plain-note { color: var(--text-muted); font-size: .88rem !important; }
+
 .hero-tertiary { color: var(--text-muted); font-size: .92rem; }
 .hero-tertiary a { font-weight: 680; }
 
@@ -748,9 +1138,6 @@ footer.site {
   .hero { padding: 62px 0 52px; }
   .hero-layout { gap: 36px; }
   h1 { font-size: clamp(2.35rem, 5vw, 3.9rem); }
-  .hero-proof { padding: 20px; }
-  .proof-list { margin-top: 12px; }
-  .proof-list li { padding: 8px 0; }
   .stat-strip { margin-top: 18px; }
   .stat { padding: 14px 16px; }
   .section-heading { margin-bottom: 20px; }

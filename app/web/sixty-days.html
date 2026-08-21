@@ -6,14 +6,14 @@
 <title>Sixty Days - hold the appeal clock</title>
 <meta name="description" content="A working console that reads a synthetic disaster-assistance letter, screens evidence framing, prepares applicant-controlled records requests, and builds a reviewable draft packet.">
 <meta name="theme-color" content="#f7f9fc">
-<link rel="stylesheet" href="/static/styles.css">
+<link rel="stylesheet" href="/static/styles.css?v=__ASSET_VERSION__">
 </head>
 <body>
 <a class="skip-link" href="#main">Skip to main content</a>
 <header class="site">
   <div class="wrap bar">
-    <div class="brand">Sixty Days <span>- a deadline keeper for disaster appeals</span></div>
-    <nav aria-label="Primary"><a href="#problem">Overview</a><a href="#console">Live demo</a><a href="/developer">Developer API</a><a href="/docs">API docs</a><a href="/judges">Judge evidence</a></nav>
+    <a class="brand" href="/" aria-label="Sixty Days home">Sixty Days <span>- a deadline keeper for disaster appeals</span></a>
+    <nav aria-label="Primary"><a href="#problem">Overview</a><a href="#run">Live demo</a><a href="/developer">Developer API</a><a href="/docs">API docs</a><a href="/judges">Judge evidence</a></nav>
     <button class="theme-toggle" id="theme-toggle" aria-pressed="false">Use dark mode</button>
   </div>
 </header>
@@ -23,16 +23,31 @@
   <div class="wrap">
     <div class="hero-layout">
       <div class="hero-copy">
-        <p class="eyebrow">The Taskmaster · Live on Google Cloud</p>
+        <p class="eyebrow">A working demonstration · Live on Google Cloud</p>
         <h1>The letter says no. The clock has already started.</h1>
-        <p class="lede">Sixty Days turns the exact reason in a disaster-assistance decision letter
-          into a dated, reviewable evidence plan-without deciding eligibility, contacting anyone,
-          or submitting on the applicant’s behalf.</p>
-        <div class="btn-row">
-          <a class="btn btn-primary" href="#console">Open a synthetic case</a>
-          <a class="btn" href="/judges">Follow the judge path</a>
+        <p class="lede">When disaster aid is refused, the letter saying no also starts a
+          60-day clock. Sixty Days reads that letter, works out which documents are needed and who
+          holds each one, and keeps track of the time left.</p>
+        <div class="plain-box">
+          <h2>In plain terms</h2>
+          <p><b>The problem.</b> A letter arrives saying some help was refused. It explains why, in
+            formal language, and gives you 60 days to challenge it<button class="info" data-info="appeal" aria-expanded="false" aria-label="What is an appeal?">i</button>. The papers you need are held by
+            other people: an insurer, a contractor, a records office. Meanwhile your home is damaged.</p>
+          <p><b>What this does.</b> It reads the letter<button class="info" data-info="decision-letter" aria-expanded="false" aria-label="What is a decision letter?">i</button> and pulls out the exact reasons, in the
+            letter's own words. It lists what you need and who to ask. It writes the request letters
+            for you to check and send. It watches the calendar and comes back on its own to tell you
+            what is still missing.</p>
+          <p><b>What it will not do.</b> It never sends anything for you. It never contacts your
+            insurer or any agency. It cannot tell you whether you will win. Every message leaves
+            your hands only when you decide to send it.</p>
+          <p class="plain-note">Everything on this page is made up for the demonstration<button class="info" data-info="synthetic" aria-expanded="false" aria-label="What is made-up demonstration data?">i</button>. No real
+            person's letter, photo, or details are used.</p>
         </div>
-        <p class="hero-tertiary">The public case needs no key. Building an integration? <a href="/developer">Create an invited API key</a> or <a href="/docs">inspect the API docs</a>.</p>
+        <div class="btn-row">
+          <a class="btn btn-primary" href="#run">See it work</a>
+          <a class="btn" href="/judges">How it was tested</a>
+        </div>
+        <p class="hero-tertiary">The public case needs no key at all. Building an integration? <a href="/developer">Create your own seven-day API key</a> or <a href="/docs">inspect the API docs</a>.</p>
         <div class="stat-strip">
           <div class="stat"><b>4.4 million</b><span>applicants referred to the Individuals and
             Households Program, 2016-2018 <a href="#ref-scale" aria-label="Reference: GAO-20-503">[1]</a></span></div>
@@ -52,20 +67,9 @@
         <p class="small muted">These describe the documented population and process, not a
           predicted outcome for any applicant. This product does not estimate eligibility, appeal
           success, or how many people would benefit.</p>
-        <p class="boundary-line"><b>Scope:</b> This is not legal advice, does not predict an
-          outcome, and has no submission endpoint. The applicant reviews and controls every action.</p>
+        <p class="boundary-line"><b>Scope:</b> This is not legal advice. It cannot tell you whether
+          you will win, and it has no way to file anything. You review and control every action.</p>
       </div>
-      <aside class="hero-proof" aria-label="Live proof">
-        <span class="proof-label">Verified public build</span>
-        <strong class="proof-value">24 / 24</strong>
-        <span class="muted">live acceptance checks passing</span>
-        <ul class="proof-list">
-          <li><b>20/20</b> recorded decision-letter fields correct</li>
-          <li><b>6/6</b> observable evidence-photo checks correct</li>
-          <li><b>8</b> deterministic deadline wakes registered</li>
-          <li><b>0</b> send or submission endpoints</li>
-        </ul>
-      </aside>
     </div>
   </div>
 </section>
@@ -73,20 +77,20 @@
 <section id="problem">
   <div class="wrap">
     <div class="section-heading">
-      <div><p class="eyebrow">The human problem</p><h2>The deadline is simple. The evidence hunt is not.</h2></div>
+      <div><p class="eyebrow">The human problem</p><h2>The deadline is simple. Finding the paperwork is not.</h2></div>
       <p class="narrow">A decision letter can ask for records held by several different people
         while the applicant is still recovering from the disaster.</p>
     </div>
     <div class="grid-3">
-      <div class="card"><h3>One letter, several obligations</h3><p>The reason, requested documents,
-        and deadline are mixed into formal language. Missing the exact reason means gathering the
-        wrong evidence.</p></div>
-      <div class="card"><h3>Evidence lives elsewhere</h3><p>Ownership, occupancy, insurance, and
-        damage records may come from different offices. The applicant remains responsible for
-        requesting and sending them.</p></div>
-      <div class="card"><h3>The clock keeps moving</h3><p>Sixty Days registers the whole reminder
-        ladder immediately, then keeps missing work visible instead of pretending a partial packet
-        is complete.</p></div>
+      <div class="card"><h3>One letter, several jobs</h3><p>The reason, the documents asked for, and the
+        date are all buried in formal wording. Read the reason wrong and you gather the wrong
+        papers.</p></div>
+      <div class="card"><h3>The papers are held by other people</h3><p>Proof of ownership, of living there, of
+        insurance, of damage: each may sit with a different office. You still have to ask for
+        every one of them, and send them yourself.</p></div>
+      <div class="card"><h3>The clock keeps moving</h3><p>Sixty Days sets every reminder<button class="info" data-info="reminder" aria-expanded="false" aria-label="What is a reminder?">i</button> the moment
+        the case opens, then keeps saying plainly what is still missing rather than pretending a
+        half-finished draft is finished.</p></div>
     </div>
     <div class="callout narrow"><p><b>Who this is for:</b> a disaster survivor managing a dense
       decision letter while rebuilding daily life. No real survivor story or private data is used;
@@ -97,23 +101,24 @@
 <section id="workflow">
   <div class="wrap">
     <div class="section-heading">
-      <div><p class="eyebrow">Before you use the console</p><h2>From decision letter to reviewable draft</h2></div>
-      <p class="narrow">The system organizes work around the applicant. It never turns document
-        preparation into permission to act for them.</p>
+      <div><p class="eyebrow">Before you use the console</p><h2>What happens, step by step</h2></div>
+      <p class="narrow">It does the organising. You keep every decision. Writing a letter for you
+        is not the same as being allowed to send it.</p>
     </div>
     <div class="journey">
       <div class="journey-step"><span class="step-index">Step 01 · Understand</span>
-        <h3>Quote the exact reason</h3><p>Read the synthetic decision letter, remove identifiers,
-        and keep only reasons that can be quoted from the transcription.</p></div>
+        <h3>Read the letter, word for word</h3><p>Strip out personal details, then keep only the
+        reasons that appear in the letter itself. Anything it cannot quote, it drops.</p></div>
       <div class="journey-step"><span class="step-index">Step 02 · Gather</span>
-        <h3>Route each missing item</h3><p>Separate applicant-held evidence from insurer or public
-        records, then screen only observable photo framing.</p></div>
+        <h3>Work out who holds what</h3><p>Sort what you already have from what someone
+        else must send you. For photos, it only checks whether the picture is clear enough to
+        read.</p></div>
       <div class="journey-step"><span class="step-index">Step 03 · Track</span>
-        <h3>Prepare, never send</h3><p>Draft a request for the applicant to review and send. Register
-        a no-reply check against the deadline.</p></div>
+        <h3>Write the request, but do not send it</h3><p>It drafts the letter. You read it and send it. If no
+        reply comes, it checks back before the deadline.</p></div>
       <div class="journey-step"><span class="step-index">Step 04 · Review</span>
-        <h3>Build a partial-safe packet</h3><p>Render an optional PDF that preserves exact reasons
-        and keeps every missing item visible. Nothing is submitted.</p></div>
+        <h3>Build a draft that admits what is missing</h3><p>Produce a PDF<button class="info" data-info="draft-packet" aria-expanded="false" aria-label="What is a draft packet?">i</button> you can read and check. It quotes the
+        letter and lists every gap. Nothing is filed anywhere.</p></div>
     </div>
     <div class="model-briefing" aria-labelledby="visual-briefing-title">
       <div class="briefing-copy">
@@ -147,82 +152,182 @@
 <section id="console">
   <div class="wrap">
     <div class="section-heading">
-      <div><p class="eyebrow">Interactive proof</p><h2>Run the appeal workflow</h2></div>
-      <p class="narrow">Choose a synthetic letter, then follow the numbered stages from left to
-        right. Disabled controls become available only when the case contains what they need.</p>
+      <div><p class="eyebrow">Interactive proof</p><h2>Try it yourself</h2></div>
+      <p class="narrow">Pick one of the made-up letters and work through the four steps in order.
+        A button stays greyed out until the step before it is done, so you cannot get lost.</p>
     </div>
-    <div class="console-shell">
+    <div class="console-shell" id="run">
     <ol class="workflow-progress" id="workflow-progress" aria-label="Suggested workflow progress">
       <li data-step="1" class="is-active" aria-current="step"><b>Understand</b>Read the letter</li>
       <li data-step="2"><b>Gather</b>Check evidence</li>
       <li data-step="3"><b>Track</b>Prepare a request</li>
       <li data-step="4"><b>Review</b>Build the draft</li>
     </ol>
-    <div class="console-intro">
-      <div><p id="measurement">Loading measured Gemini fixture catalogues…</p>
-      <p class="small muted"><b>Guided preset:</b> damage and insurance letter, failed close photo,
-        wider comparison, insurer request, packet, then deadline wakes. Starting anchors the
-        simulated clock to the selected letter date without deleting stored audit records.</p></div>
-      <a class="btn" href="/judges">Open judge evidence</a>
-    </div>
-    <div class="clock"><span>Clock:</span><b id="clock-now">loading</b><span class="note">Simulated
-      for demonstration; production uses the same durable wake path.</span></div>
     <div class="console">
-      <div class="pane">
-        <span class="control-kicker">Stage 1 · Understand</span>
-        <h3>Decision letter</h3>
-        <label for="fixture">Synthetic letter fixture</label>
-        <select id="fixture" class="control"></select>
-        <button class="btn-primary" id="btn-open">Start guided demo with this letter</button>
-        <img id="letter-image" class="fixture-image" alt="Synthetic determination letter scan"
-             hidden>
-
-        <span class="control-kicker subhead">Stage 2 · Gather</span>
-        <h3>Evidence photo</h3>
-        <label for="evidence-fixture">Synthetic photo fixture</label>
-        <select id="evidence-fixture" class="control"></select>
-        <button id="btn-screen" disabled>Screen close photo (expected retake)</button>
-        <img id="evidence-image" class="fixture-image" alt="Synthetic flood-damage evidence fixture"
-             hidden>
+      <div class="pane controls-pane" id="workflow-controls">
+      <div class="pane-heading compact console-head">
+        <h3 class="sr-only">Guided run</h3>
+        <p class="clock-inline"><span>Clock<button class="info" data-info="simulated-clock" aria-expanded="false" aria-label="What is the simulated clock?">i</button></span><b id="clock-now">loading</b></p>
+        <a class="scheduler-pill" id="scheduler-pill" href="/sixty-days/scheduler" target="_blank"
+           rel="noopener" title="Wall-clock proof that the deadline keeper is being woken">
+          <span class="scheduler-dot" aria-hidden="true"></span>
+          <span id="scheduler-text">Checking the real scheduler…</span>
+        </a>
+        <p id="measurement" class="measurement-inline">Loading measured Gemini fixture catalogues…</p>
+        <div class="guide-tools">
+          <details class="console-notes">
+            <summary>How this works</summary>
+            <p><b>Guided preset:</b> damage and insurance letter, failed close photo, wider
+              comparison, insurer request, packet, then the deadline reminders. Starting anchors the
+              simulated clock to the selected letter date without deleting stored audit records.</p>
+            <p>The clock is simulated for demonstration so five weeks fit in one sitting. Production
+              runs the very same reminder code on the real calendar, started by a Google Cloud scheduler.</p>
+          </details>
+          <a class="console-evidence-link" href="/judges">Judge evidence</a>
+          <button id="btn-restart" type="button">Start over</button>
+        </div>
+      </div>
+        <div class="guided-controls">
+          <div class="control-group" data-workflow-step="1" data-state="current">
+            <div class="step-summary"><span class="control-kicker">1. Understand</span><span class="step-state">Current</span></div>
+            <div class="stage-fields">
+              <div>
+                <label for="fixture">Synthetic letter fixture</label>
+                <select id="fixture" class="control"></select>
+              </div>
+              <div class="stage-actions">
+                <button class="btn-primary" id="btn-open">Start guided demo with this letter</button>
+              </div>
+              <p class="control-help stage-note">Anchors the labelled simulation clock to this
+                letter&rsquo;s date. No stored case or audit record is deleted.</p>
+            </div>
+          </div>
+          <div class="control-group" data-workflow-step="2" data-state="upcoming">
+            <div class="step-summary"><span class="control-kicker">2. Gather</span><span class="step-state">Upcoming</span></div>
+            <div class="stage-fields">
+              <div>
+                <label for="evidence-fixture">Synthetic photo fixture</label>
+                <select id="evidence-fixture" class="control"></select>
+              </div>
+              <div class="stage-actions">
+                <button id="btn-screen" disabled>Screen close photo (expected retake)</button>
+              </div>
+              <p class="control-help stage-note">Observable framing and legibility only. Never
+                authenticity, damage value, or agency acceptance.</p>
+            </div>
+          </div>
+          <div class="control-group" data-workflow-step="3" data-state="upcoming">
+            <div class="step-summary"><span class="control-kicker">3. Track</span><span class="step-state">Upcoming</span></div>
+            <div class="stage-fields">
+              <div>
+                <label for="request-requirement">Record to request</label>
+                <select id="request-requirement" class="control" disabled></select>
+              </div>
+              <div>
+                <label for="requested-on">Date applicant plans to send it</label>
+                <input id="requested-on" class="control" type="date" value="2026-08-10">
+              </div>
+              <div class="stage-actions">
+                <button id="btn-prepare" disabled>Prepare and track - do not send</button>
+              </div>
+              <p class="control-help stage-note">Prepared for the applicant to review and send.
+                The service has no send route.</p>
+              <div id="prepared-request" class="small muted stage-note" aria-live="polite"></div>
+            </div>
+          </div>
+          <div class="control-group" data-workflow-step="4" data-state="upcoming">
+            <div class="step-summary"><span class="control-kicker">4. Review</span><span class="step-state">Upcoming</span></div>
+            <div class="stage-fields">
+              <div>
+                <label for="applicant-statement">Applicant&rsquo;s explanation</label>
+                <textarea id="applicant-statement" class="control" rows="2"
+                  placeholder="The applicant adds their own explanation here."></textarea>
+              </div>
+              <div class="stage-actions">
+                <button id="btn-packet" disabled>Check draft packet</button>
+                <button id="btn-pdf" disabled>Download draft PDF</button>
+              </div>
+              <p class="control-help stage-note">The packet stays visibly partial. Missing items
+                are listed, never converted into confidence.</p>
+              <div id="packet-status" class="small muted stage-note" aria-live="polite">No packet built.</div>
+            </div>
+          </div>
+        </div>
       </div>
 
-      <div class="pane">
-        <span class="control-kicker">Live audit trail</span>
-        <h3>Agent activity</h3>
-        <div class="stream" id="stream" aria-live="polite" aria-relevant="additions">
-          <div class="event"><span class="agent">system</span><div>Open a synthetic case to begin.</div></div>
+      <div class="pane source-pane" id="workflow-source">
+        <div class="pane-heading compact">
+          <h3>Source documents</h3>
         </div>
-        <div class="btn-row" aria-label="Simulated deadline controls">
-          <button id="btn-day3" disabled>Advance 3 days</button>
-          <button id="btn-day52" disabled>Advance 49 more days</button>
-          <button id="btn-day58" disabled>Advance 6 more days</button>
+        <div class="source-pair">
+        <figure class="source-figure" id="letter-figure">
+          <figcaption>
+            <span class="source-kicker">Stage 1 input</span>
+            <b id="letter-caption">Decision letter</b>
+            <a class="source-zoom" id="letter-zoom" href="#" target="_blank" rel="noopener" hidden>Open full size</a>
+          </figcaption>
+          <div class="source-frame">
+            <img id="letter-image" class="fixture-image"
+                 alt="Synthetic disaster-assistance determination letter used as the demonstration input" hidden>
+            <p class="source-placeholder" id="letter-placeholder">No letter selected yet.</p>
+          </div>
+          <p class="source-note" id="letter-state">Select a letter to preview it.</p>
+        </figure>
+        <figure class="source-figure" id="evidence-figure">
+          <figcaption>
+            <span class="source-kicker">Stage 2 input</span>
+            <b id="evidence-caption">Evidence photo</b>
+            <a class="source-zoom" id="evidence-zoom" href="#" target="_blank" rel="noopener" hidden>Open full size</a>
+          </figcaption>
+          <div class="source-frame">
+            <img id="evidence-image" class="fixture-image"
+                 alt="Synthetic damage evidence photograph used as the demonstration input" hidden>
+            <p class="source-placeholder" id="evidence-placeholder">No photo selected yet.</p>
+          </div>
+          <p class="source-note" id="evidence-state">Select a photo to preview it.</p>
+          <p class="source-verdict" id="evidence-verdict" hidden></p>
+        </figure>
         </div>
-
-        <span class="control-kicker subhead">Stage 3 · Track</span>
-        <h3>Applicant-controlled records request</h3>
-        <label for="request-requirement">Record to request</label>
-        <select id="request-requirement" class="control" disabled></select>
-        <label for="requested-on">Date applicant plans to send it</label>
-        <input id="requested-on" class="control" type="date" value="2026-08-10">
-        <button id="btn-prepare" disabled>Prepare and track - do not send</button>
-        <div id="prepared-request" class="small muted" aria-live="polite"></div>
-
-        <span class="control-kicker subhead">Stage 4 · Review</span>
-        <h3>Draft packet</h3>
-        <label for="applicant-statement">Applicant’s explanation</label>
-        <textarea id="applicant-statement" class="control" rows="4"
-          placeholder="The applicant adds their own explanation here."></textarea>
-        <div class="btn-row">
-          <button id="btn-packet" disabled>Check draft packet</button>
-          <button id="btn-pdf" disabled>Download draft PDF</button>
-        </div>
-        <div id="packet-status" class="small muted" aria-live="polite">No packet built.</div>
+        <p class="source-boundary">Every letter, photograph, name, address, and case reference in
+          this demonstration is synthetic. No real applicant data is used.</p>
       </div>
 
-      <div class="pane">
-        <span class="control-kicker">Current case</span>
-        <h3>Case plan</h3>
+      <div class="pane activity-pane" id="workflow-activity">
+        <div class="pane-heading compact">
+          <h3>Agent activity</h3>
+        </div>
+        <p class="pane-lede">A live audit trail: which role acted, and why.</p>
+        <div class="stream-wrap">
+          <div class="stream" id="stream" aria-live="polite" aria-relevant="additions">
+            <div class="event"><span class="agent">system</span><div>Open a synthetic case to begin.</div></div>
+          </div>
+        </div>
+        <button class="activity-toggle" id="activity-toggle" type="button" aria-expanded="false" aria-controls="stream" hidden>Show the full activity history</button>
+        <div class="advance-controls" aria-label="Simulated deadline controls">
+          <span class="advance-label">Advance the simulated clock</span>
+          <div class="btn-row">
+            <button id="btn-day3" disabled>+3 days</button>
+            <button id="btn-day52" disabled>+49 days</button>
+            <button id="btn-day58" disabled>+6 days</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="pane case-pane" id="workflow-case">
+        <div class="pane-heading compact">
+          <h3>Case plan</h3>
+        </div>
+        <p class="pane-lede">Quoted reasons and routed evidence, from the letter itself.</p>
         <div id="case-plan" class="small muted">No case open.</div>
+        <div class="live-proof">
+          <span class="control-kicker">Is the model really there?</span>
+          <p class="control-help">Everything above replays a recorded call so judging is
+            repeatable. This sends the synthetic letter image to Gemini 3.5 Flash on Vertex AI
+            right now and scores the answer against the same truth file.</p>
+          <button id="btn-live-check" type="button">Read the letter live</button>
+          <p class="small muted" id="live-check-budget">Checking today&rsquo;s allowance…</p>
+          <div class="live-result" id="live-check-result" aria-live="polite" hidden></div>
+        </div>
       </div>
     </div>
     </div>
@@ -231,10 +336,10 @@
 
 <section id="api" class="integration-section">
   <div class="wrap">
-    <div class="section-heading"><div><p class="eyebrow">Use it beyond the demo</p><h2>An applicant-controlled API, explained before credentials.</h2></div><p>The public synthetic case is the fastest evaluation path. The API is an optional deidentified beta for approved integrations.</p></div>
+    <div class="section-heading"><div><p class="eyebrow">Use it beyond the demo</p><h2>An applicant-controlled API, explained before credentials.</h2></div><p>The public synthetic case is the fastest evaluation path. The API is an optional deidentified beta that anyone evaluating this project can open for themselves.</p></div>
     <div class="api-onboarding-grid">
-      <article class="path-card"><span class="path-number">No credentials</span><h3>Evaluate publicly</h3><p>Open a synthetic letter, inspect exact reason quotes, prepare a request, and build a visibly incomplete packet.</p><a href="#console">Run the public demo</a></article>
-      <article class="path-card"><span class="path-number">Invited access</span><h3>Create a seven-day key</h3><p>A private invitation code unlocks key creation. The separate API key determines the tenant and project scope.</p><a href="/developer">Open Developer quickstart</a></article>
+      <article class="path-card"><span class="path-number">No credentials</span><h3>Evaluate publicly</h3><p>Open a synthetic letter, inspect exact reason quotes, prepare a request, and build a visibly incomplete packet.</p><a href="#run">Run the public demo</a></article>
+      <article class="path-card"><span class="path-number">Self-serve access</span><h3>Create a seven-day key</h3><p>Name a workspace and mint your own key. No invitation, no account, and no approval step; the key sets the tenant and scope.</p><a href="/developer">Open Developer quickstart</a></article>
       <article class="path-card"><span class="path-number">Exact contract</span><h3>Read the API docs</h3><p>Use the interactive schema to authorize with X-API-Key and inspect case, request, packet, and deadline operations.</p><a href="/docs">Browse API docs</a></article>
     </div>
     <p class="integration-boundary"><b>API boundary:</b> synthetic or deliberately deidentified letters only. It prepares and tracks drafts but never contacts, sends, files, or submits.</p>
@@ -243,15 +348,15 @@
 
 <section id="limits">
   <div class="wrap">
-    <h2>What this does not do</h2>
+    <h2>What it will not do</h2>
     <div class="grid-3">
       <div class="card"><h3>No legal or eligibility decision</h3><p>It organizes quoted reasons
         and evidence tasks. It does not determine eligibility, predict acceptance, or replace
         legal advice.</p></div>
       <div class="card"><h3>No autonomous contact</h3><p>Requests are prepared with blanks for the
-        applicant to review and send. There is no contact, send, or submit endpoint.</p></div>
+        you to read and send. It has no way to contact anyone, send anything, or file anything: there is no submission endpoint anywhere in the service.</p></div>
       <div class="card"><h3>No evidence authentication</h3><p>Photo checks cover observable
-        framing only. Ready for review never means genuine, sufficient, approved, or accepted.</p></div>
+        framing only. Ready for your review<button class="info" data-info="ready-for-review" aria-expanded="false" aria-label="What is ready for your review?">i</button> never means genuine, sufficient, approved, or accepted.</p></div>
     </div>
     <div class="callout danger narrow"><p><b>The PDF is a draft.</b> It is optional, not an agency
       form, not submitted, and intentionally keeps every missing item visible.</p></div>
@@ -277,20 +382,20 @@
       <div class="card"><h3>Privacy by omission</h3><p class="small">Raw letters, photo bytes,
         transcriptions, and the applicant’s free-text statement are not persisted in the case
         record.</p></div>
-      <div class="card"><h3>The whole clock exists now</h3><p class="small">Day 3 through day 58
-        wakes are registered at intake. A shorter printed deadline moves the packet and final
+      <div class="card"><h3>Every reminder is set up front</h3><p class="small">Day 3 through day 58
+        reminders are set the moment the case opens. A shorter printed deadline moves the draft and final
         alert safeguards earlier.</p></div>
     </div>
-    <p class="conformance-link"><a href="/sixty-days/conformance">Machine-checkable conformance report</a></p>
+    <p class="conformance-link"><a href="/sixty-days/conformance">See each rule checked against the code and its test</a></p>
   </div>
 </section>
 
 <section id="architecture">
   <div class="wrap">
     <div class="section-heading">
-      <div><p class="eyebrow">As-built architecture</p><h2>A bounded workflow with durable state</h2></div>
+      <div><p class="eyebrow">As-built architecture</p><h2>How it is built, and where the state lives</h2></div>
       <p class="narrow">One Cloud Run service coordinates modular roles. Firestore stores structured
-        case and wake state; raw letters, photo bytes, and applicant narrative are omitted.</p>
+        cases and reminders. Raw letters, photo files, and anything you type are deliberately not kept.</p>
     </div>
     <div class="architecture-map" aria-label="Sixty Days system architecture">
       <div class="arch-node"><small>Inputs</small><strong>Synthetic letter and evidence</strong>
@@ -298,10 +403,10 @@
       <div class="arch-arrow" aria-hidden="true">&rarr;</div>
       <div class="arch-node accent"><small>Cloud Run &middot; sixty-days</small>
         <strong>Read, plan, schedule, screen, prepare, verify</strong>
-        <span>GenAI SDK, bounded routes, and the shared durable spine</span></div>
+        <span>GenAI SDK, a small set of routes, and shared code that survives restarts</span></div>
       <div class="arch-arrow" aria-hidden="true">&rarr;</div>
-      <div class="arch-node"><small>Durable proof</small><strong>Firestore and Cloud Trace</strong>
-        <span>Cases, wakes, request status, packet metadata, and audit spans</span></div>
+      <div class="arch-node"><small>What is kept</small><strong>Firestore and Cloud Trace</strong>
+        <span>Cases, reminders, request status, draft details, and an audit trail</span></div>
     </div>
     <p class="small muted narrow">Gemini 3.5 Flash and Gemma 4 MaaS are served from Vertex AI's
       global endpoint. Real direct identifiers from the transcribed letter are removed before
@@ -352,17 +457,17 @@
 <section id="faq">
   <div class="wrap">
     <h2>Questions a sceptic would ask</h2>
-    <details><summary>Does this file an appeal for me?</summary><p>No. It has no submission endpoint.
+    <details><summary>Does this file an appeal for me?</summary><p>No. It has no way to file anything with anyone.
       It prepares a reviewable draft and the applicant controls every external action.</p></details>
     <details><summary>Does ready for review mean FEMA will accept the photo?</summary><p>No. It means
       only that requested observable features are visible. Authenticity, sufficiency, and agency
       acceptance are outside this system's scope.</p></details>
     <details><summary>Why use a simulated clock?</summary><p>The demonstration compresses weeks into
-      minutes. The same durable wake registration and claim path runs on wall-clock time; the UI
+      minutes. The same reminder code runs on the real calendar in production; the page
       labels every simulated advance.</p></details>
     <details><summary>Where does AI make a decision?</summary><p>Gemini transcribes synthetic
       documents and reports observable image features. Deterministic code verifies exact quotes,
-      routes requirements, schedules wakes, and preserves missing items.</p></details>
+      works out which documents are needed, sets the reminders, and keeps every gap visible.</p></details>
     <details><summary>Is any real survivor information used?</summary><p>No. The fixtures are
       synthetic and unbranded. The persistence layer omits raw text, image bytes, real names,
       addresses, registration references, and applicant narrative; the API accepts only explicit
@@ -384,7 +489,8 @@
   </nav>
   <p>Built for the All Things Agentic Hackathon. Synthetic,
 unbranded documents and images only. No government agency endorses this project.</p></div></footer>
-<script src="/static/live-stack.js?v=20260819"></script>
-<script src="/static/sixty-days.js"></script>
+<script src="/static/live-stack.js?v=__ASSET_VERSION__"></script>
+<div class="popover" id="popover" role="dialog" aria-modal="false" hidden></div>
+<script src="/static/sixty-days.js?v=__ASSET_VERSION__"></script>
 </body>
 </html>

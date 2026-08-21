@@ -19,8 +19,8 @@ from datetime import timedelta
 from pathlib import Path
 from typing import Any
 
-from fastapi import FastAPI, HTTPException
-from fastapi.responses import FileResponse, JSONResponse
+from fastapi import FastAPI, Header, HTTPException, Request
+from fastapi.responses import HTMLResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 from google.cloud import firestore
 from pydantic import BaseModel, Field
@@ -32,11 +32,16 @@ from spine.firestore_stores import (
     FirestoreStateStore,
     FirestoreWakeStore,
 )
+from spine.model_armor import ModelArmorScreen
 from spine.obs import setup_tracing, span
+from spine.scheduler_auth import SchedulerIdentityError, verify_scheduler_token
+from spine.wake_ownership import project_predicate
 from spine.state import Runner, RunStatus, StepDef
 from spine.untrusted import prepare
 from spine.verify import Claim, ClaimKind, SourceRef, Verifier
 from spine.wake import Wake, WakeScheduler, WakeStatus
+from sixty_days.live_check import run_live_check
+from sixty_days.reader import LetterExtractionError, LetterVertexClient
 from sixty_days.store import CaseStore
 from sixty_days.wake_actions import DeadlineActionExecutor
 
@@ -102,6 +107,11 @@ from service.beta_routes import build_beta_router  # noqa: E402
 from spine.api_access import ApiKeyAuthenticator  # noqa: E402
 from spine.api_key_store import FirestoreApiKeyStore  # noqa: E402
 from spine.developer_access import KeyIssuer, build_developer_router  # noqa: E402
+from spine.issuance_budget import (  # noqa: E402
+    FirestoreCounterStore,
+    IssuanceBudget,
+    caller_fingerprint,
+)
 
 app.include_router(build_sixty_days_router(client, clock, scheduler, runner))
 developer_key_store = FirestoreApiKeyStore(client, "sixty-days")
@@ -109,31 +119,94 @@ beta_auth = ApiKeyAuthenticator.from_environment(dynamic_lookup=developer_key_st
 key_issuer = KeyIssuer.from_environment(
     developer_key_store, product="sixty-days", scope="sixty-days:use", prefix="sd_beta"
 )
-app.include_router(build_beta_router(client, beta_clock, lambda: beta_wake_scheduler, runner, beta_auth, project_id=settings.project_id, model_location=settings.model_location))
+armor_screen = ModelArmorScreen.from_environment(settings.project_id)
+app.include_router(build_beta_router(client, beta_clock, lambda: beta_wake_scheduler, runner, beta_auth, project_id=settings.project_id, model_location=settings.model_location, armor_screen=armor_screen))
+# Issuance is open so that a judge with no way to contact the project owner can still exercise
+# the API. The ceiling that replaces the invitation code is durable and per address.
+issuance_budget = IssuanceBudget.from_environment(
+    FirestoreCounterStore(client, "key_issuance_budget")
+)
 app.include_router(build_developer_router(
-    key_issuer, beta_auth, product="Sixty Days", scope="sixty-days:use"
+    key_issuer,
+    beta_auth,
+    product="Sixty Days",
+    scope="sixty-days:use",
+    issuance_budget=issuance_budget,
 ))
+_FIXTURE_SCANS = Path(__file__).resolve().parent.parent / "fixtures" / "letter_scans"
 _WEB = Path(__file__).resolve().parent.parent / "web"
 public_surface = "sixty-days"
+
+
+def _asset_version() -> str:
+    """A stamp that changes whenever the shipped front-end changes.
+
+    Static assets were served with an ETag but no Cache-Control, so browsers fell back to
+    heuristic caching and served a stale stylesheet without revalidating. A returning visitor then
+    got new HTML with old CSS and old JavaScript: the console rendered half-styled and the source
+    previews never loaded. That is a worse failure than a slow page, because it looks like the
+    product is broken rather than the cache.
+
+    The Cloud Run revision is the natural stamp in production. Off Cloud Run, the newest mtime in
+    the web directory keeps local reloads honest too.
+    """
+    revision = os.environ.get("K_REVISION", "").strip()
+    if revision:
+        return revision
+    if _WEB.is_dir():
+        newest = max((path.stat().st_mtime for path in _WEB.rglob("*") if path.is_file()), default=0)
+        return str(int(newest))
+    return "dev"
+
+
+ASSET_VERSION = _asset_version()
+
+
+@app.middleware("http")
+async def cache_headers(request, call_next):
+    """Never let a page and its stylesheet come from different deploys.
+
+    Documents revalidate on every view; versioned assets may be cached hard, because a new deploy
+    changes their URL. An asset requested without a version is still revalidated, so an old
+    bookmark cannot pin an old file.
+    """
+    response = await call_next(request)
+    path = request.url.path
+    if path.startswith("/static/"):
+        if request.url.query.startswith("v="):
+            response.headers["Cache-Control"] = "public, max-age=31536000, immutable"
+        else:
+            response.headers["Cache-Control"] = "no-cache"
+    elif path in {"/", "/judges", "/developer", "/sixty-days"}:
+        response.headers["Cache-Control"] = "no-cache"
+    return response
+
+
+def _page(name: str) -> HTMLResponse:
+    """Serve a page with its asset links stamped to this build."""
+    html = (_WEB / name).read_text(encoding="utf-8")
+    html = html.replace("__ASSET_VERSION__", ASSET_VERSION)
+    return HTMLResponse(html)
+
+
 if _WEB.is_dir():
     app.mount("/static", StaticFiles(directory=_WEB), name="static")
 
     @app.get("/", include_in_schema=False)
-    def index() -> FileResponse:
-        return FileResponse(_WEB / "sixty-days.html")
+    def index() -> HTMLResponse:
+        return _page("sixty-days.html")
 
     @app.get("/judges", include_in_schema=False)
-    def judges() -> FileResponse:
-        return FileResponse(_WEB / "sixty-days-judges.html")
+    def judges() -> HTMLResponse:
+        return _page("sixty-days-judges.html")
 
     @app.get("/developer", include_in_schema=False)
-    def developer() -> FileResponse:
-        return FileResponse(_WEB / "developer.html")
-
+    def developer() -> HTMLResponse:
+        return _page("developer.html")
 
     @app.get("/sixty-days", include_in_schema=False)
-    def sixty_days_console() -> FileResponse:
-        return FileResponse(_WEB / "sixty-days.html")
+    def sixty_days_console() -> HTMLResponse:
+        return _page("sixty-days.html")
 
 # Operational -----------------------------------------------------------------
 
@@ -155,30 +228,192 @@ def health() -> dict[str, Any]:
         "replay_mode": settings.replay_mode,
         "tracing": tracing_active,
         "beta_api": "configured" if beta_auth.enabled else "not_provisioned",
-        "developer_key_issuance": "invite_only" if key_issuer.enabled else "disabled",
+        "developer_key_issuance": key_issuer.mode if key_issuer.enabled else "disabled",
+        "model_armor": armor_screen.template if armor_screen.enabled else "not_configured",
         "beta_clock": "wall-clock",
         "worker": worker_id,
         "now": clock.now().isoformat(),
     }
 
 
-@app.post("/internal/scan-due")
-def scan_due(limit: int = 50) -> dict[str, Any]:
-    """Called by Cloud Scheduler. The only reason a sleeping agent ever wakes."""
-    with span("run", "scan-due", **{"scan.limit": limit}):
-        def is_beta(wake: Wake) -> bool:
-            run = state_store.get_run(wake.run_id)
-            return run is not None and run.project_id == "sixty-days-beta"
+DEMO_PROJECT = "sixty-days"
+BETA_PROJECT = "sixty-days-beta"
+OWNED_PROJECTS = frozenset({DEMO_PROJECT, BETA_PROJECT})
 
+# A public route that spends real money needs a ceiling that survives a restart and holds across
+# instances, so the counters live in Firestore alongside the issuance ones. The caps are modest on
+# purpose: this exists to answer "is the model really there", which one call per visitor settles.
+live_call_budget = IssuanceBudget(
+    FirestoreCounterStore(client, "live_call_budget"),
+    daily_cap=int(os.environ.get("LIVE_CALL_DAILY_CAP", "60")),
+    per_caller_cap=int(os.environ.get("LIVE_CALL_PER_CALLER_CAP", "3")),
+    global_denied=(
+        "The shared daily live-model budget for this public demo is spent. Every recorded control "
+        "still works, the published 20/20 stands, and the budget resets at 00:00 UTC."
+    ),
+    caller_denied=(
+        "You have used this demo's live-call allowance for today. This cap is what keeps a "
+        "credential-free page affordable to run; it resets at 00:00 UTC."
+    ),
+)
+
+
+@app.get("/sixty-days/live-check/budget")
+def live_check_budget(request: Request) -> dict[str, Any]:
+    """What the visitor has left, so the button can be honest before it is pressed."""
+    caller = caller_fingerprint(
+        request.headers.get("x-forwarded-for", ""),
+        request.client.host if request.client else "",
+    )
+    decision = live_call_budget.check(RealClock().now(), caller)
+    return {
+        "allowed": decision.allowed,
+        "reason": decision.reason,
+        "your_calls_left": max(0, decision.caller_cap - decision.caller_used),
+        "your_calls_allowed_today": decision.caller_cap,
+        "shared_calls_left": max(0, decision.global_cap - decision.global_used),
+        "model": "gemini-3.5-flash",
+    }
+
+
+@app.post("/sixty-days/live-check")
+def live_check(request: Request) -> dict[str, Any]:
+    """Prove the model is really there: one live Vertex call, graded against truth, right now.
+
+    Everything else on this page replays a recording, which is honest and repeatable but cannot
+    prove a live integration. This can. It reads a synthetic letter image with no accompanying
+    transcript, so a correct answer cannot come from copying text, and it is scored by the same
+    fields as the published run.
+    """
+    now = RealClock().now()
+    caller = caller_fingerprint(
+        request.headers.get("x-forwarded-for", ""),
+        request.client.host if request.client else "",
+    )
+    decision = live_call_budget.check(now, caller)
+    if not decision.allowed:
+        raise HTTPException(status_code=429, detail=decision.reason)
+
+    with span("run", "live-check"):
+        try:
+            result = run_live_check(
+                LetterVertexClient(settings.project_id, settings.model_location),
+                _FIXTURE_SCANS,
+            )
+        except LetterExtractionError as exc:
+            # A refused extraction is a real answer about the guardrails, not a server fault.
+            live_call_budget.consume(now, caller)
+            raise HTTPException(status_code=422, detail=str(exc)) from exc
+        except Exception as exc:  # noqa: BLE001
+            raise HTTPException(
+                status_code=503, detail=f"The live model call did not complete: {exc}"
+            ) from exc
+
+    # Counted only after the call actually happened, so a failed attempt is not charged.
+    live_call_budget.consume(now, caller)
+    payload = result.as_dict()
+    payload["your_calls_left"] = max(0, decision.caller_cap - decision.caller_used - 1)
+    return payload
+
+
+SCHEDULER_HEARTBEAT = "scheduler_heartbeat"
+
+
+def record_scheduler_heartbeat(executed: int, caller: str) -> None:
+    """Record that the worker ran, on wall-clock time, whether or not anything was due."""
+    now = RealClock().now()
+    try:
+        client.collection(SCHEDULER_HEARTBEAT).document(public_surface).set({
+            "last_scan_at": now,
+            "last_executed": executed,
+            "caller": caller,
+            "worker": worker_id,
+            "revision": os.environ.get("K_REVISION", "local"),
+        })
+    except Exception:  # noqa: BLE001
+        # Observability must never be able to fail the work it observes.
+        pass
+
+
+@app.get("/sixty-days/scheduler")
+def scheduler_status() -> dict[str, Any]:
+    """Public, credential-free proof that the deadline keeper is actually being woken.
+
+    The demo clock is simulated so five weeks fit in one sitting, and saying so honestly invites
+    the fair question of whether anything runs on its own at all. This answers it with wall-clock
+    evidence a judge can refresh: the real scheduler job, its identity, and when it last ran.
+    """
+    now = RealClock().now()
+    payload: dict[str, Any] = {
+        "job": "sixty-days-wake-scan",
+        "schedule": "every minute",
+        "target": "/internal/scan-due",
+        "authentication": "Google OIDC, scoped to this service",
+        "clock": "wall-clock, not the simulated demo clock",
+        "owned_projects": sorted(OWNED_PROJECTS),
+        "note": (
+            "The scheduler claims only wakes this service owns and creates typed case actions. "
+            "It never contacts a third party, sends, or submits."
+        ),
+    }
+    try:
+        snapshot = client.collection(SCHEDULER_HEARTBEAT).document(public_surface).get()
+    except Exception:  # noqa: BLE001
+        payload["status"] = "unavailable"
+        return payload
+    if not snapshot.exists:
+        payload["status"] = "no scan recorded yet"
+        return payload
+    data = snapshot.to_dict() or {}
+    last = data.get("last_scan_at")
+    payload["last_scan_at"] = last.isoformat() if hasattr(last, "isoformat") else str(last)
+    payload["last_executed"] = int(data.get("last_executed", 0))
+    payload["worker"] = str(data.get("worker", "unknown"))
+    payload["revision"] = str(data.get("revision", "unknown"))
+    if hasattr(last, "timestamp"):
+        seconds = max(0, int(now.timestamp() - last.timestamp()))
+        payload["seconds_since_last_scan"] = seconds
+        # A minute-cadence job that has not reported in five minutes is not healthy, and saying so
+        # is more useful than a green light that means nothing.
+        payload["status"] = "running" if seconds <= 300 else "stale"
+    else:
+        payload["status"] = "unknown"
+    return payload
+
+
+@app.post("/internal/scan-due")
+def scan_due(limit: int = 50, authorization: str | None = Header(default=None)) -> dict[str, Any]:
+    """Called by this service's Cloud Scheduler job. The only reason a sleeping agent ever wakes.
+
+    The console is credential-free on purpose; this route is not. An anonymous caller that can
+    drive the scanner can retire a wake, and a retired wake never fires its safeguard again.
+    """
+    try:
+        caller = verify_scheduler_token(authorization)
+    except SchedulerIdentityError as exc:
+        raise HTTPException(status_code=401, detail=str(exc)) from exc
+
+    with span("run", "scan-due", **{"scan.limit": limit}):
         demo = scheduler().dispatch_due(
-            record_due_action, limit=limit, predicate=lambda wake: not is_beta(wake)
+            record_due_action,
+            limit=limit,
+            predicate=project_predicate(state_store.get_run, DEMO_PROJECT),
         )
         beta = beta_wake_scheduler.dispatch_due(
-            record_due_action, limit=limit, predicate=is_beta
+            record_due_action,
+            limit=limit,
+            predicate=project_predicate(state_store.get_run, BETA_PROJECT),
         )
         executed = [*demo, *beta]
+        # A heartbeat on every scan, not only on the scans that find work. Without it the only
+        # evidence the scheduler exists is in the Cloud Scheduler console, which means a judge has
+        # to leave the product and take the architecture on trust. Recording the quiet scans is
+        # what makes "the agent is asleep, and the clock is still running" observable.
+        record_scheduler_heartbeat(len(executed), caller["mode"])
         return {
             "now": clock.now().isoformat(),
+            "caller": caller["mode"],
+            "owned_projects": sorted(OWNED_PROJECTS),
             "executed": [
                 {"wake_id": w.wake_id, "run_id": w.run_id, "kind": w.kind, "attempts": w.attempts}
                 for w in executed

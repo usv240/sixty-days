@@ -1,0 +1,52 @@
+{
+  "_comment": "Every popover follows the same contract: a plain definition, why it matters here, then a real source. Some words cannot be avoided on this page, so they get explained where they appear rather than assumed.",
+  "appeal": {
+    "title": "Appeal",
+    "plain": "Asking the agency to look at your case again after it refused some help, and sending papers that answer the reason it gave.",
+    "why": "The decision letter starts a 60-day window for this. Missing that window is usually final, which is why the whole product is built around the clock rather than around the paperwork.",
+    "url": "https://www.fema.gov/fact-sheet/8-tips-appealing-femas-decision-1",
+    "source": "FEMA: 8 Tips for Appealing FEMA's Decision"
+  },
+  "decision-letter": {
+    "title": "Decision letter",
+    "plain": "The letter the agency sends telling you what help was approved or refused, and why.",
+    "why": "This letter, not a general checklist, decides which documents actually matter for your case. Sixty Days reads your letter and follows what it says, quoting it word for word.",
+    "url": "https://www.fema.gov/fact-sheet/8-tips-appealing-femas-decision-1",
+    "source": "FEMA: the letter explains the reason and the documents"
+  },
+  "reminder": {
+    "title": "Reminder",
+    "plain": "A date the system sets for itself in advance, so it can come back and do something on that day without being asked.",
+    "why": "Eight of them are set the moment a case opens, running from day 3 to day 58. That is what makes this different from a chat window: it keeps working while you are doing something else.",
+    "url": "https://www.fema.gov/sites/default/files/documents/fema_ia-quick-reference_appeals.pdf",
+    "source": "FEMA: Individual Assistance Appeals Quick Reference"
+  },
+  "simulated-clock": {
+    "title": "Simulated clock",
+    "plain": "A pretend calendar for the demonstration, so you can jump forward weeks in seconds instead of waiting two months.",
+    "why": "The reminders are real and so is the code that runs them. Only the date is fast-forwarded, and the page always says when you are looking at pretend time. The live service is also woken by a real scheduler every minute on the real clock.",
+    "url": "https://cloud.google.com/scheduler/docs",
+    "source": "Google Cloud Scheduler"
+  },
+  "draft-packet": {
+    "title": "Draft packet",
+    "plain": "A PDF that gathers the letter's reasons, whatever documents have been collected, and a clear list of what is still missing.",
+    "why": "It is a draft on purpose. It is not an official form, it is not filed anywhere, and it never hides a gap by leaving it out. You read it and decide what to do.",
+    "url": "https://www.fema.gov/sites/default/files/documents/fema_ia-quick-reference_appeals.pdf",
+    "source": "FEMA: an appeal letter or form is optional"
+  },
+  "ready-for-review": {
+    "title": "Ready for your review",
+    "plain": "The photo is clear enough and shows enough of the scene that it is worth you looking at it.",
+    "why": "It is deliberately not the same as 'accepted', 'genuine', or 'enough'. The system only checks whether a picture is readable and wide enough. It cannot judge whether damage is disaster-related, what it is worth, or what an agency will accept.",
+    "url": "https://www.fema.gov/fact-sheet/verifying-home-ownership-or-occupancy",
+    "source": "FEMA: how records and evidence are verified"
+  },
+  "synthetic": {
+    "title": "Made up for the demo",
+    "plain": "Every letter, photo, name, address, and case number on this site was invented for the demonstration.",
+    "why": "No real survivor's information is used anywhere, so you can click every button freely. It also means the accuracy numbers describe these invented examples, not a promise about your own letter.",
+    "url": "https://www.fema.gov/fact-sheet/fema-individuals-and-households-program-application-eligibility-registration-and-appeals",
+    "source": "FEMA: Individuals and Households Program"
+  }
+}

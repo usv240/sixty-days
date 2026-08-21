@@ -23,6 +23,9 @@ REPLAY_MODE="${REPLAY_MODE:-true}"
 PUBLIC_PROJECT="sixty-days"
 BETA_API_SECRET="${BETA_API_SECRET:-}"
 BETA_ENROLLMENT_SECRET="${BETA_ENROLLMENT_SECRET:-}"
+# The worker route is closed even though the console is open. These two values are what
+# spine/scheduler_auth.py checks; with them unset on Cloud Run the scanner fails closed.
+SCHEDULER_IDENTITY="${SCHEDULER_IDENTITY:-agent-wake-scheduler@${PROJECT_ID}.iam.gserviceaccount.com}"
 
 # WSL resolves the Windows Cloud SDK's extensionless `gcloud` through Linux Python, which uses a
 # separate unauthenticated config under the WSL home. A Windows launcher must be invoked by a
@@ -81,7 +84,7 @@ run_gcloud run deploy "${SERVICE}" \
   --memory 512Mi \
   --timeout 300 \
   --allow-unauthenticated \
-  --update-env-vars "GOOGLE_CLOUD_PROJECT=${PROJECT_ID},REGION=${REGION},SIM_MODE=${SIM_MODE},REPLAY_MODE=${REPLAY_MODE},PUBLIC_PROJECT=${PUBLIC_PROJECT},BETA_DEVELOPER_KEY_TTL_HOURS=168" \
+  --update-env-vars "GOOGLE_CLOUD_PROJECT=${PROJECT_ID},REGION=${REGION},SIM_MODE=${SIM_MODE},REPLAY_MODE=${REPLAY_MODE},PUBLIC_PROJECT=${PUBLIC_PROJECT},BETA_DEVELOPER_KEY_TTL_HOURS=168,SCHEDULER_SERVICE_ACCOUNT=${SCHEDULER_IDENTITY},SCHEDULER_AUDIENCE=${SCHEDULER_AUDIENCE:-}" \
   "${BETA_SECRET_ARGS[@]}" \
   --labels "hackathon=all-things-agentic,component=${SERVICE}"
 
@@ -92,3 +95,12 @@ echo
 echo "Verify from an unauthenticated client:"
 echo "  curl ${URL}/health"
 echo "  curl -X POST -H \"Content-Type: application/json\" -d '{}' ${URL}/exit-test"
+
+# The OIDC audience is the service URL, which is only known after the first deploy. Set it now and
+# re-deploy so the scanner can verify tokens; until then it fails closed and rejects every scan.
+if [[ -z "${SCHEDULER_AUDIENCE:-}" ]]; then
+  echo
+  echo "Scheduler audience was not set for this deploy. Finish wiring the worker with:"
+  echo "  SCHEDULER_AUDIENCE=${URL} bash deploy.sh ${SERVICE}"
+  echo "  bash infra/provision_scheduler.sh"
+fi
