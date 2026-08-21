@@ -63,10 +63,30 @@
   fetch("/developer/config")
     .then((response) => response.ok ? response.json() : Promise.reject())
     .then((config) => {
+      const modeLabel = {
+        open: "Self-serve issuance is live",
+        invite_only: "Invite-only issuance is live",
+      };
       document.querySelector("#access-mode").textContent =
-        config.issuance === "invite_only" ? "Invite-only issuance is live" : "Issuance is disabled";
+        modeLabel[config.issuance] || "Issuance is disabled";
       document.querySelector("#key-lifetime").textContent = config.ttl_hours + " hour lifetime";
-      form.querySelector("button[type=submit]").disabled = config.issuance !== "invite_only";
+      form.querySelector("button[type=submit]").disabled =
+        config.issuance !== "open" && config.issuance !== "invite_only";
+
+      // The cap is read from the service rather than written into the page, so the number a
+      // visitor is told is the number this deployment actually enforces.
+      const help = document.querySelector("#issuance-help");
+      if (help) {
+        if (config.issuance === "open") {
+          help.textContent = config.keys_per_day
+            ? `No invitation code is needed. Up to ${config.keys_per_day} keys per day from one address; each expires on its own and can be revoked.`
+            : "No invitation code is needed. Each key expires on its own and can be revoked.";
+        } else if (config.issuance === "invite_only") {
+          help.textContent = "This deployment requires an invitation code from the project owner.";
+        } else {
+          help.textContent = "Key issuance is disabled on this deployment.";
+        }
+      }
     })
     .catch(() => setStatus("Access configuration could not be loaded.", "error"));
 
@@ -76,8 +96,10 @@
     submit.disabled = true;
     setStatus("Creating a scoped key...", "neutral");
     const data = new FormData(form);
+    const invitation = data.get("invitation_code");
     const payload = {
-      invitation_code: data.get("invitation_code"),
+      // Omitted entirely when the field is not on the page, so open issuance sends no null secret.
+      ...(invitation ? { invitation_code: invitation } : {}),
       tenant_id: String(data.get("tenant_id")).trim().toLowerCase(),
       label: String(data.get("label")).trim(),
       acknowledge_terms: data.get("acknowledge_terms") === "on",
@@ -94,7 +116,7 @@
       keyOutput.value = body.api_key;
       expires.textContent = new Date(body.expires_at).toLocaleString();
       result.hidden = false;
-      form.elements.invitation_code.value = "";
+      if (form.elements.invitation_code) form.elements.invitation_code.value = "";
       setStatus("Key created and loaded into this browser session. Save it now.", "success");
       keyOutput.focus();
     } catch (error) {
