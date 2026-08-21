@@ -15,20 +15,32 @@ historical process figures, not a current denial rate or a prediction of appeal 
 Source context: https://www.gao.gov/products/gao-20-503
 
 Sixty Days is a deployed deadline keeper that carries the coordination burden without taking the
-applicant's authority. It preserves the synthetic letter's exact reason, registers eight durable
-wakes, checks only observable evidence framing, prepares applicant-controlled request drafts, and
-builds a visibly partial PDF. It never contacts a third party, provides legal advice, predicts
+applicant's authority. It quotes the letter's exact reason, sets eight reminders for itself, checks only whether an
+evidence photo is readable, drafts the requests for the applicant to send, and builds a PDF that
+still shows every gap. It never contacts a third party, gives legal advice, predicts
 eligibility, or submits an appeal.
 
-Adversarial testing improved the core safety boundary. The Verifier now rejects empty and
-whitespace-only quotes, and one valid reference cannot launder an empty one. Redaction tests now
-cover hyphenated and apostrophe-bearing names, lowercase applicant labels, FEMA-style references,
-street addresses, and PO boxes.
+A Cloud Scheduler job wakes the deployed service every minute, and the site shows when it last
+ran, so the autonomy is checkable rather than narrated.
+
+Adversarial testing improved the core safety boundary. The Verifier rejects empty and
+whitespace-only quotes, and one valid reference cannot launder an empty one.
+
+Model Armor now screens for prompt injection in front of that deterministic layer. Measured on
+the live service it blocked a direct injection and missed the same injection diluted inside a
+long letter, which the deterministic quarantine caught. Publishing the miss is the point: a
+screen whose failures are unknown cannot be relied on.
+
+The console replays recorded model calls so judging is repeatable, and carries one button that
+calls Gemini 3.5 Flash live and grades the answer against the same truth file, so the
+integration is provable rather than claimed.
 
 Current proof:
 
-- 288 standalone tests
+- 289 standalone tests
 - 24 of 24 public acceptance checks
+- 29 of 29 developer-API checks, including tenant isolation
+- 33 of 33 responsive checks and 11 of 11 screen sizes
 - 20 of 20 recorded letter fields
 - 6 of 6 recorded evidence decisions
 - 10 of 10 shared-substrate exit-test clauses
@@ -51,7 +63,7 @@ I created this post for the purposes of entering the All Things Agentic Hackatho
 
 Sixty Days is a deployed deadline agent for synthetic disaster-assistance appeals. It quotes the
 letter, registers eight wakes, prepares applicant-controlled requests, and keeps partial packets
-visibly partial. It never sends or submits. Proven by 288 tests and a 24 of 24 public flow.
+visibly partial. It never sends or submits. Proven by 289 tests and a 24 of 24 public flow.
 
 Live: https://sixty-days-109051079423.us-central1.run.app
 
