@@ -116,7 +116,7 @@ FEMA-oriented conformance, synthetic case fixtures, and the 24-step public accep
 ## Reproduce and inspect it
 
 The public repository contains the architecture SVG and Mermaid source, local and cloud spin-up
-instructions, truth-adjacent recordings, 205 standalone tests, a 24-step live acceptance flow,
+instructions, truth-adjacent recordings, 288 standalone tests, a 24-step live acceptance flow,
 accessibility checks, public conformance evidence, and the 10-clause shared-substrate exit test.
 
 Live product: https://sixty-days-109051079423.us-central1.run.app

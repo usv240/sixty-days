@@ -6,14 +6,14 @@
 <meta name="theme-color" content="#f7f9fc">
 <title>Sixty Days: evidence for judges</title>
 <meta name="description" content="Rubric map, deployment proof, measured evidence, limits, and reproduction steps for Sixty Days.">
-<link rel="stylesheet" href="/static/styles.css">
+<link rel="stylesheet" href="/static/styles.css?v=__ASSET_VERSION__">
 </head>
 <body>
 <a class="skip-link" href="#main">Skip to main content</a>
 <header class="site">
   <div class="wrap bar">
     <div class="brand">Sixty Days <span>- judge evidence</span></div>
-    <nav aria-label="Judge navigation"><a href="/">Product</a><a href="/#console">Live demo</a><a href="#rubric">Rubric map</a><a href="/developer">Developer API</a><a href="/docs">API docs</a></nav>
+    <nav aria-label="Judge navigation"><a href="/">Product</a><a href="/#run">Live demo</a><a href="#rubric">Rubric map</a><a href="/developer">Developer API</a><a href="/docs">API docs</a></nav>
     <button class="theme-toggle" id="theme-toggle" aria-pressed="false">Use dark mode</button>
   </div>
 </header>
@@ -41,7 +41,7 @@
       evidence fixtures, then advance time and watch the scheduled safeguard build a visibly partial
       packet automatically. Open the conformance map for the official-source-to-code-to-test chain.</p>
     <div class="evaluator-actions">
-      <a href="/#console">Run the guided workflow</a>
+      <a href="/#run">Run the guided workflow</a>
       <a href="/sixty-days/conformance">Open conformance</a>
       <a href="https://github.com/usv240/sixty-days">Inspect the repository</a>
     </div>
@@ -65,9 +65,18 @@
   <div class="section-heading"><div><p class="eyebrow">Mandatory technology</p><h2>Requirements are visible in the execution path</h2></div></div>
   <div class="grid-3">
     <div class="card"><h3>Gemini 3.5 Flash</h3><p>Vertex AI powers decision-letter transcription and observable evidence-photo checks. Four letter calls and two evidence calls are recorded and graded against adjacent truth.</p></div>
-    <div class="card"><h3>Google GenAI SDK</h3><p>The reader and recording scripts use the Google GenAI SDK with structured outputs. Deterministic fixture replay keeps public judging repeatable.</p></div>
-    <div class="card"><h3>Google Cloud</h3><p>Cloud Run serves the application; Firestore holds structured cases and wakes; Cloud Scheduler drives the shared due-wake worker; Cloud Trace receives spans.</p></div>
+    <div class="card"><h3>Google GenAI SDK</h3><p>One of the four accepted agent frameworks (ADK, GenAI SDK, Antigravity SDK, GenKit). The reader, evidence checker, and recording scripts call it with schema-constrained structured outputs at temperature zero. Deterministic fixture replay keeps public judging repeatable.</p></div>
+    <div class="card"><h3>Google Cloud</h3><p>Cloud Run serves the application and scales to zero; Firestore holds structured cases, wakes, and durable counters; a dedicated <code>sixty-days-wake-scan</code> Cloud Scheduler job drives this service’s own worker over OIDC; Secret Manager holds key hashes; Cloud Trace and Cloud Logging receive OpenTelemetry spans; Cloud Build and Artifact Registry produce the image. <a href="/sixty-days/scheduler">Live scheduler proof</a>.</p></div>
   </div>
+  <div class="callout narrow"><p><b>Model Armor:</b> the de-identified API screens
+    untrusted letter text for prompt injection before any model call, in front of the deterministic
+    redaction and quarantine rather than instead of them. Measured live it blocked a bare injection
+    and missed the same injection diluted inside a long letter, which the quarantine caught. An
+    unavailable screen is recorded as unavailable, never as a pass.</p></div>
+  <div class="callout ok narrow"><p><b>Prove the model is live:</b> the console replays recordings so
+    judging is repeatable, and also carries one button that calls Gemini 3.5 Flash on Vertex AI for
+    real, on a letter image with no transcript supplied, graded against the same truth file by the
+    same fields as the published run. Bounded per visitor and per day.</p></div>
   <div class="callout narrow"><p><b>Three additional Google models:</b> Gemma 4 reviews
     already-pattern-redacted text for remaining person names; Gemini 3.1 Flash Image creates the
     non-data-bearing first-use illustration; and Veo 3.1 Fast creates the optional four-second
@@ -77,15 +86,15 @@
 </div></section>
 
 <section id="proof"><div class="wrap">
-  <div class="section-heading"><div><p class="eyebrow">Deployment proof</p><h2>What is live, and what is shared</h2></div><p class="narrow">The product service and the scheduler worker are named separately to avoid implying a boundary that does not exist.</p></div>
-  <div class="architecture-map" role="img" aria-label="Decision letter and evidence enter the Sixty Days Cloud Run service, which uses Gemini and Gemma through Vertex AI, stores structured state in Firestore, receives due wake claims from a shared scheduler worker, and emits Cloud Trace spans.">
+  <div class="section-heading"><div><p class="eyebrow">Deployment proof</p><h2>What is live, and what is shared</h2></div><p class="narrow">This service now owns its scheduler job outright. It claims only the wakes it can execute, so a worker on the shared Firestore substrate cannot retire this project's safeguards.</p></div>
+  <div class="architecture-map" role="img" aria-label="Decision letter and evidence enter the Sixty Days Cloud Run service, which uses Gemini and Gemma through Vertex AI, stores structured state in Firestore, is woken every minute by its own OIDC-authenticated Cloud Scheduler job, and emits Cloud Trace spans.">
     <div class="arch-node"><b>Synthetic inputs</b><span>Letters and evidence images</span></div><span class="arch-arrow" aria-hidden="true">&rarr;</span>
     <div class="arch-node"><b>Cloud Run: sixty-days</b><span>Typed workflow and safety boundaries</span></div><span class="arch-arrow" aria-hidden="true">&rarr;</span>
     <div class="arch-node"><b>Vertex AI + Firestore</b><span>Models, durable cases, wakes, and traces</span></div>
   </div>
   <ul>
     <li><b>Service:</b> <code>sixty-days</code> in <code>us-central1</code>, bounded to three instances and running as <code>sa-reason</code>.</li>
-    <li><b>Scheduler:</b> <code>spine-scan-due</code> invokes the shared spine worker, which claims due wakes from the same Firestore substrate. It is not represented as a second Sixty Days service.</li>
+    <li><b>Scheduler:</b> <code>sixty-days-wake-scan</code> posts to <code>/internal/scan-due</code> every minute with an OIDC token scoped to this service. The worker claims only wakes owned by <code>sixty-days</code> and <code>sixty-days-beta</code>, so a neighbouring worker on the shared Firestore substrate cannot retire this project's safeguards. Anonymous calls to the worker route return 401.</li>
     <li><b>Acceptance:</b> <code>scripts/sixty_days_demo_flow.py</code> performs 23 public HTTP checks; <code>/exit-test</code> exercises the shared 10-stage substrate.</li>
     <li><b>Measured fixtures:</b> truth sits next to every synthetic input. Reports record 20/20 extracted fields and 6/6 evidence decisions.</li>
   </ul>
@@ -101,7 +110,7 @@ python -m pytest -q
 python scripts/check_a11y.py
 python scripts/sixty_days_demo_flow.py --url https://SERVICE_URL
 curl -X POST -H "Content-Type: application/json" -d '{}' https://SERVICE_URL/exit-test</code></pre>
-  <p>The expected standalone baseline is <b>222 tests</b>. Deployment and credentials are documented in the repository README and <code>deploy.sh</code>.</p>
+  <p>The expected standalone baseline is <b>288 tests</b>. Deployment and credentials are documented in the repository README and <code>deploy.sh</code>.</p>
 </div></section>
 
 <section id="findings"><div class="wrap">
@@ -157,7 +166,7 @@ curl -X POST -H "Content-Type: application/json" -d '{}' https://SERVICE_URL/exi
   <p>Built for the All Things Agentic Hackathon. No government agency endorses this project.</p>
   <div class="footer-links"><a href="https://github.com/usv240/sixty-days">GitHub</a><a href="/">Product</a><a href="/developer">Developer API</a><a href="/docs">API docs</a><a href="/sixty-days/conformance">Conformance</a></div>
 </div></footer>
-<script src="/static/live-stack.js?v=20260819"></script>
+<script src="/static/live-stack.js?v=__ASSET_VERSION__"></script>
 <script>
 const toggle = document.querySelector("#theme-toggle");
 const themes = ["light", "dark"];

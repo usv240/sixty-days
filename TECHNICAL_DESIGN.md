@@ -149,7 +149,7 @@ moment and records the resulting partial status and missing list. No wake contac
 
 - One submission-specific Cloud Run service with its own root, judges page, health identity, and URL.
 - Firestore for structured case/run/wake state.
-- The existing `spine-scan-due` Cloud Scheduler job invokes a shared spine worker that claims due
+- A dedicated `sixty-days-wake-scan` Cloud Scheduler job invokes this service's worker, which claims due
   wakes from the same Firestore substrate; it is not a second Sixty Days service.
 - Firestore simulation clocks are namespaced per public project
   (`sim/clock-sixty-days` here). Simulated advances filter candidates by the owning run's project
@@ -217,6 +217,6 @@ python scripts/check_a11y.py
 python scripts/sixty_days_demo_flow.py --url https://SERVICE.run.app
 ```
 
-The standalone completion baseline is 219 tests, accessibility green, and 24/24 Sixty Days
+The standalone completion baseline is 288 tests, accessibility green, and 24/24 Sixty Days
 acceptance checks. The combined integration workspace currently has 300 tests; never substitute
 that larger number for the standalone repository result. Update either number only from real output.

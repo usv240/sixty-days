@@ -11,7 +11,7 @@ flowchart LR
     L --> V[Vertex AI: Gemini 3.5 Flash and Gemma 4 MaaS]
     F --> X[Deadline action executor]
     X --> P
-    S[Shared Cloud Scheduler worker] --> F
+    S[Cloud Scheduler: sixty-days-wake-scan] --> B
     B --> T[Cloud Trace and Logging]
     P --> H[Applicant-reviewed draft]
     M[Gemini 3.1 Flash Image and Veo 3.1 Fast] -. recorded at build time .-> O[Static onboarding media]

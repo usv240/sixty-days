@@ -38,10 +38,29 @@ The full source hierarchy and rejected claims are in
 |---|---:|---|
 | Recorded Gemini letter extraction | 20 of 20 fields | python scripts/record_letters.py and adjacent report |
 | Recorded evidence screening | 6 of 6 decisions | python scripts/record_evidence.py and adjacent report |
-| Standalone test suite | 219 passed | python -m pytest -q |
+| Standalone test suite | 288 passed | python -m pytest -q |
 | Public acceptance flow | 24 of 24 | python scripts/sixty_days_demo_flow.py with the public URL |
 | Shared-substrate exit test | 10 of 10 | POST /exit-test with an empty JSON body |
 | Accessibility gate | Pass in light and dark themes | python scripts/check_a11y.py |
+
+## What adding Model Armor actually measured
+
+Model Armor was added in front of the deterministic screens, never instead of them, and then
+measured against the live service rather than assumed. Three inputs through the `/v1` API:
+
+| Input | Model Armor | Deterministic layer | Result |
+|---|---|---|---|
+| Clean synthetic letter | No match | 0 lines quarantined | Two quote-grounded reasons kept |
+| Same letter with an injection appended | **No match** | **1 line quarantined** | Two quote-grounded reasons kept; the instruction was never obeyed |
+| Bare injection with no letter around it | **Match, blocked** | not reached | Rejected before any model call |
+
+The middle row is the reason this project does not treat a managed classifier as a guarantee. Model
+Armor caught the direct attack and missed the same attack diluted inside a legitimate document; the
+deterministic quarantine caught the one it missed. Reporting the miss is the point: a screen whose
+failures are unknown cannot be relied on, and a layer that can only ever add strictness cannot
+weaken the guarantees the rest of this suite pins.
+
+An unavailable screen is recorded as unavailable, never as a pass.
 
 These measurements describe committed synthetic fixtures and specified behavior. They are not
 legal accuracy, eligibility, evidence sufficiency, or appeal-outcome measurements.
@@ -62,6 +81,8 @@ legal accuracy, eligibility, evidence sufficiency, or appeal-outcome measurement
 | Disaster-name prose | Preserve | test_the_gate_does_not_over_redact |
 | Applicant markup in PDF text | Render as text, not markup | test_applicant_markup_is_rendered_as_text_not_reportlab_markup |
 | Real-looking packet references | Reject | Public route contract tests |
+| Bare prompt injection through the API | Reject before the model is called | Model Armor `pi_and_jailbreak` MATCH_FOUND; measured live |
+| Injection diluted inside a long letter | Quarantine the line; keep only quote-grounded reasons | Deterministic quarantine; Model Armor misses this case, measured and reported |
 
 ## Deadline and resilience matrix
 

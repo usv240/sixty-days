@@ -32,7 +32,7 @@ their prerequisites exist, so the judge can follow the numbered stages without g
 | Gate | Reproducible result |
 |---|---:|
 | Deployed public acceptance flow | **24/24** |
-| Standalone automated tests | **219 passed** |
+| Standalone automated tests | **288 passed** |
 | Recorded letter fields | **20/20** |
 | Recorded evidence decisions | **6/6** |
 | Shared-substrate exit test | **10/10** |
@@ -83,7 +83,7 @@ flowchart LR
     L --> V[Vertex AI: Gemini 3.5 Flash and Gemma 4 MaaS]
     F --> X[Deadline action executor]
     X --> P
-    S[Shared Cloud Scheduler worker] --> F
+    S[Cloud Scheduler: sixty-days-wake-scan] --> B
     B --> T[Cloud Trace and Logging]
     P --> H[Applicant-reviewed draft]
     M[Gemini 3.1 Flash Image and Veo 3.1 Fast] -. recorded at build time .-> O[Static onboarding media]
@@ -91,9 +91,14 @@ flowchart LR
 ```
 
 The domain modules and copied spine run inside one `sixty-days` Cloud Run service. It is not a fleet of
-pretend microservices. The shared `spine-scan-due` scheduler invokes a worker that claims due wakes
-from Firestore. Each claimed wake creates one idempotent, typed case action. The packet safeguard
-actually builds and records a partial packet snapshot; no action sends or submits. Raw letter text,
+pretend microservices. A dedicated `sixty-days-wake-scan` Cloud Scheduler job posts to
+`/internal/scan-due` every minute, authenticated with an OIDC token minted for
+`agent-wake-scheduler` and scoped to this service's URL as the audience. The worker claims only the
+wakes this service owns, because wakes from several projects share one Firestore collection and
+claiming is a compare-and-swap: a worker that claims a wake it cannot execute would complete it and
+silently retire another service's safeguard. Each claimed wake creates one idempotent, typed case
+action. The packet safeguard actually builds and records a partial packet snapshot; no action sends
+or submits. Raw letter text,
 image bytes, and applicant narrative are deliberately omitted from durable case records.
 
 Only explicit `DEMO-*` application references and `DR-DEMO*` disaster references are accepted by
@@ -112,6 +117,19 @@ wake claims are filtered by the owning project.
 | **Gemma 4 MaaS** (`gemma-4-26b-a4b-it-maas`) | Second-pass privacy review after deterministic redaction. | It does not interpret eligibility or legal rights. |
 | **Gemini 3.1 Flash Image** | Creates the optional abstract first-use briefing. | Build-time media only; no applicant data or case facts. |
 | **Veo 3.1 Fast** | Creates the optional four-second motion briefing. | Muted, user-controlled, and outside the case path. |
+
+**Model Armor** screens de-identified `/v1` text for prompt injection and jailbreak attempts before
+any model call, in front of the deterministic redaction and quarantine rather than instead of them.
+It can only ever make the pipeline stricter: a match blocks, and an outage is recorded as
+*unavailable* rather than treated as a pass. Measured live, it blocked a bare injection and missed
+the same injection diluted inside a long letter, which the deterministic quarantine caught. Both
+results are published in [the validation evidence](VALIDATION_EVIDENCE.md).
+
+**A live model call you can trigger.** The console replays recordings so judging is repeatable, so
+the console also carries one button that calls Gemini 3.5 Flash on Vertex AI for real, on a
+synthetic letter image with no transcript supplied, and grades the answer against the same truth
+file by the same fields as the published run. Bounded by a durable per-visitor and global daily
+cap.
 
 The additional models have narrow, inspectable roles. Their prompts, exact IDs, byte counts, and
 hashes are public, and none of them creates evidence or makes an appeal decision.
@@ -161,8 +179,11 @@ contact, filing, submission, legal-advice, or outcome-prediction operation.
 
 Full provisioning, expiry, and rotation instructions are in [the beta API guide](docs/api-beta.md).
 
-Invited developers can open [the live Developer page](https://sixty-days-109051079423.us-central1.run.app/developer), enter the invitation
-code supplied by the project owner, and generate a tenant-scoped key that expires after seven days.
+Anyone evaluating this project can open [the live Developer page](https://sixty-days-109051079423.us-central1.run.app/developer),
+name a workspace, and generate a tenant-scoped key that expires after seven days. There is no
+invitation code, no account, and no approval step, because a private code cannot gate a beta whose
+whole purpose is to be tested by people with no way to contact the author. What replaces the code is
+a durable ceiling on issuance itself: up to 50 keys per address per day behind a global daily cap.
 The plaintext key is shown once and remains only in page memory. The page includes a connection
 test, a copyable project request, immediate revocation, and a link to the interactive OpenAPI schema.
 
@@ -236,6 +257,8 @@ receives HTTP 411.
 - [Validation evidence](VALIDATION_EVIDENCE.md): research-to-test evidence, adversarial checks, and explicit limits
 - [Project differentiation](PROJECT_DIFFERENTIATION.md): concrete separation from the other submission and shared-spine disclosure
 - `SUBMISSION_KIT.md`: evidence-backed video and Devpost plan
+- `LICENSE`: MIT
+- [Live scheduler proof](https://sixty-days-109051079423.us-central1.run.app/sixty-days/scheduler): wall-clock evidence that the deadline keeper is being woken, refreshed in the console
 
 ## Disclosure
 

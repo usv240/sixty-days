@@ -12,7 +12,7 @@ service. Do not substitute the larger combined-workspace count.
 - Public repository: `https://github.com/usv240/sixty-days`
 - Category: The Taskmaster
 - Public acceptance flow: 24/24
-- Standalone tests: 219 passed
+- Standalone tests: 288 passed
 - Recorded letter extraction: 20/20 fields
 - Recorded evidence screening: 6/6 decisions
 - Shared-substrate exit test: 10/10
@@ -38,7 +38,7 @@ edited around it, but the proof-of-action sequence should not be cut.
 1. From `app/`, run:
    `python scripts/sixty_days_demo_flow.py --url https://sixty-days-109051079423.us-central1.run.app`
    and save the 24/24 result.
-2. Run `python -m pytest -q` and confirm 219 passed.
+2. Run `python -m pytest -q` and confirm 288 passed.
 3. Run `python scripts/check_a11y.py` and confirm both themes pass.
 4. Use a fresh 1440 by 900 browser window in light mode. Hide bookmarks, extensions, notifications,
    personal accounts, and unrelated tabs.
@@ -60,12 +60,12 @@ Timings are targets. Keep at least five seconds of final margin.
 | 0:00 to 0:20 | Landing hero and problem cards | "A disaster-assistance decision letter can start a short appeal clock while the records it requests are scattered across insurers, public offices, and a damaged home. Sixty Days keeps the reason, evidence, and deadline together without pretending to be a lawyer or acting as the applicant." |
 | 0:20 to 0:35 | Four-stage workflow and boundaries | "It understands the letter, checks observable evidence, tracks applicant-controlled requests, and builds a reviewable draft. It never contacts a third party, predicts eligibility, or submits an appeal." |
 | 0:35 to 1:05 | Open the console and press **Start guided demo with this letter** | "This is the live deployed service. The guided preset anchors a clearly labelled simulation clock to this synthetic letter, so every rehearsal proves the same sequence without deleting stored audit evidence. Gemini 3.5 Flash preserves exact reasons and requirements. Four recorded calls score twenty out of twenty fields against adjacent truth." |
-| 1:05 to 1:30 | Show exact reason, deadline, requirements, and eight wakes | "The letter controls the plan. Its exact reason is quoted, the deadline is calculated deterministically, and all eight wakes are registered immediately. In production, a scheduled worker claims due work from Firestore on wall-clock time." |
+| 1:05 to 1:30 | Show exact reason, deadline, requirements, and eight wakes | "The letter controls the plan. Its exact reason is quoted, the deadline is calculated deterministically, and all eight wakes are registered immediately. A Cloud Scheduler job wakes this service every minute, and the worker claims only the wakes this project owns." |
 | 1:30 to 1:58 | Press **Screen close photo**, then screen the automatically selected wider comparison | "The close image receives an actionable retake because the requested context is missing. The wider comparison becomes ready for applicant review. That phrase is deliberate. The system checks only framing and legibility. It does not authenticate evidence, value damage, or predict agency acceptance. Two recorded calls score six out of six decisions." |
 | 1:58 to 2:20 | Prepare the insurer request | "The agent prepares an insurer request with blanks and registers a no-reply wake. Nothing is sent. The applicant reviews and sends every external request, and the service has no send endpoint." |
 | 2:20 to 2:48 | Add the applicant statement, check the packet, and download the PDF | "The packet keeps the letter's quoted reason beside the evidence and lists everything still missing. Every page repeats validated synthetic application and disaster references for applicant verification. The PDF is clearly marked draft, optional, and not submitted." |
 | 2:48 to 3:08 | Advance the simulated days and show the automatic packet snapshot | "Now time advances. The deadline keeper resumes from durable state. At the packet safeguard, it actually runs the packet builder against accepted evidence, stores a visibly partial snapshot with everything missing, and does not send or submit. That is asynchronous action over time, not a chat response." |
-| 3:08 to 3:30 | Show the architecture diagram, then the judge evidence page | "One Cloud Run service coordinates bounded modules. Firestore stores structured cases and wakes, while raw letters, photo bytes, and applicant narrative are omitted. Gemini performs measured extraction, Gemma reviews redaction, and the Verifier rejects unsupported or empty quotes. The standalone repository passes two hundred and five tests." |
+| 3:08 to 3:30 | Show the architecture diagram, then the judge evidence page | "One Cloud Run service coordinates bounded modules. Firestore stores structured cases and wakes, while raw letters, photo bytes, and applicant narrative are omitted. Gemini performs measured extraction, Gemma reviews redaction, and the Verifier rejects unsupported or empty quotes. The standalone repository passes two hundred and eighty-eight tests." |
 | 3:30 to 3:52 | Show the Cloud Run service, public URL, and current revision | "This is the independent sixty-days service running on Google Cloud in us-central1, with Firestore, Vertex AI, Cloud Scheduler, Cloud Trace, and scale-to-zero Cloud Run. The public URL you just watched is this deployed service." |
 
 Upload publicly to YouTube or Vimeo with the title:
@@ -179,7 +179,7 @@ No government agency endorses this project.
 - [x] Submission-ready architecture SVG and Mermaid source
 - [x] Three additional Google model integrations with public provenance
 - [x] 24/24 public acceptance flow
-- [x] 205 standalone tests
+- [x] 288 standalone tests
 - [x] 20/20 letter fields and 6/6 evidence decisions
 - [x] Accessibility gate and 10/10 exit test
 - [x] Public build story published: https://dev.to/ujwal240/a-deadline-does-not-care-that-you-are-still-recovering-3080
