@@ -6,7 +6,7 @@ from datetime import date
 from typing import Any, Callable, Literal
 
 from fastapi import APIRouter, Depends, HTTPException
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field
 
 from service.sixty_days_routes import PacketRequest, PreparedRequestRequest
 from sixty_days.deadline import Case, Contact, DeadlineKeeper
@@ -19,11 +19,15 @@ from sixty_days.reader import (
     LetterVertexClient,
 )
 from sixty_days.store import CaseStore
+from spine.model_armor import ModelArmorScreen
 from spine.api_access import ApiKeyAuthenticator, ApiPrincipal, require_scope
 from spine.redact import GemmaReviewer, RedactionError, Redactor
 
 
 class OpenBetaCaseRequest(BaseModel):
+    # Same reasoning as KeyRequest: a silently dropped field reads as an accepted one.
+    model_config = ConfigDict(extra="forbid")
+
     document: str = Field(min_length=40, max_length=30_000)
     applicant_ref: str = Field(
         min_length=3, max_length=40, pattern=r"^SUBJECT-[A-Za-z0-9._-]+$"
@@ -57,7 +61,11 @@ def build_beta_router(
     reader_factory: Callable[[], LetterReader] | None = None,
     project_id: str = "",
     model_location: str = "global",
+    armor_screen: ModelArmorScreen | None = None,
 ) -> APIRouter:
+    # A disabled screen is the local and test default, and behaves exactly as before.
+    armor_screen = armor_screen or ModelArmorScreen(project_id="", template="")
+
     router = APIRouter(prefix="/v1", tags=["beta-api"])
     cases = CaseStore(client)
 
@@ -107,6 +115,17 @@ def build_beta_router(
     ) -> dict[str, Any]:
         authorize(principal)
         _reject_obvious_identifiers(request.document)
+        # Model Armor screens ahead of the deterministic layer, and can only make this stricter:
+        # an unavailable screen hands the decision straight back to the checks below.
+        armor = armor_screen.screen(request.document)
+        if armor.blocked:
+            raise HTTPException(
+                status_code=422,
+                detail=(
+                    "Model Armor flagged this text as a prompt-injection or jailbreak attempt. "
+                    "The document was not sent to the model."
+                ),
+            )
         try:
             result = reader().parse(
                 artifact_id=f"letter_{principal.key_id}", document=request.document
@@ -177,6 +196,10 @@ def build_beta_router(
             "dropped": result.dropped,
             "redacted": result.redacted_count,
             "raw_document_persisted": False,
+            # Reported rather than merely acted on: a screen that silently passes is
+            # indistinguishable from a screen that never ran.
+            "model_armor": armor.as_dict(),
+            "quarantined_lines": len(result.quarantined),
             "safety": "Draft and organize only. The applicant reviews and submits.",
         }
 
