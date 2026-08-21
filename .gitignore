@@ -11,3 +11,6 @@ tmp/
 .gcloud/
 dev.to/
 .beta-keys/
+
+# Working notes for the recording, not part of the submitted repository.
+DEMO_SCRIPT.md
