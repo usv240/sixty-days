@@ -233,3 +233,47 @@ def test_cancelled_wakes_are_marked_not_deleted(scheduler):
     assert len(store_wakes) == 1
     assert store_wakes[0].status is WakeStatus.CANCELLED
     assert store_wakes[0].cancelled_reason == "patient discharged"
+
+
+def test_cancel_run_can_spare_the_wake_that_is_currently_running():
+    """A handler may decide mid-flight that the whole run is finished.
+
+    The wake it is running inside is CLAIMED, so a blanket cancel would sweep it up. The dispatcher
+    then marks it DONE a moment later, silently reverting the cancellation and leaving the returned
+    count one higher than the number of reminders that were actually stopped.
+    """
+    from datetime import datetime, timedelta, timezone
+
+    from spine.clock import ClockState, MemoryClockStateStore, SimulatedClock
+    from spine.wake import MemoryWakeStore, WakeScheduler, WakeStatus
+
+    start = datetime(2026, 8, 5, 9, 0, tzinfo=timezone.utc)
+    store = MemoryWakeStore()
+    scheduler = WakeScheduler(store, SimulatedClock(MemoryClockStateStore(ClockState(frozen_at=start))))
+
+    running = scheduler.sleep_until("run_1", "nudge", start + timedelta(days=1))
+    later = scheduler.sleep_until("run_1", "final_alert", start + timedelta(days=30))
+
+    cancelled = scheduler.cancel_run("run_1", "case complete", except_wake_id=running.wake_id)
+
+    assert cancelled == 1
+    assert store.get(running.wake_id).status is WakeStatus.PENDING
+    assert store.get(later.wake_id).status is WakeStatus.CANCELLED
+    assert store.get(later.wake_id).cancelled_reason == "case complete"
+
+
+def test_cancel_run_without_an_exclusion_still_cancels_everything():
+    from datetime import datetime, timedelta, timezone
+
+    from spine.clock import ClockState, MemoryClockStateStore, SimulatedClock
+    from spine.wake import MemoryWakeStore, WakeScheduler, WakeStatus
+
+    start = datetime(2026, 8, 5, 9, 0, tzinfo=timezone.utc)
+    store = MemoryWakeStore()
+    scheduler = WakeScheduler(store, SimulatedClock(MemoryClockStateStore(ClockState(frozen_at=start))))
+    first = scheduler.sleep_until("run_2", "nudge", start + timedelta(days=1))
+    second = scheduler.sleep_until("run_2", "final_alert", start + timedelta(days=30))
+
+    assert scheduler.cancel_run("run_2", "closed") == 2
+    assert store.get(first.wake_id).status is WakeStatus.CANCELLED
+    assert store.get(second.wake_id).status is WakeStatus.CANCELLED

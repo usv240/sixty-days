@@ -127,9 +127,13 @@ class DeadlineKeeper:
             discriminator=f"{case.case_id}:chase:{requirement_key}",
         )
 
-    def close(self, case: Case, reason: str) -> int:
-        """Appeal submitted, or the case resolved. Stop contacting them."""
-        return self._scheduler.cancel_run(case.run_id, reason)
+    def close(self, case: Case, reason: str, except_wake_id: str = "") -> int:
+        """Appeal submitted, or the case resolved. Stop contacting them.
+
+        When the decision to close is made from inside a running wake, that wake is excluded: it is
+        not a remaining reminder, it is the one that just did its job.
+        """
+        return self._scheduler.cancel_run(case.run_id, reason, except_wake_id=except_wake_id)
 
     @staticmethod
     def explain(contact: Contact) -> str:

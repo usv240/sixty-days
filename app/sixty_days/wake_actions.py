@@ -110,7 +110,7 @@ class DeadlineActionExecutor:
             "external_side_effect": False,
             **result,
         }
-        outcome = self._converge(case_id, case)
+        outcome = self._converge(case, result, wake.wake_id)
         if outcome is not None:
             recorded["lifecycle"] = outcome
         self._cases.record_due_action(case_id, recorded)
@@ -130,7 +130,7 @@ class DeadlineActionExecutor:
             return False
         return True
 
-    def _converge(self, case_id: str, case: Any) -> dict[str, Any] | None:
+    def _converge(self, case: Any, action: dict[str, Any], wake_id: str) -> dict[str, Any] | None:
         """Stop when the letter's requirements are met, exhausted, or out of time.
 
         A fixed ladder that keeps firing after the work is done is not autonomy, it is an alarm
@@ -140,12 +140,15 @@ class DeadlineActionExecutor:
         if not required:
             return None
 
+        # The action that just ran is not in the stored case yet: it is written after this.
+        # Without folding it in, a case that becomes exhausted on this very wake is only noticed
+        # on the next one, and if this was the last wake it is never noticed at all.
         outcome = evaluate(
             required,
             self._satisfied(case),
             today=self._today(),
             deadline=self._deadline(case),
-            exhausted_keys=self._exhausted(case),
+            exhausted_keys=self._exhausted(case) + self._exhausted_by(action),
         )
         if not outcome.terminal:
             return outcome.as_dict()
@@ -153,7 +156,7 @@ class DeadlineActionExecutor:
         cancelled = 0
         tracked = self._as_case(case)
         if self._keeper is not None and tracked is not None:
-            cancelled = self._keeper.close(tracked, outcome.reason)
+            cancelled = self._keeper.close(tracked, outcome.reason, except_wake_id=wake_id)
         payload = outcome.as_dict()
         payload["cancelled_reminders"] = cancelled
         return payload
@@ -180,6 +183,16 @@ class DeadlineActionExecutor:
                 if key:
                     keys.append(key)
         return tuple(keys)
+
+    @staticmethod
+    def _exhausted_by(action: dict[str, Any]) -> tuple[str, ...]:
+        """A requirement this action just found no remaining route for."""
+        plan = action.get("replan")
+        if isinstance(plan, dict) and plan.get("handoff") == "legal_aid":
+            key = str(plan.get("failed_key", ""))
+            if key:
+                return (key,)
+        return ()
 
     @staticmethod
     def _deadline(case: Any):

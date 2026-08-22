@@ -292,14 +292,22 @@ class WakeScheduler:
             )
         )
 
-    def cancel_run(self, run_id: str, reason: str) -> int:
+    def cancel_run(self, run_id: str, reason: str, except_wake_id: str = "") -> int:
         """Cancel remaining wakes, for example when a patient is discharged.
 
         Cancelled wakes are marked, never deleted, so the audit trail shows what would have
         happened and why it did not.
+
+        `except_wake_id` exists because a handler may decide, while running, that the whole run is
+        finished. The wake it is running inside is CLAIMED, so a blanket cancel would sweep it up,
+        the dispatcher would immediately overwrite it to DONE, and the returned count would claim
+        one more cancelled reminder than there were. Excluding it keeps both the audit trail and
+        the number honest.
         """
         cancelled = 0
         for wake in self._store.for_run(run_id):
+            if wake.wake_id == except_wake_id:
+                continue
             if wake.status in (WakeStatus.PENDING, WakeStatus.CLAIMED):
                 self._store.put(
                     replace(wake, status=WakeStatus.CANCELLED, cancelled_reason=reason)

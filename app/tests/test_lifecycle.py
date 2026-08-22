@@ -92,13 +92,15 @@ class Keeper:
     def __init__(self) -> None:
         self.chased: list[str] = []
         self.closed: list[str] = []
+        self.spared: list[str] = []
 
     def chase_third_party(self, case, requirement_key, requested_on):
         self.chased.append(requirement_key)
         return object()
 
-    def close(self, case, reason):
+    def close(self, case, reason, except_wake_id=""):
         self.closed.append(reason)
+        self.spared.append(except_wake_id)
         return 4
 
 
@@ -243,3 +245,45 @@ def test_closing_a_case_never_claims_an_external_side_effect() -> None:
         Cases(case), now=lambda: datetime(2026, 9, 1, tzinfo=timezone.utc), keeper=keeper
     ).execute(nudge())
     assert result["external_side_effect"] is False
+
+
+def test_closing_never_cancels_the_wake_that_is_running() -> None:
+    """cancel_run sweeps CLAIMED wakes too, and the running one is CLAIMED.
+
+    Without excluding it the dispatcher would immediately overwrite the cancellation with DONE, and
+    the count shown to the applicant would claim one more cancelled reminder than there ever was.
+    """
+    keeper = Keeper()
+    case = a_case(evidence=[
+        {"requirement_key": "repair_record", "decision": "ready_for_review"},
+        {"requirement_key": "photo_wide", "decision": "ready_for_review"},
+    ])
+    wake = nudge()
+
+    DeadlineActionExecutor(
+        Cases(case), now=lambda: datetime(2026, 9, 1, tzinfo=timezone.utc), keeper=keeper
+    ).execute(wake)
+
+    assert keeper.spared == [wake.wake_id]
+
+
+def test_a_case_exhausted_by_this_very_wake_closes_now_not_next_time() -> None:
+    """The stored case is written after this action, so convergence must fold the action in.
+
+    Otherwise a case that runs out of routes on its final reminder is never noticed at all: there
+    is no next wake to notice it.
+    """
+    keeper = Keeper()
+    case = a_case(
+        requirements=[{"key": "deed"}, {"key": "insurance_denial"}],
+        evidence=[{"requirement_key": "deed", "decision": "ready_for_review"}],
+        due_actions=[],
+    )
+
+    result = DeadlineActionExecutor(
+        Cases(case), now=lambda: datetime(2026, 9, 1, tzinfo=timezone.utc), keeper=keeper
+    ).execute(chase("insurance_denial"))
+
+    assert result["replan"]["handoff"] == "legal_aid"
+    assert result["lifecycle"]["state"] == "exhausted"
+    assert keeper.closed, "the case should have closed on this wake, not the next one"
