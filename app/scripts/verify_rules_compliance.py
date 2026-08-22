@@ -5,8 +5,13 @@ something changes, and the expensive way to discover a missed requirement is at 
 names the rule it enforces, and each is verified against the deployed service or the repository
 rather than against a claim in the README.
 
-Items that genuinely cannot be verified from here -- a published video, a Devpost form -- are
-reported as MANUAL rather than quietly passed.
+Anything that can be checked is checked, including the things people usually take on trust: that
+the public repository actually carries the code that is deployed, and that the video and social
+links in SUBMISSION_LINKS.md really resolve. A checkbox in a document proves nothing; fetching the
+URL does.
+
+Only what genuinely cannot be reached from here -- whether a Devpost form was submitted, whether the
+captions read well -- is reported as MANUAL rather than quietly passed.
 
     python scripts/verify_rules_compliance.py --url https://sixty-days-....run.app
 """
@@ -16,6 +21,7 @@ from __future__ import annotations
 import argparse
 import json
 import re
+import subprocess
 import sys
 import urllib.error
 import urllib.request
@@ -54,13 +60,28 @@ class Report:
 
 
 def get(url: str, path: str = "") -> tuple[int, str]:
+    # Several publishing platforms refuse a bare urllib fetch, which would report a perfectly
+    # public page as broken. Identify like a browser so a 403 means blocked, not missing.
+    request = urllib.request.Request(
+        url.rstrip("/") + path,
+        headers={"User-Agent": "Mozilla/5.0 (compatible; sixty-days-compliance/1.0)"},
+    )
     try:
-        with urllib.request.urlopen(url.rstrip("/") + path, timeout=45) as response:
+        with urllib.request.urlopen(request, timeout=45) as response:
             return response.status, response.read().decode("utf-8", "replace")
     except urllib.error.HTTPError as error:
         return error.code, ""
     except Exception:  # noqa: BLE001
         return 0, ""
+
+
+def _git(*args: str) -> str:
+    try:
+        return subprocess.run(
+            ["git", *args], cwd=ROOT, capture_output=True, text=True, timeout=30
+        ).stdout.strip()
+    except Exception:  # noqa: BLE001 - a missing git is a failed check, not a crash
+        return ""
 
 
 def read(*parts: str) -> str:
@@ -148,15 +169,62 @@ def main() -> int:
     issuance = json.loads(config).get("issuance") if code == 200 else None
     r.check(issuance == "open", "API testable without contacting the author", str(issuance))
 
+    # --- The repository a judge will actually open -----------------------------------------
+    # "URL to your public code repository to show how your project was built" is a submission
+    # requirement, and a repo that lags the deployment quietly tells a judge a different story
+    # from the one the live service tells.
+    local_head = _git("rev-parse", "HEAD")
+    remote_head = ""
+    status, body = get("https://api.github.com", "/repos/usv240/sixty-days/commits/main")
+    if status == 200:
+        match = re.search(r'"sha"\s*:\s*"([0-9a-f]{40})"', body)
+        remote_head = match.group(1) if match else ""
+    dirty = _git("status", "--porcelain")
+
+    r.check(
+        bool(local_head) and local_head == remote_head,
+        "Public repository carries the deployed code",
+        "in sync" if local_head == remote_head else f"local {local_head[:8]} vs github {remote_head[:8] or 'unknown'}",
+    )
+    r.check(not dirty, "No uncommitted work left behind",
+            "clean" if not dirty else f"{len(dirty.splitlines())} file(s) uncommitted")
+
+    # --- Submission links, fetched rather than trusted --------------------------------------
+    links = read("SUBMISSION_LINKS.md")
+    if not links.strip():
+        r.manual("Video and social URLs recorded for checking",
+                 "create SUBMISSION_LINKS.md and this script will verify them")
+    else:
+        video = re.search(r"https?://(?:www\.)?(?:youtube\.com|youtu\.be|vimeo\.com)/\S+", links)
+        if video:
+            code, _ = get(video.group(0))
+            r.check(code == 200, "Demo video URL resolves publicly", f"HTTP {code}")
+        else:
+            r.check(False, "Demo video published",
+                    "required by the rules and not yet recorded")
+
+        social = re.search(
+            r"https?://(?:www\.)?(?:x\.com|twitter\.com|linkedin\.com|instagram\.com|facebook\.com)/\S+",
+            links,
+        )
+        if social:
+            code, _ = get(social.group(0))
+            # These platforms often refuse anonymous fetches; a refusal is not a broken link.
+            r.check(code in {200, 401, 403, 405, 999},
+                    "Social post URL resolves", f"HTTP {code}")
+        else:
+            r.check(False, "Social post published",
+                    "worth 0.2 bonus points and not yet published")
+
+        story = re.search(r"https?://dev\.to/\S+", links)
+        if story:
+            code, _ = get(story.group(0))
+            r.check(code == 200, "Build story URL resolves publicly", f"HTTP {code}")
+
     # --- Things a script cannot see -------------------------------------------------------
-    r.manual("Demo video under 4 minutes, public on YouTube or Vimeo",
-             "not yet recorded: Stage One is pass/fail on this")
-    r.manual("English captions reviewed", "depends on the video")
+    r.manual("Demo video runs under four minutes", "length is not machine-checkable from a URL")
     r.manual("Devpost submission fields completed", "category, links, write-up")
-    r.manual("Social post published with #AllThingsAgenticHackathon",
-             "copy ready in docs/social-post.md")
-    r.manual("Public repository pushed with these changes",
-             "local commits must reach github.com/usv240/sixty-days")
+    r.manual("Captions reviewed by a human", "auto-generated captions mis-transcribe the names")
 
     return r.render()
 
