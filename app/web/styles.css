@@ -502,7 +502,7 @@ textarea.control { resize: vertical; }
   font-size: .72rem; font-weight: 740; letter-spacing: .06em; text-transform: uppercase;
 }
 /* One row of three. Wrapping these onto two rows cost height the console could not spare. */
-.advance-controls .btn-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+.advance-controls .btn-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
 .advance-controls button { min-width: 0; min-height: 38px; padding: 6px 8px; }
 .card.compact { padding: 12px; margin-bottom: 10px; }
 .eyebrow {

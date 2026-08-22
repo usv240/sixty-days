@@ -40,6 +40,7 @@ from spine.state import Runner, RunStatus, StepDef
 from spine.untrusted import prepare
 from spine.verify import Claim, ClaimKind, SourceRef, Verifier
 from spine.wake import Wake, WakeScheduler, WakeStatus
+from sixty_days.deadline import DeadlineKeeper
 from sixty_days.live_check import run_live_check
 from sixty_days.reader import LetterExtractionError, LetterVertexClient
 from sixty_days.store import CaseStore
@@ -85,9 +86,15 @@ def record_due_action(wake: Wake) -> None:
     consume this due-action state under their own human-review boundaries.
     """
     with span("wake", "dispatch", **{"wake.id": wake.wake_id, "wake.kind": wake.kind}):
-        domain = DeadlineActionExecutor(CaseStore(client)).execute(wake)
         run = state_store.get_run(wake.run_id)
-        recorded_clock = beta_clock if run is not None and run.project_id == "sixty-days-beta" else clock
+        owning_clock = beta_clock if run is not None and run.project_id == BETA_PROJECT else clock
+        owning_scheduler = beta_wake_scheduler if owning_clock is beta_clock else scheduler()
+        domain = DeadlineActionExecutor(
+            CaseStore(client),
+            now=owning_clock.now,
+            keeper=DeadlineKeeper(owning_scheduler),
+        ).execute(wake)
+        recorded_clock = owning_clock
         client.collection("wake_actions").document(wake.wake_id).set({
             "wake_id": wake.wake_id,
             "run_id": wake.run_id,

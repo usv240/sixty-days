@@ -401,6 +401,7 @@ function resetDemoUi() {
   showEvidenceVerdict("", "");
   $("#prepared-request").textContent = "";
   $("#packet-status").textContent = "No packet built.";
+  lastLifecycleState = "";
   $("#applicant-statement").value = "";
   $("#evidence-fixture").value = "damage_close_bad";
   previewSource("evidence", "damage_close_bad");
@@ -409,7 +410,7 @@ function resetDemoUi() {
   $("#request-requirement").disabled = true;
   for (const selector of [
     "#btn-screen", "#btn-prepare", "#btn-day3", "#btn-day52",
-    "#btn-day58", "#btn-packet", "#btn-pdf",
+    "#btn-day58", "#btn-day61", "#btn-packet", "#btn-pdf",
   ]) {
     $(selector).disabled = true;
   }
@@ -461,13 +462,19 @@ $("#btn-open").addEventListener("click", async () => {
   );
   addOptions($("#request-requirement"), requestable);
   if (requestable.length) {
-    const preferred = requestable.find((item) => item.key === "insurance_denial") || requestable[0];
+    // The contractor record is the guided default because it is the one requirement with a
+    // second route, so a judge gets to watch the agent change its own plan when no reply
+    // comes back. The insurer record stays selectable and demonstrates the opposite case:
+    // no alternative exists, so the agent refuses to guess and hands over to legal aid.
+    const preferred = requestable.find((item) => item.key === "repair_record")
+      || requestable.find((item) => item.key === "insurance_denial")
+      || requestable[0];
     $("#request-requirement").value = preferred.key;
   }
   $("#request-requirement").disabled = requestable.length === 0;
   $("#btn-prepare").disabled = requestable.length === 0;
   $("#btn-screen").disabled = !data.requirements.some((item) => item.key === "photo_wide");
-  for (const button of ["#btn-day3", "#btn-day52", "#btn-day58", "#btn-packet", "#btn-pdf"]) {
+  for (const button of ["#btn-day3", "#btn-day52", "#btn-day58", "#btn-day61", "#btn-packet", "#btn-pdf"]) {
     $(button).disabled = false;
   }
   openButton.disabled = false;
@@ -571,6 +578,22 @@ $("#btn-pdf").addEventListener("click", async () => {
       "No send or submission action occurred.", "accept");
 });
 
+// Asked after every advance, because a case can finish quietly: everything gathered, or the window
+// closing after the last reminder. Waiting for a wake to announce it would mean it never gets said.
+let lastLifecycleState = "";
+async function reportLifecycle() {
+  if (!currentCase) return;
+  const { ok, data } = await api(`/sixty-days/cases/${currentCase.case_id}/status`);
+  if (!ok || !data.terminal || data.state === lastLifecycleState) return;
+  lastLifecycleState = data.state;
+  const headline = {
+    resolved: "Case complete. It stopped scheduling reminders by itself.",
+    exhausted: "Nothing left it can usefully chase. It closed the case by itself.",
+    deadline_passed: "The appeal window has closed. It closed the case by itself.",
+  }[data.state] || "It closed the case by itself.";
+  log("deadline keeper", headline, data.reason, data.state === "resolved" ? "accept" : "");
+}
+
 async function advance(days, label) {
   const { ok, data } = await api("/sim/advance", { days });
   if (!ok) {
@@ -586,16 +609,56 @@ async function advance(days, label) {
     log("deadline keeper", `It woke up on its own and ${plainWake(wake.kind)}.`,
         domain.detail || "The clock reached this date. Nobody pressed anything.",
         "accept");
+    // Rerouting is the moment the agent stops reminding and starts deciding, so it gets its own
+    // line rather than being buried in the generic wake detail.
+    if (domain.action === "evidence_route_changed" && domain.replan) {
+      const plan = domain.replan;
+      log("evidence planner",
+          `Changed its own plan: now getting "${plan.alternative_title}" from ${plan.alternative_routed_to}.`,
+          `${plan.reason}${domain.drafted_request ? " The replacement request has been drafted for you to read." : ""}`,
+          "accept");
+    }
+    if (domain.action === "third_party_reply_check_due" && domain.replan
+        && domain.replan.alternative_key && !domain.replan.changed
+        && domain.replan.handoff !== "legal_aid") {
+      log("evidence planner", "Checked the route and left it alone.",
+          domain.replan.reason, "accept");
+    }
+    if (domain.action === "third_party_reply_check_due" && domain.replan
+        && domain.replan.handoff === "legal_aid") {
+      log("evidence planner", "No other route exists for this record.",
+          `${domain.replan.reason} Free legal aid is surfaced instead of guessing an alternative.`,
+          "reject");
+    }
+    // Stopping is a decision too, and the applicant should see it happen rather than just notice
+    // the reminders went quiet.
+    const life = domain.lifecycle;
+    if (life && life.terminal) {
+      const headline = {
+        resolved: "Case complete. It stopped scheduling reminders by itself.",
+        exhausted: "Nothing left it can usefully chase. It stopped by itself.",
+        deadline_passed: "The appeal window closed. It stopped by itself.",
+      }[life.state] || "It closed the case by itself.";
+      const cancelled = life.cancelled_reminders
+        ? ` ${life.cancelled_reminders} remaining reminder(s) were cancelled.`
+        : "";
+      log("deadline keeper", headline, life.reason + cancelled,
+          life.state === "resolved" ? "accept" : "");
+    }
     if (domain.action === "partial_packet_built") {
       $("#packet-status").textContent = `${domain.packet_status}: ${(domain.missing || []).join(" | ")}`;
       log("packet builder", "Built a draft appeal packet by itself.",
           "It still shows everything that is missing, and nothing was sent to anyone.", "accept");
     }
   }
+  await reportLifecycle();
 }
 $("#btn-day3").addEventListener("click", () => advance(3, "Advanced 3 days"));
 $("#btn-day52").addEventListener("click", () => advance(49, "Advanced 49 more days"));
 $("#btn-day58").addEventListener("click", () => advance(6, "Advanced 6 more days"));
+// Past the deadline on purpose: the last thing a judge should see is the agent deciding it
+// is finished and switching itself off, rather than the reminders merely going quiet.
+$("#btn-day61").addEventListener("click", () => advance(3, "Advanced 3 more days"));
 
 $("#letter-image").closest(".source-frame").classList.add("is-letter");
 

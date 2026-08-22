@@ -14,6 +14,7 @@ from pydantic import BaseModel, Field
 from spine.clock import ClockState
 from sixty_days.deadline import Case, Contact, DeadlineKeeper
 from sixty_days.evidence import EvidenceChecker
+from sixty_days.lifecycle import evaluate
 from sixty_days.letters import plan_requirements
 from sixty_days.outreach import RequestPreparer
 from sixty_days.packet import PacketBuilder, PacketRenderer
@@ -271,6 +272,51 @@ def build_sixty_days_router(client, clock, scheduler, runner) -> APIRouter:
     @router.get("/cases/{case_id}")
     def get_case(case_id: str) -> dict[str, Any]:
         return require_case(case_id)
+
+    @router.get("/cases/{case_id}/status")
+    def case_status(case_id: str) -> dict[str, Any]:
+        """Where the case stands, and whether the agent still has any reason to be working on it.
+
+        Lifecycle is a property of the case, not a side effect of a reminder firing. Computing it
+        only inside a due wake meant a case that finished quietly -- everything gathered, or the
+        window closed after the last reminder -- never announced that it was done. Anyone can ask
+        at any time, including by curl.
+        """
+        case = cases.get(case_id)
+        if case is None:
+            raise HTTPException(status_code=404, detail="no such case")
+
+        required = tuple(
+            str(item.get("key"))
+            for item in (case.get("requirements") or [])
+            if isinstance(item, dict) and item.get("key")
+        )
+        satisfied = tuple(
+            str(item.get("requirement_key") or item.get("requirement") or "")
+            for item in (case.get("evidence") or [])
+            if isinstance(item, dict)
+            and str(item.get("decision", "")) in {"ready_for_review", "accepted"}
+        )
+        exhausted = tuple(
+            str((action.get("replan") or {}).get("failed_key", ""))
+            for action in (case.get("due_actions") or [])
+            if isinstance(action, dict)
+            and isinstance(action.get("replan"), dict)
+            and action["replan"].get("handoff") == "legal_aid"
+        )
+        deadline_value = case.get("deadline")
+        outcome = evaluate(
+            required,
+            satisfied,
+            today=clock.now().date(),
+            deadline=date.fromisoformat(str(deadline_value)[:10]) if deadline_value else None,
+            exhausted_keys=tuple(k for k in exhausted if k),
+        )
+        return {
+            "case_id": case_id,
+            "today": clock.now().date().isoformat(),
+            **outcome.as_dict(),
+        }
 
     @router.post("/cases/{case_id}/evidence/check")
     def check_evidence(case_id: str, request: EvidenceCheckRequest) -> dict[str, Any]:
