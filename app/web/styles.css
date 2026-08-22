@@ -1100,6 +1100,34 @@ a.brand:hover span, a.brand:focus-visible span { color: var(--accent); }
 .popover a { font-size: .8rem; }
 .popover[hidden] { display: none; }
 
+/* The request examples are the whole point of this page, so they get room to breathe and a
+   visible way to run them rather than being a grey block someone squints at. */
+.code-actions { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.code-actions button { min-height: 34px; padding: 5px 14px; font-size: .8rem; }
+.code-response {
+  margin: 0; padding: 14px 16px; border-top: 1px solid var(--border-strong);
+  background: var(--surface-2); font-size: .84rem; line-height: 1.5;
+}
+.code-response[hidden] { display: none; }
+.code-response .response-head {
+  display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; margin-bottom: 8px;
+  font-weight: 700;
+}
+.code-response .response-status {
+  padding: 2px 9px; border-radius: 999px; font-size: .74rem; font-weight: 750;
+  background: var(--ok-soft); color: var(--ok);
+}
+.code-response.is-error .response-status { background: var(--danger-soft); color: var(--danger); }
+.code-response .response-note { font-weight: 400; color: var(--text-muted); font-size: .8rem; }
+.code-response pre {
+  margin: 0; padding: 12px; border-radius: 8px; background: var(--bg);
+  max-height: 260px; overflow: auto; font-size: .78rem; line-height: 1.5;
+}
+.code-note {
+  margin: 10px 2px 0; color: var(--text-muted); font-size: .84rem; line-height: 1.5;
+  max-width: 80ch;
+}
+
 .plain-box {
   margin: 26px 0 4px; padding: 20px 22px;
   border: 1px solid var(--border); border-left: 3px solid var(--accent);

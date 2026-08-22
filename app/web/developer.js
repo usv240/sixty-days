@@ -30,12 +30,19 @@
     statusMirror.dataset.kind = kind;
   };
 
+  // The page tells people not to put the key in screenshots or videos, then used to print it into
+  // the example. Show a mask; put the real value on the clipboard.
+  const maskKey = (value) =>
+    value ? `${value.slice(0, 8)}${"\u2022".repeat(24)}` : "YOUR_API_KEY";
+
   const renderExamples = () => {
-    const visibleKey = apiKey || "YOUR_API_KEY";
     for (const [node, template] of templates) {
-      node.textContent = template.replaceAll("YOUR_API_KEY", visibleKey);
+      node.textContent = template.replaceAll("YOUR_API_KEY", maskKey(apiKey));
     }
   };
+
+  const realRequest = (node) =>
+    (templates.get(node) || "").replaceAll("YOUR_API_KEY", apiKey || "YOUR_API_KEY");
 
   const setActiveKey = (value) => {
     apiKey = String(value || "").trim();
@@ -89,6 +96,122 @@
       }
     })
     .catch(() => setStatus("Access configuration could not be loaded.", "error"));
+
+  // --- Running the example from the page ------------------------------------------------
+  // A request you can read is good; a request you can watch return is better, and it is the only
+  // way to show that the documented example actually works rather than merely looking plausible.
+
+  const showResponse = (panel, { status, note, body, error }) => {
+    panel.replaceChildren();
+    panel.classList.toggle("is-error", Boolean(error) || (status && status >= 400));
+    const head = document.createElement("div");
+    head.className = "response-head";
+    const badge = document.createElement("span");
+    badge.className = "response-status";
+    badge.textContent = error ? "no response" : `HTTP ${status}`;
+    head.append(badge);
+    if (note) {
+      const detail = document.createElement("span");
+      detail.className = "response-note";
+      detail.textContent = note;
+      head.append(detail);
+    }
+    panel.append(head);
+    const pre = document.createElement("pre");
+    pre.textContent = body;
+    panel.append(pre);
+    panel.hidden = false;
+  };
+
+  const explain = (status, payload) => {
+    if (status === 401) return "The key is missing, expired, or already revoked. Generate a new one above.";
+    if (status === 429) return "The daily allowance for this address is spent. It resets at 00:00 UTC.";
+    if (status === 422) {
+      const detail = typeof payload?.detail === "string" ? payload.detail : "";
+      if (detail.includes("Model Armor")) return "Blocked before the model saw it: the text looked like a prompt injection.";
+      if (detail.includes("identifier")) return "Refused: the text still contains a direct identifier.";
+      return "The request did not match the documented contract.";
+    }
+    if (status === 503) return "The service could not complete the call. Nothing was stored.";
+    if (status >= 200 && status < 300) return "Nothing was sent to anyone, and no case was created for another tenant.";
+    return "";
+  };
+
+  const runExample = async (button, panel, request) => {
+    if (!apiKey) {
+      showResponse(panel, {
+        error: true, body: "No API key is loaded in this page session.",
+        note: "Generate one above, or paste an existing key and press Use this key.",
+      });
+      return;
+    }
+    const original = button.textContent;
+    button.disabled = true;
+    button.textContent = "Running\u2026";
+    const started = performance.now();
+    try {
+      const response = await fetch(request.path, {
+        method: request.method,
+        headers: { "X-API-Key": apiKey, ...(request.body ? { "Content-Type": "application/json" } : {}) },
+        body: request.body ? JSON.stringify(request.body) : undefined,
+      });
+      const text = await response.text();
+      let payload = null;
+      let pretty = text;
+      try {
+        payload = JSON.parse(text);
+        pretty = JSON.stringify(payload, null, 2);
+      } catch {
+        // A non-JSON body is still worth showing verbatim rather than swallowing.
+      }
+      const elapsed = Math.round(performance.now() - started);
+      showResponse(panel, {
+        status: response.status,
+        note: `${elapsed} ms \u00b7 ${explain(response.status, payload)}`,
+        body: pretty.length > 4000 ? `${pretty.slice(0, 4000)}\n\u2026 truncated for display` : pretty,
+      });
+    } catch (error) {
+      showResponse(panel, {
+        error: true,
+        body: String(error && error.message ? error.message : error),
+        note: "The request never reached the service. Check the connection and try again.",
+      });
+    } finally {
+      button.disabled = false;
+      button.textContent = original;
+    }
+  };
+
+  const runConnection = document.querySelector("#run-connection");
+  if (runConnection) {
+    runConnection.addEventListener("click", () =>
+      runExample(runConnection, document.querySelector("#connection-response"), {
+        method: "GET", path: "/v1",
+      }));
+  }
+
+  const runWorkflow = document.querySelector("#run-workflow");
+  if (runWorkflow) {
+    runWorkflow.addEventListener("click", () =>
+      runExample(runWorkflow, document.querySelector("#workflow-response"), {
+        method: "POST",
+        path: "/v1/cases",
+        // Exactly the body printed above, so what runs is what a reader was told to expect.
+        body: {
+          applicant_ref: "SUBJECT-101",
+          disaster_ref: "DR-101",
+          acknowledge_deidentified: true,
+          document: [
+            "DISASTER ASSISTANCE DETERMINATION - SYNTHETIC DEMONSTRATION",
+            "Date: August 5, 2026",
+            "Decision: Some requested assistance is not approved.",
+            "The inspection did not show disaster-caused damage that made the home unsafe to occupy.",
+            "We also need the insurance settlement or denial before we can consider uninsured losses.",
+            "Your appeal must be received by October 4, 2026.",
+          ].join("\n"),
+        },
+      }));
+  }
 
   form.addEventListener("submit", async (event) => {
     event.preventDefault();
@@ -196,11 +319,14 @@
   });
 
   document.querySelectorAll("[data-copy-code]").forEach((button) => {
+    const label = button.textContent;
     button.addEventListener("click", async () => {
       const target = document.querySelector(button.dataset.copyCode);
-      const copied = await copy(target.textContent);
+      // The block on screen shows a masked key. What lands on the clipboard has to be the request
+      // that actually runs, or "copy" hands the reader something that fails.
+      const copied = await copy(realRequest(target) || target.textContent);
       button.textContent = copied ? "Copied" : "Select and copy";
-      window.setTimeout(() => { button.textContent = "Copy request"; }, 1600);
+      window.setTimeout(() => { button.textContent = label; }, 1600);
     });
   });
 

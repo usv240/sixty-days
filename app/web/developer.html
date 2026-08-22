@@ -96,8 +96,15 @@
       <p class="small muted">Revocation is permanent. Clearing removes the value only from this page session.</p>
     </div>
     <div class="code-shell">
-      <div class="code-toolbar"><span>Connection check</span><button type="button" data-copy-code="#curl-example code">Copy request</button></div>
+      <div class="code-toolbar">
+        <span>Connection check</span>
+        <div class="code-actions">
+          <button type="button" data-copy-code="#curl-example code">Copy</button>
+          <button type="button" class="btn-primary" id="run-connection">Run it here</button>
+        </div>
+      </div>
       <pre class="developer-code" id="curl-example"><code>curl -H "X-API-Key: YOUR_API_KEY" "SERVICE_URL/v1"</code></pre>
+      <div class="code-response" id="connection-response" aria-live="polite" hidden></div>
     </div>
   </div>
 </div></section>
@@ -105,12 +112,28 @@
 <section id="workflow"><div class="wrap">
   <div class="section-heading dev-section-heading"><div><p class="step-label">Step 3 of 3</p><h2>Call the project workflow</h2></div><p>The example follows this project's real input contract and safety boundary.</p></div>
   <div class="code-shell">
-    <div class="code-toolbar"><span>Project request</span><button type="button" data-copy-code="#workflow-example code">Copy request</button></div>
+    <div class="code-toolbar">
+      <span>Project request</span>
+      <div class="code-actions">
+        <button type="button" data-copy-code="#workflow-example code">Copy</button>
+        <button type="button" class="btn-primary" id="run-workflow">Run it here</button>
+      </div>
+    </div>
     <pre class="developer-code" id="workflow-example"><code>curl -X POST "SERVICE_URL/v1/cases" \
   -H "X-API-Key: YOUR_API_KEY" \
   -H "Content-Type: application/json" \
-  -d '{"subject_ref":"SUBJECT-101","disaster_ref":"DR-101","acknowledge_deidentified":true,"letter_text":"DECISION LETTER\\nDate: August 1, 2026\\nDecision: Ineligible\\nReason: Proof of occupancy was not provided.\\nYou may appeal within 60 days."}'</code></pre>
+  -d '{
+    "applicant_ref": "SUBJECT-101",
+    "disaster_ref": "DR-101",
+    "acknowledge_deidentified": true,
+    "document": "DISASTER ASSISTANCE DETERMINATION - SYNTHETIC DEMONSTRATION\\nDate: August 5, 2026\\nDecision: Some requested assistance is not approved.\\nThe inspection did not show disaster-caused damage that made the home unsafe to occupy.\\nWe also need the insurance settlement or denial before we can consider uninsured losses.\\nYour appeal must be received by October 4, 2026."
+  }'</code></pre>
+    <div class="code-response" id="workflow-response" aria-live="polite" hidden></div>
   </div>
+  <p class="code-note">The key is masked on screen so it cannot be read from a screenshot or a
+    recording. <b>Copy</b> puts the real key on your clipboard; <b>Run it here</b> sends the request
+    from this page using the key held in memory. Nothing is stored, and no case is created for
+    anyone but you.</p>
   <div class="api-docs-guide">
     <div><p class="step-label">Interactive reference</p><h2>Use the API docs without guessing.</h2><p>Open the schema, select <b>Authorize</b>, paste the API key, then expand an endpoint to see its exact request and response model.</p><div class="btn-row"><a class="btn btn-primary" href="/docs">Open API docs</a><a class="btn" href="https://github.com/usv240/sixty-days/blob/main/docs/api-beta.md">Read provisioning guide</a><a class="btn" href="/#run">Return to public demo</a></div></div>
     <ol class="docs-steps"><li><b>Authorize</b><span>Paste the temporary API key into the X-API-Key field.</span></li><li><b>Inspect</b><span>Review required fields and safety acknowledgements before executing.</span></li><li><b>Execute</b><span>Start with GET /v1, then call the project-specific workflow.</span></li></ol>
