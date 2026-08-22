@@ -48,6 +48,17 @@
     apiKey = String(value || "").trim();
     activeKeyInput.value = apiKey;
     renderExamples();
+    // A result panel describes a request made with a particular key. Once the key changes, the old
+    // panel is answering a question nobody is asking any more -- and "No API key is loaded" sitting
+    // under a freshly generated key reads as a broken page.
+    for (const id of ["#connection-response", "#workflow-response"]) {
+      const panel = document.querySelector(id);
+      if (panel) {
+        panel.hidden = true;
+        panel.replaceChildren();
+        panel.classList.remove("is-error", "is-pending");
+      }
+    }
   };
 
   const copy = async (value) => {
@@ -101,14 +112,16 @@
   // A request you can read is good; a request you can watch return is better, and it is the only
   // way to show that the documented example actually works rather than merely looking plausible.
 
-  const showResponse = (panel, { status, note, body, error }) => {
+  const showResponse = (panel, { status, note, body, error, pending }) => {
     panel.replaceChildren();
     panel.classList.toggle("is-error", Boolean(error) || (status && status >= 400));
+    panel.classList.toggle("is-pending", Boolean(pending));
+
     const head = document.createElement("div");
     head.className = "response-head";
     const badge = document.createElement("span");
     badge.className = "response-status";
-    badge.textContent = error ? "no response" : `HTTP ${status}`;
+    badge.textContent = pending ? "sending" : error ? "no response" : `HTTP ${status}`;
     head.append(badge);
     if (note) {
       const detail = document.createElement("span");
@@ -117,10 +130,84 @@
       head.append(detail);
     }
     panel.append(head);
-    const pre = document.createElement("pre");
-    pre.textContent = body;
-    panel.append(pre);
+
+    if (body) {
+      const pre = document.createElement("pre");
+      pre.textContent = body;
+      panel.append(pre);
+    }
     panel.hidden = false;
+  };
+
+  // A judge should be able to read what came back without parsing JSON in their head. The raw
+  // response stays one click away, because summarising is only trustworthy if the original is there.
+  const summarise = (payload) => {
+    if (!payload || typeof payload !== "object") return [];
+    const rows = [];
+    if (payload.product && payload.tenant) {
+      rows.push(["Authenticated as", payload.tenant]);
+      if (payload.retention) rows.push(["Retention", payload.retention]);
+    }
+    if (payload.case_id) {
+      rows.push(["Case created", payload.case_id]);
+      if (payload.deadline) rows.push(["Appeal deadline", `${payload.deadline} (from the letter itself)`]);
+      if (Array.isArray(payload.deficiencies)) {
+        rows.push(["Reasons quoted from the letter", String(payload.deficiencies.length)]);
+      }
+      if (Array.isArray(payload.requirements)) {
+        rows.push(["Documents to gather", payload.requirements.map((r) => r.title).join(", ")]);
+      }
+      if (Array.isArray(payload.wakes)) {
+        rows.push(["Reminders set by the agent", String(payload.wakes.length)]);
+      }
+      if (payload.model_armor) {
+        rows.push([
+          "Model Armor",
+          payload.model_armor.available
+            ? (payload.model_armor.blocked ? "blocked this text" : "screened, no match")
+            : "unavailable, deterministic checks decided",
+        ]);
+      }
+      if (typeof payload.quarantined_lines === "number") {
+        rows.push(["Instruction-shaped lines quarantined", String(payload.quarantined_lines)]);
+      }
+      if (payload.raw_document_persisted === false) {
+        rows.push(["Raw letter stored", "no"]);
+      }
+    }
+    if (payload.detail && typeof payload.detail === "string") {
+      rows.push(["Detail", payload.detail]);
+    }
+    return rows;
+  };
+
+  const renderSummary = (panel, payload, raw) => {
+    const rows = summarise(payload);
+    if (!rows.length) {
+      const pre = document.createElement("pre");
+      pre.textContent = raw;
+      panel.append(pre);
+      return;
+    }
+    const list = document.createElement("dl");
+    list.className = "response-summary";
+    for (const [label, value] of rows) {
+      const term = document.createElement("dt");
+      term.textContent = label;
+      const description = document.createElement("dd");
+      description.textContent = value;
+      list.append(term, description);
+    }
+    panel.append(list);
+
+    const details = document.createElement("details");
+    details.className = "response-raw";
+    const summary = document.createElement("summary");
+    summary.textContent = "Show the raw JSON response";
+    const pre = document.createElement("pre");
+    pre.textContent = raw;
+    details.append(summary, pre);
+    panel.append(details);
   };
 
   const explain = (status, payload) => {
@@ -148,6 +235,12 @@
     const original = button.textContent;
     button.disabled = true;
     button.textContent = "Running\u2026";
+    // Without this the previous result -- often "no API key is loaded" -- stayed on screen for the
+    // whole call, so the page looked broken at exactly the moment it was working.
+    showResponse(panel, {
+      pending: true,
+      note: `${request.method} ${request.path} \u00b7 waiting for the service\u2026`,
+    });
     const started = performance.now();
     try {
       const response = await fetch(request.path, {
@@ -165,11 +258,14 @@
         // A non-JSON body is still worth showing verbatim rather than swallowing.
       }
       const elapsed = Math.round(performance.now() - started);
+      const trimmed = pretty.length > 6000
+        ? `${pretty.slice(0, 6000)}\n\u2026 truncated for display`
+        : pretty;
       showResponse(panel, {
         status: response.status,
-        note: `${elapsed} ms \u00b7 ${explain(response.status, payload)}`,
-        body: pretty.length > 4000 ? `${pretty.slice(0, 4000)}\n\u2026 truncated for display` : pretty,
+        note: `${request.method} ${request.path} \u00b7 ${elapsed} ms \u00b7 ${explain(response.status, payload)}`,
       });
+      renderSummary(panel, payload, trimmed);
     } catch (error) {
       showResponse(panel, {
         error: true,

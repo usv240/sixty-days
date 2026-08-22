@@ -89,3 +89,44 @@ def test_every_failure_a_judge_can_hit_is_explained_in_words() -> None:
 
 def test_the_page_still_refuses_to_claim_anything_was_sent() -> None:
     assert "Nothing was sent to anyone" in SCRIPT
+
+
+def test_the_panel_clears_the_moment_a_run_starts() -> None:
+    """The reported bug: a stale error stayed on screen for the whole nine-second call.
+
+    Pressing Run with no key showed "No API key is loaded". Loading a key and pressing Run again
+    left that message sitting there while the request was genuinely in flight, so the page looked
+    broken at exactly the moment it was working.
+    """
+    assert "pending: true" in SCRIPT
+    assert "waiting for the service" in SCRIPT
+    # The pending state must be written before the fetch, not after it resolves.
+    pending_at = SCRIPT.index("pending: true")
+    fetch_at = SCRIPT.index("await fetch(request.path")
+    assert pending_at < fetch_at, "the panel is cleared after the request, which is too late"
+
+
+def test_the_response_is_summarised_before_the_raw_json() -> None:
+    """A judge should not have to parse JSON in their head to see what the agent did."""
+    assert "renderSummary" in SCRIPT
+    assert "Reminders set by the agent" in SCRIPT
+    assert "Reasons quoted from the letter" in SCRIPT
+    assert "Show the raw JSON response" in SCRIPT, "the original must stay one click away"
+
+
+def test_the_summary_reports_the_safety_facts_not_only_the_happy_ones() -> None:
+    """Summarising is only honest if it surfaces the boundary as prominently as the result."""
+    for fact in ["Model Armor", "quarantined", "Raw letter stored"]:
+        assert fact in SCRIPT, f"the summary hides {fact}"
+
+
+def test_a_stale_result_panel_is_cleared_when_the_key_changes() -> None:
+    """A panel describes a request made with one key. After the key changes it answers nothing.
+
+    Leaving "No API key is loaded" visible underneath a freshly generated key is the same confusion
+    as leaving it visible during a running request, just slower to notice.
+    """
+    block = SCRIPT[SCRIPT.index("const setActiveKey"):SCRIPT.index("const copy =")]
+    assert "#connection-response" in block
+    assert "#workflow-response" in block
+    assert "panel.hidden = true" in block
