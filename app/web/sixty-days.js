@@ -390,8 +390,10 @@ async function refreshLiveBudget() {
   if (!ok) { label.textContent = "Live-call allowance unavailable."; return; }
   const left = data.your_calls_left ?? 0;
   button.disabled = !data.allowed;
+  // One line. The old wording wrapped to two in the rail's column, and the second line only
+  // repeated what the button already says once you press it.
   label.textContent = data.allowed
-    ? `${left} of ${data.your_calls_allowed_today} live calls left for you today. Takes 10 to 30 seconds.`
+    ? `${left} of ${data.your_calls_allowed_today} live calls left today · takes 10-30s`
     : data.reason;
 }
 
@@ -498,38 +500,67 @@ $("#evidence-fixture").addEventListener("change", (event) => {
 });
 
 function renderPlan(data) {
+  // Same principle as the timeline: show the shape of the case, keep the evidence one click away.
+  // The letter's exact wording is the safety-critical part and the longest text on the page, so it
+  // is what gets folded rather than what gets dropped.
+  // The deadline is not repeated here: the timeline in the pane beside this one already
+  // shows it, marked at the end of the window it closes.
   const target = $("#case-plan");
   target.replaceChildren();
-  const deadline = document.createElement("p");
-  deadline.textContent = `Deadline: ${data.deadline} (${data.days_in_window}-day window)`;
-  target.append(deadline);
+
   if (data.deadline_conflict) {
     const conflict = document.createElement("p");
     conflict.className = "callout danger";
     conflict.textContent = data.deadline_conflict;
     target.append(conflict);
   }
+
+  const reasons = document.createElement("ul");
+  reasons.className = "plan-reasons";
   for (const deficiency of data.deficiencies) {
-    const card = document.createElement("div");
-    card.className = "card compact";
-    const heading = document.createElement("h4");
-    heading.textContent = deficiency.plain_language;
-    const quote = document.createElement("p");
-    quote.className = "quote";
-    quote.textContent = `“${deficiency.quoted_text}”`;
-    card.append(heading, quote);
-    target.append(card);
+    const item = document.createElement("li");
+    item.textContent = deficiency.plain_language;
+    item.title = deficiency.plain_language;
+    reasons.append(item);
   }
-  const routeHeading = document.createElement("h4");
-  routeHeading.textContent = "Evidence routes";
+  target.append(reasons);
+
+  // The claim is that every reason is copied from the letter. That has to remain checkable, so the
+  // quotes stay in the page in full rather than being summarised away.
+  if (data.deficiencies.length) {
+    const quotes = document.createElement("details");
+    quotes.className = "plan-quotes";
+    const summary = document.createElement("summary");
+    summary.textContent = `Show the letter's exact words (${data.deficiencies.length})`;
+    quotes.append(summary);
+    for (const deficiency of data.deficiencies) {
+      const quote = document.createElement("blockquote");
+      quote.className = "quote";
+      quote.textContent = `\u201c${deficiency.quoted_text}\u201d`;
+      quotes.append(quote);
+    }
+    target.append(quotes);
+  }
+
+  const routeHeading = document.createElement("p");
+  routeHeading.className = "plan-subhead";
+  routeHeading.textContent = "Who holds what";
   target.append(routeHeading);
-  const list = document.createElement("ul");
+
+  const routes = document.createElement("ul");
+  routes.className = "plan-routes";
   for (const requirement of data.requirements) {
     const item = document.createElement("li");
-    item.textContent = `${requirement.title} → ${requirement.routed_to}`;
-    list.append(item);
+    const what = document.createElement("b");
+    what.textContent = requirement.title;
+    const who = document.createElement("span");
+    who.className = "route-holder";
+    // The arrow lives here rather than in a ::before rule: one string, one place it can go wrong.
+    who.textContent = `\u2192 ${requirement.routed_to}`;
+    item.append(what, who);
+    routes.append(item);
   }
-  target.append(list);
+  target.append(routes);
 }
 
 function resetDemoUi() {

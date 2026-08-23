@@ -158,10 +158,10 @@
     </div>
     <div class="console-shell" id="run">
     <ol class="workflow-progress" id="workflow-progress" aria-label="Suggested workflow progress">
-      <li data-step="1" class="is-active" aria-current="step"><b>Understand</b>Read the letter</li>
-      <li data-step="2"><b>Gather</b>Check evidence</li>
-      <li data-step="3"><b>Track</b>Prepare a request</li>
-      <li data-step="4"><b>Review</b>Build the draft</li>
+      <li data-step="1" class="is-active" aria-current="step"><b>Understand</b><span class="step-hint">Read the letter</span></li>
+      <li data-step="2"><b>Gather</b><span class="step-hint">Check evidence</span></li>
+      <li data-step="3"><b>Track</b><span class="step-hint">Prepare a request</span></li>
+      <li data-step="4"><b>Review</b><span class="step-hint">Build the draft</span></li>
     </ol>
     <div class="console">
       <div class="pane controls-pane" id="workflow-controls">
@@ -187,6 +187,7 @@
           <button id="btn-restart" type="button">Start over</button>
         </div>
       </div>
+        <div class="controls-row">
         <div class="guided-controls">
           <div class="control-group" data-workflow-step="1" data-state="current">
             <div class="step-summary"><span class="control-kicker">1. Understand</span><span class="step-state">Current</span></div>
@@ -268,8 +269,8 @@
           <div class="control-cluster">
             <div class="wall-clock-proof">
             <span class="advance-label">On the real clock</span>
-            <p class="control-help">Set one reminder ninety seconds from now. Nothing on this page
-            runs it — Cloud Scheduler claims it. You can close the tab and it still fires.</p>
+            <p class="control-help">Nothing on this page runs it. Cloud Scheduler claims it &mdash;
+            close the tab and it still fires.</p>
             <button id="btn-live-proof" type="button">Set a reminder 90 seconds from now</button>
             <p class="small muted" id="live-proof-status" aria-live="polite"></p>
             </div>
@@ -277,14 +278,14 @@
           <div class="control-cluster">
             <div class="live-proof">
             <span class="control-kicker">Is the model really there?</span>
-            <p class="control-help">Everything above replays a recorded call so judging is
-            repeatable. This sends the synthetic letter image to Gemini 3.5 Flash on Vertex AI
-            right now and scores the answer against the same truth file.</p>
+            <p class="control-help">The demo replays a recorded call so judging is repeatable.
+            This one goes to Gemini 3.5 Flash live, scored against the same truth file.</p>
             <button id="btn-live-check" type="button">Read the letter live</button>
             <p class="small muted" id="live-check-budget">Checking today&rsquo;s allowance…</p>
             <div class="live-result" id="live-check-result" aria-live="polite" hidden></div>
             </div>
           </div>
+        </div>
         </div>
       </div>
 
