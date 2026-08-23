@@ -169,7 +169,7 @@
         <h3 class="sr-only">Guided run</h3>
         <p class="clock-inline"><span>Clock<button class="info" data-info="simulated-clock" aria-expanded="false" aria-label="What is the simulated clock?">i</button></span><b id="clock-now">loading</b></p>
         <a class="scheduler-pill" id="scheduler-pill" href="/sixty-days/scheduler" target="_blank"
-           rel="noopener" title="Wall-clock proof that the deadline keeper is being woken">
+           rel="noopener" title="A Cloud Scheduler job calls this service once a minute on the real calendar, claims any reminder that has come due, and runs it. Opens the live status.">
           <span class="scheduler-dot" aria-hidden="true"></span>
           <span id="scheduler-text">Checking the real scheduler…</span>
         </a>
@@ -180,8 +180,9 @@
             <p><b>Guided preset:</b> damage and insurance letter, failed close photo, wider
               comparison, insurer request, packet, then the deadline reminders. Starting anchors the
               simulated clock to the selected letter date without deleting stored audit records.</p>
-            <p>The clock is simulated for demonstration so five weeks fit in one sitting. Production
-              runs the very same reminder code on the real calendar, started by a Google Cloud scheduler.</p>
+            <p>The clock is simulated for demonstration so five weeks fit in one sitting. The reminders
+              themselves are not simulated: the same code runs on the real calendar, woken once a
+              minute by a Cloud Scheduler job. The badge beside this clock is that job reporting in.</p>
           </details>
           <a class="console-evidence-link" href="/judges">Judge evidence</a>
           <button id="btn-restart" type="button">Start over</button>
@@ -451,7 +452,24 @@
       <div class="arch-node"><small>What is kept</small><strong>Firestore and Cloud Trace</strong>
         <span>Cases, reminders, request status, draft details, and an audit trail</span></div>
     </div>
-    <p class="small muted narrow">Gemini 3.5 Flash and Gemma 4 MaaS are served from Vertex AI's
+    <div class="card narrow scheduler-explainer">
+            <h3>What wakes it</h3>
+            <p>Cloud Run scales to zero, so with nobody on this page there is no process running.
+              A Cloud Scheduler job, <b>sixty-days-wake-scan</b>, is the only reason a sleeping
+              agent ever wakes. Once a minute, on the real calendar, it calls one internal route on
+              this service with a Google-signed token scoped to this service alone; an anonymous
+              caller cannot drive it.</p>
+            <p>Each scan asks Firestore for reminders whose time has arrived and claims each one in
+              a transaction, so two overlapping scans cannot fire the same reminder twice and a
+              reminder left behind by a worker that died is picked up by the next one. A claimed
+              reminder becomes a case action — follow up, change the approach, build a partial
+              packet, stop — recorded once, and signed with the revision that ran it. It never
+              contacts anyone, sends, or submits.</p>
+            <p class="small muted">It also records a heartbeat on scans that find nothing to do,
+              which is what makes <a href="/sixty-days/scheduler">the scheduler status</a> honest
+              rather than only visible on the days something happened.</p>
+          </div>
+          <p class="small muted narrow">Gemini 3.5 Flash and Gemma 4 MaaS are served from Vertex AI's
       global endpoint. Real direct identifiers from the transcribed letter are removed before
       structured downstream persistence. The API accepts only explicit <code>DEMO-*</code> and
       <code>DR-DEMO*</code> packet references. Storage and compute are pinned to us-central1;

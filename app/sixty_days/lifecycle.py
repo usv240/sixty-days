@@ -91,8 +91,10 @@ def evaluate(
         return Outcome(
             State.DEADLINE_PASSED,
             (
-                "The appeal window has closed, so no further reminders are scheduled. The draft "
-                "and everything gathered stay available to you."
+                "The 60-day window has closed, so no further reminders are scheduled. The draft "
+                "and everything gathered stay available to you. A late appeal can still be "
+                "accepted for good cause, so a disaster legal-aid service is worth asking before "
+                "you treat this as over."
             ),
             satisfied,
             outstanding,

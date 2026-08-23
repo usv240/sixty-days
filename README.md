@@ -58,6 +58,22 @@ case-specific records
 So the failure being addressed here is documentary and the clock is fixed — which is what makes it
 a job for a deadline keeper rather than an assistant.
 
+I could not get a caseworker or a survivor to review this, and
+[VALIDATION_EVIDENCE.md](VALIDATION_EVIDENCE.md) says so rather than implying otherwise. What is
+available is what practitioners have already written down for each other. The Texas Law Help
+disaster manual — "this resource is meant for volunteer lawyers" — puts the burden exactly where
+this product assumes it falls: the applicant collects the evidence, not FEMA, and "without a repair
+estimate, FEMA will likely deny the applicant immediately." The Advocates for Disaster Justice
+appeals FAQ, published with Lone Star Legal Aid, NLADA and the ABA's pro bono committee, lists the
+records an appeal carries and requires third-party documents to name the third party, which is why
+every route here names a holder rather than just a document.
+
+**One of those sources corrected the product.** The same manual notes that FEMA "generally accepts
+appeals submitted after the deadline for a good cause reason." The closing message used to tell an
+applicant at day 61 only that the window had closed — true, and read at the wrong moment it means
+"you have lost." It now says a late appeal can still be accepted for good cause and that a disaster
+legal-aid service is worth asking first.
+
 **What is not in this project is the statistic that made it feel urgent.** A 5% appeal-rate figure
 was the number the idea started from, and it did not survive source review. It is recorded under
 *claims deliberately rejected* rather than quietly dropped.
