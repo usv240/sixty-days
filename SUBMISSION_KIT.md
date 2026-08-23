@@ -12,7 +12,7 @@ service. Do not substitute the larger combined-workspace count.
 - Public repository: `https://github.com/usv240/sixty-days`
 - Category: The Taskmaster
 - Public acceptance flow: 24/24
-- Standalone tests: 338 passed
+- Standalone tests: 357 passed
 - Recorded letter extraction: 20/20 fields
 - Recorded evidence screening: 6/6 decisions
 - Shared-substrate exit test: 10/10
@@ -30,53 +30,22 @@ it must make five things undeniable:
 4. The architecture and safety boundaries are deliberate.
 5. The demonstrated backend is running on Google Cloud.
 
-The live product execution should be one continuous take. Introductory and closing stills may be
-edited around it, but the proof-of-action sequence should not be cut.
+**The recording itself lives in one place: [DEMO_SCRIPT.md](DEMO_SCRIPT.md).** Beat timings,
+pre-flight, exact narration, click order, and what to do if a beat runs long are all there, and the
+whole take is continuous with no cuts anywhere -- the rules reward "unedited, live execution" and
+that is easier to honour than to edit around. This file carries the submission-form material only.
+Two scripts drift; one does not.
 
-## Pre-flight checklist
+## Three moments the video should not skip
 
-1. From `app/`, run:
-   `python scripts/sixty_days_demo_flow.py --url https://sixty-days-109051079423.us-central1.run.app`
-   and save the 24/24 result.
-2. Run `python -m pytest -q` and confirm 338 passed.
-3. Run `python scripts/check_a11y.py` and confirm both themes pass.
-4. Use a fresh 1440 by 900 browser window in light mode. Hide bookmarks, extensions, notifications,
-   personal accounts, and unrelated tabs.
-5. Open the live app in tab one, the architecture diagram in tab two, and the Google Cloud Run
-   service page for `sixty-days` in tab three.
-6. Show Cloud Trace only if a fresh trace from the exact rehearsal has been inspected first.
-7. Leave the default `damage_and_insurance` fixture selected.
-8. Press **Start guided demo with this letter** and confirm the labelled clock anchors to
-   August 5, 2026.
-9. Rehearse once, then record one continuous product run.
-10. Export below 3 minutes 55 seconds and correct the English captions before publishing.
+Each was added after an audit, and each answers a sceptical question a recording cannot.
 
-## Four-minute shot list and exact narration
-
-Timings are targets. Keep at least five seconds of final margin.
-
-| Time | On screen | Say exactly |
-|---|---|---|
-| 0:00 to 0:20 | Landing hero and problem cards | "A disaster-assistance decision letter can start a short appeal clock while the records it requests are scattered across insurers, public offices, and a damaged home. Sixty Days keeps the reason, evidence, and deadline together without pretending to be a lawyer or acting as the applicant." |
-| 0:20 to 0:35 | Four-stage workflow and boundaries | "It understands the letter, checks observable evidence, tracks applicant-controlled requests, and builds a reviewable draft. It never contacts a third party, predicts eligibility, or submits an appeal." |
-| 0:35 to 1:05 | Open the console and press **Start guided demo with this letter** | "This is the live deployed service. The guided preset anchors a clearly labelled simulation clock to this synthetic letter, so every rehearsal proves the same sequence without deleting stored audit evidence. Gemini 3.5 Flash preserves exact reasons and requirements. Four recorded calls score twenty out of twenty fields against adjacent truth." |
-| 1:05 to 1:30 | Show exact reason, deadline, requirements, and eight wakes | "The letter controls the plan. Its exact reason is quoted, the deadline is calculated deterministically, and all eight wakes are registered immediately. A Cloud Scheduler job wakes this service every minute, and the worker claims only the wakes this project owns." |
-| 1:30 to 1:58 | Press **Screen close photo**, then screen the automatically selected wider comparison | "The close image receives an actionable retake because the requested context is missing. The wider comparison becomes ready for applicant review. That phrase is deliberate. The system checks only framing and legibility. It does not authenticate evidence, value damage, or predict agency acceptance. Two recorded calls score six out of six decisions." |
-| 1:58 to 2:20 | Prepare the insurer request | "The agent prepares an insurer request with blanks and registers a no-reply wake. Nothing is sent. The applicant reviews and sends every external request, and the service has no send endpoint." |
-| 2:20 to 2:48 | Add the applicant statement, check the packet, and download the PDF | "The packet keeps the letter's quoted reason beside the evidence and lists everything still missing. Every page repeats validated synthetic application and disaster references for applicant verification. The PDF is clearly marked draft, optional, and not submitted." |
-| 2:48 to 3:08 | Advance the simulated days and show the automatic packet snapshot | "Now time advances. The deadline keeper resumes from durable state. At the packet safeguard, it actually runs the packet builder against accepted evidence, stores a visibly partial snapshot with everything missing, and does not send or submit. That is asynchronous action over time, not a chat response." |
-| 3:08 to 3:30 | Show the live scheduler pill, then the architecture diagram | "This badge is not the simulated clock. It is wall-clock proof that a Cloud Scheduler job woke this service seconds ago, refreshed live on the page. One Cloud Run service coordinates bounded modules, Firestore stores structured cases and reminders, and raw letters, photo bytes, and applicant narrative are deliberately omitted. The standalone repository passes three hundred and thirty-eight tests." |
-| 3:30 to 3:52 | Show the Cloud Run service, public URL, and current revision | "This is the independent sixty-days service running on Google Cloud in us-central1, with Firestore, Vertex AI, Cloud Scheduler, Cloud Trace, and scale-to-zero Cloud Run. The public URL you just watched is this deployed service." |
-
-Upload publicly to YouTube or Vimeo with the title:
-
-**Sixty Days: All Things Agentic Hackathon**
-
-Use corrected English captions. Do not leave the video unlisted.
-
-## Two moments the video should not skip
-
-Both were added after an audit and both answer a sceptical question a recording cannot.
+**The reminder that fires with nobody watching.** Arm it in the first thirty seconds and do not
+touch it again. It registers a reminder ninety seconds out on the real calendar; the page only
+polls to ask whether it has happened. Cloud Scheduler claims it on its next pass and the record
+names the Cloud Run revision that executed it. Measured arm-to-fired: 111 and 131 seconds across
+two runs, with a 150-second ceiling. This is the beat that answers "you pressed a button" without
+argument, because between arming and firing you are visibly doing something else.
 
 **The scheduler badge.** The demo clock is simulated and the page says so, which fairly invites the
 question of whether anything runs on its own. The badge beside it reads "Real scheduler woke this
@@ -194,7 +163,7 @@ No government agency endorses this project.
 - [x] Submission-ready architecture SVG and Mermaid source
 - [x] Three additional Google model integrations with public provenance
 - [x] 24/24 public acceptance flow
-- [x] 338 standalone tests
+- [x] 357 standalone tests
 - [x] 20/20 letter fields and 6/6 evidence decisions
 - [x] Accessibility gate and 10/10 exit test
 - [x] Public build story published: https://dev.to/ujwal240/a-deadline-does-not-care-that-you-are-still-recovering-3080

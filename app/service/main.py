@@ -115,6 +115,12 @@ def record_due_action(wake: Wake) -> None:
             "recorded_at": recorded_clock.now(),
             "status": "due_action_recorded",
             "external_side_effect": False,
+            # Which process did this, named in the record itself. The live-proof endpoint's whole
+            # claim is "the scheduled worker ran it, not you", and an unsigned record leaves that
+            # claim resting on a sentence rather than on evidence. It also makes a wake executed by
+            # the wrong service visible instead of silent.
+            "worker": worker_id,
+            "revision": os.environ.get("K_REVISION", "local"),
             "domain": domain,
         })
 
@@ -446,6 +452,7 @@ def check_live_proof(wake_id: str) -> dict[str, Any]:
         "status": "fired by Cloud Scheduler",
         "fired_at": recorded_at.isoformat() if hasattr(recorded_at, "isoformat") else str(recorded_at),
         "worker": str(fired.get("worker", "")) or None,
+        "revision": str(fired.get("revision", "")) or None,
         "kind": str(fired.get("kind", "")),
         "run_id": str(fired.get("run_id", "")),
         "external_side_effect": False,

@@ -156,6 +156,36 @@ def main() -> int:
             f"{extra_models} integrated, cap reached at 3")
     r.check("dev.to" in bonus, "Public build content published")
 
+    # --- Numbers the documents claim about themselves ---------------------------------------
+    # "Findings and learnings" and the README's evidence table are read by a judge who can run
+    # pytest in one command. A stale count is a small error that costs more than it should: it is
+    # the one claim in the whole submission that is trivially checkable, so getting it wrong
+    # invites doubt about the claims that are not. Counted here rather than trusted, and every
+    # document that states a count has to state the same one.
+    collected = subprocess.run(
+        [sys.executable, "-m", "pytest", "--collect-only", "-q"],
+        cwd=APP, capture_output=True, text=True, timeout=300,
+    ).stdout
+    actual = re.search(r"(\d+) tests? collected", collected)
+    if actual is None:
+        r.manual("Documented test count matches the suite", "pytest did not report a collection")
+    else:
+        total = actual.group(1)
+        # The published build story is deliberately excluded: it is a snapshot of an article that is
+        # already public, and editing it would make the repository disagree with what was published.
+        claimed: dict[str, set[str]] = {}
+        for document in ROOT.rglob("*.md"):
+            if document.name == "public-build-story.md" or ".git" in document.parts:
+                continue
+            found = set(re.findall(r"(\d{3,4})(?= (?:standalone )?tests?| passed)",
+                                   document.read_text(encoding="utf-8", errors="ignore")))
+            if found:
+                claimed[str(document.relative_to(ROOT))] = found
+        stale = sorted(f"{name}: {', '.join(sorted(n for n in nums if n != total))}"
+                       for name, nums in claimed.items() if nums != {total})
+        r.check(not stale, "Documented test count matches the suite",
+                f"{total} collected" if not stale else "; ".join(stale))
+
     # --- Originality and disclosure -------------------------------------------------------
     r.check("AI coding assistants" in readme, "AI-assistance disclosure present")
     r.check((ROOT / "PROJECT_DIFFERENTIATION.md").exists(),

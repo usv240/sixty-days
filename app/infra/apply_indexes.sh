@@ -28,10 +28,16 @@ create_index() {
     2>&1 | grep -v "already exists" || true
 }
 
-echo "Creating Firestore composite indexes in ${PROJECT_ID}"
-create_index wakes status due_at            "scan_due: pending wakes whose time has arrived"
-create_index wakes status lease_expires_at  "scan_due: reclaim wakes whose worker died"
-create_index wakes run_id due_at            "for_run: a course's whole ladder, in order"
+# The collection this service actually queries. It has its own rather than sharing one, because a
+# neighbouring service scanning the same collection claims wakes it has no handler for, completes
+# them, and permanently retires this service's deadline safeguards -- silently, with no error
+# anywhere. Ownership predicates help, but a separate collection is the guarantee.
+COLLECTION="${WAKE_COLLECTION:-wakes_sixty_days}"
+
+echo "Creating Firestore composite indexes in ${PROJECT_ID} for ${COLLECTION}"
+create_index "${COLLECTION}" status due_at            "scan_due: pending wakes whose time has arrived"
+create_index "${COLLECTION}" status lease_expires_at  "scan_due: reclaim wakes whose worker died"
+create_index "${COLLECTION}" run_id due_at            "for_run: a case's whole ladder, in order"
 
 echo
 echo "Index builds are asynchronous. Check readiness with:"

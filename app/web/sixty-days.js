@@ -343,8 +343,13 @@ async function pollLiveProof(wakeId, dueAt) {
     status.className = "small fired";
     status.textContent =
       `Cloud Scheduler fired it at ${new Date(data.fired_at).toLocaleTimeString()}. Nobody pressed anything.`;
+    // The rail column is too narrow for the worker id, but it is the part that makes this checkable,
+    // so it goes where there is room to read it: on hover, and in the activity trail.
+    status.title = data.worker ? `Executed by ${data.worker}` : "";
     log("deadline keeper", "A reminder fired on the real clock.",
-        "Registered ninety seconds earlier and executed by the scheduled worker, not by this page.",
+        data.revision
+          ? `Registered ninety seconds earlier and executed by Cloud Run revision ${data.revision}, not by this page.`
+          : "Registered ninety seconds earlier and executed by the scheduled worker, not by this page.",
         "accept");
     $("#btn-live-proof").disabled = false;
     $("#btn-live-proof").textContent = "Set another one";

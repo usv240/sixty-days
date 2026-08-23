@@ -69,6 +69,25 @@ if [[ "${REGION}" != "us-central1" ]]; then
   exit 1
 fi
 
+# --update-env-vars is additive: anything named here is written, anything omitted is left alone.
+# That distinction matters for SCHEDULER_AUDIENCE. Passing it through as "${SCHEDULER_AUDIENCE:-}"
+# writes an *empty* value when the caller has not exported one, and an empty audience makes
+# verify_scheduler_token fail closed on Cloud Run -- every scan rejected, the deadline keeper
+# silently stops, and the only symptom is a scheduler badge that goes stale minutes later. So the
+# audience is named only when there is a real value to name; otherwise the deployed one survives.
+#
+# It is not derived from the service URL either. Cloud Run answers on two hostnames and the OIDC
+# audience must be the exact one the scheduler job was provisioned with. Guessing wrong fails the
+# same silent way.
+ENV_VARS="GOOGLE_CLOUD_PROJECT=${PROJECT_ID},REGION=${REGION},SIM_MODE=${SIM_MODE}"
+ENV_VARS="${ENV_VARS},REPLAY_MODE=${REPLAY_MODE},PUBLIC_PROJECT=${PUBLIC_PROJECT}"
+ENV_VARS="${ENV_VARS},WAKE_COLLECTION=${WAKE_COLLECTION:-wakes_sixty_days}"
+ENV_VARS="${ENV_VARS},BETA_DEVELOPER_KEY_TTL_HOURS=168"
+ENV_VARS="${ENV_VARS},SCHEDULER_SERVICE_ACCOUNT=${SCHEDULER_IDENTITY}"
+if [[ -n "${SCHEDULER_AUDIENCE:-}" ]]; then
+  ENV_VARS="${ENV_VARS},SCHEDULER_AUDIENCE=${SCHEDULER_AUDIENCE}"
+fi
+
 echo "Deploying ${SERVICE} to ${PROJECT_ID} in ${REGION}"
 echo "  public_project=${PUBLIC_PROJECT}  sim_mode=${SIM_MODE}  replay_mode=${REPLAY_MODE}  sa=${SERVICE_ACCOUNT}"
 
@@ -84,7 +103,7 @@ run_gcloud run deploy "${SERVICE}" \
   --memory 512Mi \
   --timeout 300 \
   --allow-unauthenticated \
-  --update-env-vars "GOOGLE_CLOUD_PROJECT=${PROJECT_ID},REGION=${REGION},SIM_MODE=${SIM_MODE},REPLAY_MODE=${REPLAY_MODE},PUBLIC_PROJECT=${PUBLIC_PROJECT},BETA_DEVELOPER_KEY_TTL_HOURS=168,SCHEDULER_SERVICE_ACCOUNT=${SCHEDULER_IDENTITY},SCHEDULER_AUDIENCE=${SCHEDULER_AUDIENCE:-}" \
+  --update-env-vars "${ENV_VARS}" \
   "${BETA_SECRET_ARGS[@]}" \
   --labels "hackathon=all-things-agentic,component=${SERVICE}"
 
@@ -96,11 +115,16 @@ echo "Verify from an unauthenticated client:"
 echo "  curl ${URL}/health"
 echo "  curl -X POST -H \"Content-Type: application/json\" -d '{}' ${URL}/exit-test"
 
-# The OIDC audience is the service URL, which is only known after the first deploy. Set it now and
-# re-deploy so the scanner can verify tokens; until then it fails closed and rejects every scan.
+# The OIDC audience is the service URL, which is only known after the first deploy. On a first
+# deploy it has to be set and the service redeployed, or the scanner fails closed and rejects every
+# scan. On any later deploy the value already on the service was left untouched above, so this is
+# only a reminder to check -- not a step that was skipped.
 if [[ -z "${SCHEDULER_AUDIENCE:-}" ]]; then
   echo
-  echo "Scheduler audience was not set for this deploy. Finish wiring the worker with:"
+  echo "SCHEDULER_AUDIENCE was not passed. The value already on the service was preserved."
+  echo "Confirm the worker is still authenticated:"
+  echo "  curl ${URL}/sixty-days/scheduler   # expect \"status\": \"running\""
+  echo "If this was the first deploy, wire it now:"
   echo "  SCHEDULER_AUDIENCE=${URL} bash deploy.sh ${SERVICE}"
   echo "  bash infra/provision_scheduler.sh"
 fi
