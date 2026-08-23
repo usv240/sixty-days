@@ -518,8 +518,30 @@ textarea.control { resize: vertical; }
   grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
   align-items: stretch;
 }
-.control-cluster { min-width: 0; display: flex; }
+/* These four boxes used to stretch to match the tallest of them, which is right while their
+   contents are comparable and wrong the moment one of them holds a result. A live-call verdict with
+   its provenance open is several hundred pixels; matching it gave the clock box and the reminder box
+   the same height with nothing to put in it, and pushed the three panes below off the screen. Each
+   box is now as tall as its own content. */
+.control-cluster { min-width: 0; display: flex; align-items: start; }
 .control-cluster > * { margin-top: 0 !important; flex: 1 1 auto; }
+.console-controls { align-items: start; }
+.controls-row { align-items: start; }
+
+/* Opening the provenance must not be able to grow the console without limit either. It is evidence
+   to check, not prose to read, so beyond a few lines it scrolls in place. */
+
+/* The five things the live call is graded on, named. A tick that says only "5 of 5" tells a judge
+   the score and nothing about what was scored. */
+.live-checks {
+  margin: 7px 0 0; padding: 0; list-style: none;
+  display: flex; flex-wrap: wrap; gap: 2px 10px;
+}
+.live-checks li { position: relative; padding-left: 13px; font-size: .71rem; line-height: 1.5; white-space: nowrap; }
+.live-checks li::before { position: absolute; left: 0; font-weight: 700; }
+.live-checks li.is-pass::before { content: "✓"; color: var(--ok, #0a7); }
+.live-checks li.is-fail::before { content: "✕"; color: var(--warn, #b60); }
+
 .console-controls .advance-controls,
 .console-controls .live-proof {
   padding: 9px 10px; border: 1px solid var(--border);
@@ -697,11 +719,6 @@ textarea.control { resize: vertical; }
 .live-result.fail { border-left-color: var(--warn); background: var(--warn-soft); }
 .live-result b { display: block; font-size: .95rem; }
 .live-result .live-meta { color: var(--text-muted); font-size: .76rem; }
-.live-proof-detail { margin-top: 6px; }
-.live-proof-detail summary {
-  color: var(--text-muted); font-size: .72rem; font-weight: 640; cursor: pointer; padding: 2px 0;
-}
-.live-proof-detail summary:hover { color: var(--accent); }
 .advance-label {
   display: block; margin-bottom: 6px; color: var(--text-muted);
   font-size: .72rem; font-weight: 740; letter-spacing: .06em; text-transform: uppercase;

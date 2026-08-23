@@ -41,6 +41,10 @@ class LiveCheckResult:
     dropped_by_guard: int
     expected_kinds: list[str]
     extracted_kinds: list[str]
+    # What the model actually said, and what it was measured against. A score with neither is a
+    # number a judge has to take on faith, which is the one thing this route exists not to ask for.
+    answered: dict[str, str]
+    expected: dict[str, str]
 
     def as_dict(self) -> dict[str, Any]:
         return {
@@ -54,6 +58,8 @@ class LiveCheckResult:
             "dropped_by_guard": self.dropped_by_guard,
             "expected_kinds": self.expected_kinds,
             "extracted_kinds": self.extracted_kinds,
+            "answered": self.answered,
+            "expected": self.expected,
             "replayed": False,
             "note": (
                 "A live Vertex AI call on a synthetic letter, graded against the committed truth "
@@ -122,4 +128,21 @@ def run_live_check(
         dropped_by_guard=len(result.dropped),
         expected_kinds=[item["kind"] for item in truth["deficiencies"]],
         extracted_kinds=[item.kind.value for item in result.letter.deficiencies],
+        answered=_readable(result.letter),
+        expected={
+            "letter_date": str(truth["letter_date"]),
+            "determination": str(truth["determination"]),
+            "stated_deadline": str(truth["stated_deadline"] or "none stated"),
+        },
     )
+
+
+def _readable(letter: Any) -> dict[str, str]:
+    """The three scalar answers, as the model returned them."""
+    return {
+        "letter_date": letter.letter_date.isoformat(),
+        "determination": letter.determination.value,
+        "stated_deadline": (
+            letter.stated_deadline.isoformat() if letter.stated_deadline else "none stated"
+        ),
+    }

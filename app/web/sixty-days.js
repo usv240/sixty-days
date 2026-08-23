@@ -422,44 +422,57 @@ $("#btn-live-check").addEventListener("click", async () => {
   result.replaceChildren();
   const headline = document.createElement("b");
   headline.textContent = `${data.correct} of ${data.total} fields correct, live`;
-  const detail = document.createElement("div");
-  const failed = Object.entries(data.fields || {})
-    .filter(([, value]) => !value).map(([key]) => key.replaceAll("_", " "));
-  detail.textContent = perfect
-    ? "Same fields, same truth file, and the same scoring as the published recorded run."
-    : `Missed: ${failed.join(", ")}. Reported as measured, not hidden.`;
-  // The verdict is the moment. The provenance is what makes the verdict checkable, so it stays in
-  // the page in full -- but not stacked underneath. These four control boxes are equal-height, so
-  // 270px of result stretched three boxes that had nothing to put in the space and pushed the whole
-  // console, panes and images included, off a 900px screen. Folded, it costs about 70px.
-  const redacted = data.redacted_identifiers;
-  const meta = document.createElement("div");
-  meta.className = "live-meta";
-  meta.textContent =
-    `${data.model} on Vertex AI - ${data.elapsed_ms} ms - ` +
-    `${redacted} identifier${redacted === 1 ? "" : "s"} redacted before the model saw the text - ` +
-    "image only, no transcript supplied - nothing stored.";
+  result.append(headline);
 
-  if (perfect) {
-    // A clean result can afford to be terse: the number says it.
-    const proof = document.createElement("details");
-    proof.className = "live-proof-detail";
-    const summary = document.createElement("summary");
-    summary.textContent = "How it was scored";
-    proof.append(summary, detail, meta);
-    result.append(headline, proof);
-  } else {
-    // A miss names itself where it cannot be missed. Only the provenance folds.
-    const proof = document.createElement("details");
-    proof.className = "live-proof-detail";
-    const summary = document.createElement("summary");
-    summary.textContent = "How it was scored";
-    proof.append(summary, meta);
-    result.append(headline, detail, proof);
+  // "5 of 5" on its own is a number a judge has to take on trust: it names neither what was checked
+  // nor what came back. Both are in the response and were being discarded. The five checks are
+  // therefore listed by name, and the three the model answers in words show its answer beside the
+  // truth it was graded against -- so the score can be re-derived by reading, not believed.
+  // Short enough that five of them fit a narrow column as wrapped chips rather than five wrapped
+  // list rows. The long form cost 130px in a box that already pushes the panes down.
+  const LABEL = {
+    letter_date: "letter date",
+    determination: "decision",
+    stated_deadline: "stated deadline",
+    deficiency_kinds: "reasons",
+    all_quotes_grounded: "quotes grounded",
+  };
+  const checks = document.createElement("ul");
+  checks.className = "live-checks";
+  for (const [key, passed] of Object.entries(data.fields || {})) {
+    const item = document.createElement("li");
+    item.className = passed ? "is-pass" : "is-fail";
+    item.textContent = LABEL[key] || key.replaceAll("_", " ");
+    checks.append(item);
   }
+  result.append(checks);
+
+  // What the model actually answered goes to the activity pane, not here. This card is one column
+  // of a four-column rail, about 240px wide, and a date-value list in it wrapped, clipped mid-word,
+  // and pushed the three panes below off a 900px screen. The pane beside it is twice as wide and is
+  // already where "what just happened" is read.
+  const answered = data.answered || {};
+  const expected = data.expected || {};
+  const parts = [];
+  for (const [key, value] of Object.entries(answered)) {
+    const label = LABEL[key] || key.replaceAll("_", " ");
+    parts.push(value === expected[key]
+      ? `${label} ${value}`
+      : `${label} ${value} (truth: ${expected[key]})`);
+  }
+  if ((data.extracted_kinds || []).length) {
+    parts.push(`reasons ${data.extracted_kinds.map((k) => k.replaceAll("_", " ")).join(" + ")}`);
+  }
+  const redacted = data.redacted_identifiers;
+  const provenance =
+    `It answered: ${parts.join(" · ")}. Read from the letter image on the left, no ` +
+    `transcript supplied — ${data.model} on Vertex AI, ${data.elapsed_ms} ms, ` +
+    `${redacted} identifier${redacted === 1 ? "" : "s"} removed before the model saw the text. ` +
+    "No case was created and nothing was stored.";
   result.hidden = false;
-  log("live model call", `${data.correct}/${data.total} fields correct on a live Vertex call.`,
-      "No case was created and nothing was stored.", perfect ? "accept" : "reject");
+  log("live model call",
+      `${data.correct} of ${data.total} fields correct on a live Vertex AI call.`,
+      provenance, perfect ? "accept" : "reject");
   await refreshLiveBudget();
 });
 
