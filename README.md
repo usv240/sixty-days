@@ -13,6 +13,7 @@ decision.
 - [Open the live application](https://sixty-days-109051079423.us-central1.run.app)
 - [Read the judge evidence](https://sixty-days-109051079423.us-central1.run.app/judges)
 - [Inspect machine-checkable conformance](https://sixty-days-109051079423.us-central1.run.app/sixty-days/conformance)
+- [Create your own API key](https://sixty-days-109051079423.us-central1.run.app/developer) — no account, no approval, no contact with me
 
 ## Judge it in 90 seconds
 
