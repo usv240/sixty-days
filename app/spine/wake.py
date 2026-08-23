@@ -192,15 +192,39 @@ class WakeScheduler:
     ) -> Wake:
         return self.sleep_until(run_id, kind, self._clock.now() + delta, payload, discriminator)
 
+    # How far past `limit` a filtered scan will look before giving up for this tick. The store
+    # returns the oldest due wakes first, so without this a scanner only ever sees the head.
+    MAX_SCAN_MULTIPLIER = 40
+
     def scan_due(
         self,
         limit: int = 50,
         predicate: Callable[[Wake], bool] | None = None,
     ) -> list[Wake]:
-        """What Cloud Scheduler triggers. Returns wakes this worker successfully claimed."""
+        """What Cloud Scheduler triggers. Returns wakes this worker successfully claimed.
+
+        When a predicate is supplied this pages rather than truncating, and that is not a
+        micro-optimisation. `due()` returns the *oldest* due wakes, so a filtered scanner used to
+        fetch one page, reject all of it, and stop -- permanently blind to everything behind it.
+
+        That is exactly what happened here. A frozen demo clock left fifty overdue wakes belonging
+        to another project sitting at the head of the queue. The scanner that owned them could not
+        see them as due, and the scanner that could see them did not own them. Every wake
+        registered afterwards, including the one the live proof depends on, was starved
+        indefinitely -- with no error anywhere, because refusing to claim an unowned wake is
+        correct behaviour on its own terms.
+
+        Paging cannot be the whole answer at scale: the right shape is to record the owning
+        project on the wake and filter in the query. This is the fix that needs no schema change
+        and drains data that already exists.
+        """
         now = self._clock.now()
         claimed: list[Wake] = []
-        for candidate in self._store.due(now, limit):
+        if predicate is None:
+            candidates = self._store.due(now, limit)
+        else:
+            candidates = self._paged_due(now, limit)
+        for candidate in candidates:
             if predicate is not None and not predicate(candidate):
                 continue
             token = f"tok_{now.timestamp()}_{candidate.wake_id}"
@@ -213,7 +237,26 @@ class WakeScheduler:
                 self.dead_letters.append(dead)
                 continue
             claimed.append(won)
+            if len(claimed) >= limit:
+                break
         return claimed
+
+    def _paged_due(self, now: datetime, limit: int) -> list[Wake]:
+        """Widen the window until the store is exhausted or the ceiling is reached.
+
+        `due()` has no cursor, so this re-asks for a larger page each time. That is a few extra
+        reads per scan against a bounded backlog, which is the cheaper mistake compared with a
+        scanner that silently stops seeing its own work.
+        """
+        ceiling = limit * self.MAX_SCAN_MULTIPLIER
+        size = limit
+        candidates: list[Wake] = []
+        while size <= ceiling:
+            candidates = self._store.due(now, size)
+            if len(candidates) < size:
+                break  # the store gave everything it had
+            size *= 4
+        return candidates
 
     def dispatch_due(
         self,

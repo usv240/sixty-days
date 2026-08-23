@@ -277,3 +277,49 @@ def test_cancel_run_without_an_exclusion_still_cancels_everything():
     assert scheduler.cancel_run("run_2", "closed") == 2
     assert store.get(first.wake_id).status is WakeStatus.CANCELLED
     assert store.get(second.wake_id).status is WakeStatus.CANCELLED
+
+
+def test_a_rejected_head_does_not_starve_owned_wakes_behind_it():
+    """The bug this exists for: a filtered scanner used to see only the first page.
+
+    A frozen clock in a neighbouring project left fifty overdue wakes it could not claim sitting
+    at the head of the shared queue. This scanner did not own them, rejected the whole page, and
+    stopped -- so every wake registered afterwards was starved, silently, with no error anywhere.
+    """
+    store = MemoryWakeStore()
+    clock = SimulatedClock(MemoryClockStateStore())
+    scheduler = WakeScheduler(store, clock)
+
+    for index in range(120):
+        scheduler.sleep_for("run_theirs", "nudge", timedelta(seconds=-10), discriminator=str(index))
+    ours = scheduler.sleep_for("run_ours", "live_proof", timedelta(seconds=-1))
+
+    claimed = scheduler.scan_due(limit=50, predicate=lambda w: w.run_id == "run_ours")
+    assert [w.wake_id for w in claimed] == [ours.wake_id], (
+        "the owned wake sat behind 120 unowned ones and must still be found"
+    )
+
+
+def test_an_unfiltered_scan_still_respects_its_limit():
+    store = MemoryWakeStore()
+    scheduler = WakeScheduler(store, SimulatedClock(MemoryClockStateStore()))
+    for index in range(30):
+        scheduler.sleep_for("run", "nudge", timedelta(seconds=-5), discriminator=str(index))
+    assert len(scheduler.scan_due(limit=10)) == 10
+
+
+def test_a_filtered_scan_claims_no_more_than_its_limit():
+    store = MemoryWakeStore()
+    scheduler = WakeScheduler(store, SimulatedClock(MemoryClockStateStore()))
+    for index in range(30):
+        scheduler.sleep_for("run_ours", "nudge", timedelta(seconds=-5), discriminator=str(index))
+    claimed = scheduler.scan_due(limit=10, predicate=lambda w: w.run_id == "run_ours")
+    assert len(claimed) == 10
+
+
+def test_paging_terminates_when_nothing_matches():
+    store = MemoryWakeStore()
+    scheduler = WakeScheduler(store, SimulatedClock(MemoryClockStateStore()))
+    for index in range(200):
+        scheduler.sleep_for("run_theirs", "nudge", timedelta(seconds=-5), discriminator=str(index))
+    assert scheduler.scan_due(limit=50, predicate=lambda w: w.run_id == "run_ours") == []
