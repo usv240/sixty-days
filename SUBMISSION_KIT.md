@@ -12,7 +12,7 @@ service. Do not substitute the larger combined-workspace count.
 - Public repository: `https://github.com/usv240/sixty-days`
 - Category: The Taskmaster
 - Public acceptance flow: 24/24
-- Standalone tests: 357 passed
+- Standalone tests: 365 passed
 - Recorded letter extraction: 20/20 fields
 - Recorded evidence screening: 6/6 decisions
 - Shared-substrate exit test: 10/10
@@ -41,10 +41,10 @@ Two scripts drift; one does not.
 Each was added after an audit, and each answers a sceptical question a recording cannot.
 
 **The reminder that fires with nobody watching.** Arm it in the first thirty seconds and do not
-touch it again. It registers a reminder ninety seconds out on the real calendar; the page only
+touch it again. It registers a reminder twenty seconds out on the real calendar; the page only
 polls to ask whether it has happened. Cloud Scheduler claims it on its next pass and the record
-names the Cloud Run revision that executed it. Measured arm-to-fired: 111 and 131 seconds across
-two runs, with a 150-second ceiling. This is the beat that answers "you pressed a button" without
+names the Cloud Run revision that executed it. Measured arm-to-fired: 51 seconds, with an
+80-second ceiling — the lead plus one full turn of the minute-cadence scan. This is the beat that answers "you pressed a button" without
 argument, because between arming and firing you are visibly doing something else.
 
 **The scheduler badge.** The demo clock is simulated and the page says so, which fairly invites the
@@ -192,7 +192,7 @@ No government agency endorses this project.
 - [x] Submission-ready architecture SVG and Mermaid source
 - [x] Three additional Google model integrations with public provenance
 - [x] 24/24 public acceptance flow
-- [x] 357 standalone tests
+- [x] 365 standalone tests
 - [x] 20/20 letter fields and 6/6 evidence decisions
 - [x] Accessibility gate and 10/10 exit test
 - [x] Public build story published: https://dev.to/ujwal240/a-deadline-does-not-care-that-you-are-still-recovering-3080

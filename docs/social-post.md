@@ -37,7 +37,7 @@ integration is provable rather than claimed.
 
 Current proof:
 
-- 357 standalone tests
+- 365 standalone tests
 - 24 of 24 public acceptance checks
 - 29 of 29 developer-API checks, including tenant isolation
 - 33 of 33 responsive checks and 11 of 11 screen sizes
@@ -63,7 +63,7 @@ I created this post for the purposes of entering the All Things Agentic Hackatho
 
 Sixty Days is a deployed deadline agent for synthetic disaster-assistance appeals. It quotes the
 letter, registers eight wakes, prepares applicant-controlled requests, and keeps partial packets
-visibly partial. It never sends or submits. Proven by 357 tests and a 24 of 24 public flow.
+visibly partial. It never sends or submits. Proven by 365 standalone tests and a 24 of 24 public flow.
 
 Live: https://sixty-days-109051079423.us-central1.run.app
 

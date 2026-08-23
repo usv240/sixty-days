@@ -727,11 +727,18 @@ $("#btn-packet").addEventListener("click", async () => {
     return;
   }
   setProgress(4, true);
-  $("#packet-status").textContent = data.missing.length
-    ? `Partial draft: ${data.missing.length} item(s) still listed as missing.`
+  // "item(s)" is a shortcut taken for the writer's benefit, not the reader's, and these two lines
+  // are read by someone deciding whether a half-finished appeal packet is honest about being
+  // half-finished. Worth the ternary.
+  const missing = data.missing.length;
+  const items = (n) => `${n} item${n === 1 ? "" : "s"}`;
+  const checked = data.verified_statements.length;
+  $("#packet-status").textContent = missing
+    ? `Partial draft: ${items(missing)} still listed as missing.`
     : "Draft ready for the applicant’s page-by-page review.";
-  log("packet verifier", `Checked ${data.verified_statements.length} statement(s) against the letter's own words.`,
-      `${data.missing.length} item(s) are still missing, and the draft says so. Nothing was submitted.`,
+  log("packet verifier",
+      `Checked ${checked} statement${checked === 1 ? "" : "s"} against the letter's own words.`,
+      `${items(missing)} still missing, and the draft says so. Nothing was submitted.`,
       "accept");
 });
 

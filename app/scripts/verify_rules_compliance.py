@@ -89,6 +89,48 @@ def read(*parts: str) -> str:
     return path.read_text(encoding="utf-8", errors="ignore") if path.exists() else ""
 
 
+
+# Only a line that says "standalone" is checked. This repository ships beside a combined
+# integration workspace with a different, legitimately different, count, and the word "standalone"
+# is how every document already distinguishes the two. The rule is self-documenting: to have a
+# number checked, say which suite it belongs to.
+COUNT_ON_LINE = re.compile(r"([0-9]{3,4})")
+
+
+def audit_test_counts(root: Path, app: Path) -> tuple[str | None, list[str]]:
+    """Return the suite's real size and every document that disagrees with it."""
+    collected = subprocess.run(
+        [sys.executable, "-m", "pytest", "--collect-only", "-q"],
+        cwd=app, capture_output=True, text=True, timeout=300,
+    ).stdout
+    reported = re.search(r"([0-9]+) tests? collected", collected)
+    if reported is None:
+        return None, []
+    total = reported.group(1)
+
+    stale: list[str] = []
+    for document in sorted(root.rglob("*.md")):
+        # The published build story is a snapshot of an article that is already public. Editing it
+        # would make the repository disagree with what was published rather than agree with it.
+        if document.name == "public-build-story.md" or ".git" in document.parts:
+            continue
+        for number, line in _claimed_counts(document):
+            if number != total:
+                stale.append(f"{document.relative_to(root)}:{line} says {number}")
+    return total, stale
+
+
+def _claimed_counts(document: Path) -> list[tuple[str, int]]:
+    found: list[tuple[str, int]] = []
+    text = document.read_text(encoding="utf-8", errors="ignore")
+    for lineno, line in enumerate(text.splitlines(), start=1):
+        if "standalone" not in line.lower():
+            continue
+        for match in COUNT_ON_LINE.findall(line):
+            found.append((match, lineno))
+    return found
+
+
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--url", required=True)
@@ -157,32 +199,10 @@ def main() -> int:
     r.check("dev.to" in bonus, "Public build content published")
 
     # --- Numbers the documents claim about themselves ---------------------------------------
-    # "Findings and learnings" and the README's evidence table are read by a judge who can run
-    # pytest in one command. A stale count is a small error that costs more than it should: it is
-    # the one claim in the whole submission that is trivially checkable, so getting it wrong
-    # invites doubt about the claims that are not. Counted here rather than trusted, and every
-    # document that states a count has to state the same one.
-    collected = subprocess.run(
-        [sys.executable, "-m", "pytest", "--collect-only", "-q"],
-        cwd=APP, capture_output=True, text=True, timeout=300,
-    ).stdout
-    actual = re.search(r"(\d+) tests? collected", collected)
-    if actual is None:
-        r.manual("Documented test count matches the suite", "pytest did not report a collection")
+    total, stale = audit_test_counts(ROOT, APP)
+    if total is None:
+        r.manual("Documented test count matches the suite", "pytest reported no collection")
     else:
-        total = actual.group(1)
-        # The published build story is deliberately excluded: it is a snapshot of an article that is
-        # already public, and editing it would make the repository disagree with what was published.
-        claimed: dict[str, set[str]] = {}
-        for document in ROOT.rglob("*.md"):
-            if document.name == "public-build-story.md" or ".git" in document.parts:
-                continue
-            found = set(re.findall(r"(\d{3,4})(?= (?:standalone )?tests?| passed)",
-                                   document.read_text(encoding="utf-8", errors="ignore")))
-            if found:
-                claimed[str(document.relative_to(ROOT))] = found
-        stale = sorted(f"{name}: {', '.join(sorted(n for n in nums if n != total))}"
-                       for name, nums in claimed.items() if nums != {total})
         r.check(not stale, "Documented test count matches the suite",
                 f"{total} collected" if not stale else "; ".join(stale))
 
