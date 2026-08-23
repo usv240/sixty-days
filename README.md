@@ -41,6 +41,40 @@ their prerequisites exist, so the judge can follow the numbered stages without g
 Every synthetic input has adjacent truth. Recorded Gemini outputs and grading reports are committed,
 so the extraction and image-screening claims can be audited without trusting a screenshot.
 
+## Why this friction
+
+I have not lived this one, which is exactly why every claim behind it is named in
+[docs/research-traceability.md](docs/research-traceability.md) rather than asserted.
+
+The finding that survives audit is narrow and old enough to date precisely. Between 2016 and 2018,
+roughly 1.7 million disaster-assistance applicants were determined ineligible, and among the
+reasons GAO recorded were insufficient damage and missing supporting evidence
+([GAO-20-503](https://www.gao.gov/products/gao-20-503)). That is historical context, not a current
+denial rate and not an appeal-success estimate, and the ledger says so beside it. Current FEMA
+guidance is what sets the shape of the work: a 60-day window, and an appeal expected to carry
+case-specific records
+([appeals quick reference](https://www.fema.gov/sites/default/files/documents/fema_ia-quick-reference_appeals.pdf)).
+So the failure being addressed here is documentary and the clock is fixed — which is what makes it
+a job for a deadline keeper rather than an assistant.
+
+**What is not in this project is the statistic that made it feel urgent.** A 5% appeal-rate figure
+was the number the idea started from, and it did not survive source review. It is recorded under
+*claims deliberately rejected* rather than quietly dropped.
+
+Two product decisions went the same way, and these changed code, not just wording:
+
+- The insurer route used to accept a self-authored statement as evidence of absent coverage. FEMA's
+  insurance guide names settlement, denial, and policy documents instead, so the unsupported
+  equivalence was removed.
+- "A wide photo proves the damage" became "a wide photo is optional context," because the official
+  examples emphasise case-specific records. Photo screening now reports only observable framing and
+  legibility, and no result is called authentic, sufficient, causal, valued, or agency-approved.
+
+That is the friction brought to this hackathon: not a story about me, but a process I could check,
+where the sources were allowed to overrule the product three times. The same discipline is why the
+letter always outranks the generic catalogue, why every reason is a verified quote, and why there
+is no endpoint that files anything.
+
 ## The problem
 
 A disaster-assistance decision letter can start a short appeal window while the relevant records sit

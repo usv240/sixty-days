@@ -89,6 +89,32 @@ manual review, or ready for applicant review, and a verifier builds a partial-sa
 The agent prepares and tracks work but never contacts a third party, provides legal advice, predicts
 eligibility, or submits an appeal.
 
+### Why this friction (Bring Your Own Friction)
+
+*Paste this above "Features and functionality". It answers a scored Stage Two sub-criterion that
+nothing else in the write-up addresses. Change "I" to "we" if submitting as a team.*
+
+I have not lived this one, which is why every claim behind it is cited rather than asserted.
+
+Between 2016 and 2018, roughly 1.7 million disaster-assistance applicants were determined
+ineligible, and among the reasons GAO recorded were insufficient damage and missing supporting
+evidence (GAO-20-503). That is historical context, not a current denial rate — the research ledger
+says so beside it. Current FEMA guidance sets the shape: a 60-day appeal window, and an appeal
+expected to carry case-specific records. The failure is documentary and the clock is fixed, which
+is what makes it a job for a deadline keeper rather than an assistant.
+
+What is not in this project is the statistic that made it feel urgent. A 5% appeal-rate figure was
+where the idea started; it did not survive source review, and it is recorded under *claims
+deliberately rejected* rather than quietly dropped. Two product decisions went the same way and
+changed code, not wording: the insurer route stopped accepting a self-authored statement as
+evidence of absent coverage, because FEMA's insurance guide names settlement, denial, and policy
+documents instead; and "a wide photo proves the damage" became "a wide photo is optional context."
+
+The friction I brought is not a story about me. It is a process I could check, where the sources
+were allowed to overrule the product three times — the same discipline that makes the letter
+outrank the generic catalogue, every reason a verified quote, and every external action the
+applicant's to take.
+
 ### Features and functionality
 
 - Quote-grounded letter transcription and requirement routing
@@ -133,7 +159,10 @@ official letter. The strongest verifier rule also needed an adversarial test: a 
 could be present while its quote was empty, so every reference now has to carry nonempty support.
 Privacy patterns also needed ordinary real-world spellings, including hyphenated names, apostrophes,
 lowercase labels, and PO boxes. Finally, a visibly partial packet is safer than a false-complete one,
-and preparing a request is meaningfully different from having authority to send it.
+and preparing a request is meaningfully different from having authority to send it. The most
+useful discipline was letting the sources overrule the pitch: the appeal-rate statistic the idea
+started from did not survive review and was removed, and two evidence rules changed in code once
+the official guidance turned out to say something narrower than the shorthand.
 
 ### Disclosure
 
