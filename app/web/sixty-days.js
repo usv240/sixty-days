@@ -428,13 +428,35 @@ $("#btn-live-check").addEventListener("click", async () => {
   detail.textContent = perfect
     ? "Same fields, same truth file, and the same scoring as the published recorded run."
     : `Missed: ${failed.join(", ")}. Reported as measured, not hidden.`;
+  // The verdict is the moment. The provenance is what makes the verdict checkable, so it stays in
+  // the page in full -- but not stacked underneath. These four control boxes are equal-height, so
+  // 270px of result stretched three boxes that had nothing to put in the space and pushed the whole
+  // console, panes and images included, off a 900px screen. Folded, it costs about 70px.
+  const redacted = data.redacted_identifiers;
   const meta = document.createElement("div");
   meta.className = "live-meta";
   meta.textContent =
     `${data.model} on Vertex AI - ${data.elapsed_ms} ms - ` +
-    `${data.redacted_identifiers} identifier(s) redacted before the model saw the text - ` +
+    `${redacted} identifier${redacted === 1 ? "" : "s"} redacted before the model saw the text - ` +
     "image only, no transcript supplied - nothing stored.";
-  result.append(headline, detail, meta);
+
+  if (perfect) {
+    // A clean result can afford to be terse: the number says it.
+    const proof = document.createElement("details");
+    proof.className = "live-proof-detail";
+    const summary = document.createElement("summary");
+    summary.textContent = "How it was scored";
+    proof.append(summary, detail, meta);
+    result.append(headline, proof);
+  } else {
+    // A miss names itself where it cannot be missed. Only the provenance folds.
+    const proof = document.createElement("details");
+    proof.className = "live-proof-detail";
+    const summary = document.createElement("summary");
+    summary.textContent = "How it was scored";
+    proof.append(summary, meta);
+    result.append(headline, detail, proof);
+  }
   result.hidden = false;
   log("live model call", `${data.correct}/${data.total} fields correct on a live Vertex call.`,
       "No case was created and nothing was stored.", perfect ? "accept" : "reject");

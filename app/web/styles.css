@@ -697,6 +697,11 @@ textarea.control { resize: vertical; }
 .live-result.fail { border-left-color: var(--warn); background: var(--warn-soft); }
 .live-result b { display: block; font-size: .95rem; }
 .live-result .live-meta { color: var(--text-muted); font-size: .76rem; }
+.live-proof-detail { margin-top: 6px; }
+.live-proof-detail summary {
+  color: var(--text-muted); font-size: .72rem; font-weight: 640; cursor: pointer; padding: 2px 0;
+}
+.live-proof-detail summary:hover { color: var(--accent); }
 .advance-label {
   display: block; margin-bottom: 6px; color: var(--text-muted);
   font-size: .72rem; font-weight: 740; letter-spacing: .06em; text-transform: uppercase;
