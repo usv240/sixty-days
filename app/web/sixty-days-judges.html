@@ -102,15 +102,52 @@
 </div></section>
 
 <section id="reproduce"><div class="wrap">
-  <div class="section-heading"><div><p class="eyebrow">Reproducibility</p><h2>Run the same gates locally</h2></div></div>
-  <pre><code>cd app
+  <div class="section-heading">
+    <div><p class="eyebrow">Verify it yourself</p><h2>Check these claims without trusting this page</h2></div>
+    <p class="narrow">Every button below runs against the deployed service, right now, in this
+      browser. Nothing is pre-recorded and no terminal is required.</p>
+  </div>
+
+  <div class="verify-grid">
+    <article class="verify-card">
+      <h3>The durable workflow, end to end</h3>
+      <p>Creates a run, registers a reminder sixty days out, proves nothing fires early, advances a
+        simulated clock, and checks that the agent wakes, records its action, and completes. Then it
+        tries to break it: hidden instructions inside a document, a fabricated number, a worker that
+        dies mid-run.</p>
+      <button class="btn-primary" id="run-exit-test" type="button">Run the ten checks</button>
+      <div class="verify-result" id="exit-test-result" aria-live="polite" hidden></div>
+    </article>
+
+    <article class="verify-card">
+      <h3>The scheduler that wakes it</h3>
+      <p>The demo clock is simulated and says so. This is the wall clock: a Cloud Scheduler job
+        calls this service every minute whether or not anyone has the page open.</p>
+      <button id="run-scheduler-check" type="button">Check the live scheduler</button>
+      <div class="verify-result" id="scheduler-result" aria-live="polite" hidden></div>
+    </article>
+
+    <article class="verify-card">
+      <h3>Policy against code</h3>
+      <p>Each published rule, the source it came from, the module that implements it, and the test
+        that holds it. Read as data rather than as prose.</p>
+      <button id="run-conformance" type="button">Load the conformance report</button>
+      <div class="verify-result" id="conformance-result" aria-live="polite" hidden></div>
+    </article>
+  </div>
+
+  <details class="verify-local">
+    <summary>Prefer to run it on your own machine?</summary>
+    <pre><code>cd app
 python -m venv .venv
 .venv/bin/pip install -e ".[dev]"
 python -m pytest -q
 python scripts/check_a11y.py
 python scripts/sixty_days_demo_flow.py --url https://SERVICE_URL
-curl -X POST -H "Content-Type: application/json" -d '{}' https://SERVICE_URL/exit-test</code></pre>
-  <p>The expected standalone baseline is <b>289 tests</b>. Deployment and credentials are documented in the repository README and <code>deploy.sh</code>.</p>
+python scripts/verify_rules_compliance.py --url https://SERVICE_URL</code></pre>
+    <p>The expected standalone baseline is <b>338 tests</b>. Deployment and credentials are
+      documented in the repository README and <code>deploy.sh</code>.</p>
+  </details>
 </div></section>
 
 <section id="findings"><div class="wrap">
@@ -167,6 +204,7 @@ curl -X POST -H "Content-Type: application/json" -d '{}' https://SERVICE_URL/exi
   <div class="footer-links"><a href="https://github.com/usv240/sixty-days">GitHub</a><a href="/">Product</a><a href="/developer">Developer API</a><a href="/docs">API docs</a><a href="/sixty-days/conformance">Conformance</a></div>
 </div></footer>
 <script src="/static/live-stack.js?v=__ASSET_VERSION__"></script>
+<script src="/static/judge-verify.js?v=__ASSET_VERSION__"></script>
 <script>
 const toggle = document.querySelector("#theme-toggle");
 const themes = ["light", "dark"];

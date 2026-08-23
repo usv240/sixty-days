@@ -32,7 +32,7 @@ their prerequisites exist, so the judge can follow the numbered stages without g
 | Gate | Reproducible result |
 |---|---:|
 | Deployed public acceptance flow | **24/24** |
-| Standalone automated tests | **289 passed** |
+| Standalone automated tests | **338 passed** |
 | Recorded letter fields | **20/20** |
 | Recorded evidence decisions | **6/6** |
 | Shared-substrate exit test | **10/10** |
