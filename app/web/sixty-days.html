@@ -253,89 +253,102 @@
             </div>
           </div>
         </div>
-      </div>
-
-      <div class="pane source-pane" id="workflow-source">
-        <div class="pane-heading compact">
-          <h3>Source documents</h3>
-        </div>
-        <div class="source-pair">
-        <figure class="source-figure" id="letter-figure">
-          <figcaption>
-            <span class="source-kicker">Stage 1 input</span>
-            <b id="letter-caption">Decision letter</b>
-            <a class="source-zoom" id="letter-zoom" href="#" target="_blank" rel="noopener" hidden>Open full size</a>
-          </figcaption>
-          <div class="source-frame">
-            <img id="letter-image" class="fixture-image"
-                 alt="Synthetic disaster-assistance determination letter used as the demonstration input" hidden>
-            <p class="source-placeholder" id="letter-placeholder">No letter selected yet.</p>
-          </div>
-          <p class="source-note" id="letter-state">Select a letter to preview it.</p>
-        </figure>
-        <figure class="source-figure" id="evidence-figure">
-          <figcaption>
-            <span class="source-kicker">Stage 2 input</span>
-            <b id="evidence-caption">Evidence photo</b>
-            <a class="source-zoom" id="evidence-zoom" href="#" target="_blank" rel="noopener" hidden>Open full size</a>
-          </figcaption>
-          <div class="source-frame">
-            <img id="evidence-image" class="fixture-image"
-                 alt="Synthetic damage evidence photograph used as the demonstration input" hidden>
-            <p class="source-placeholder" id="evidence-placeholder">No photo selected yet.</p>
-          </div>
-          <p class="source-note" id="evidence-state">Select a photo to preview it.</p>
-          <p class="source-verdict" id="evidence-verdict" hidden></p>
-        </figure>
-        </div>
-        <p class="source-boundary">Every letter, photograph, name, address, and case reference in
-          this demonstration is synthetic. No real applicant data is used.</p>
-      </div>
-
-      <div class="pane activity-pane" id="workflow-activity">
-        <div class="pane-heading compact">
-          <h3>Agent activity</h3>
-        </div>
-        <p class="pane-lede">A live audit trail: which role acted, and why.</p>
-        <div class="stream-wrap">
-          <div class="stream" id="stream" aria-live="polite" aria-relevant="additions">
-            <div class="event"><span class="agent">system</span><div>Open a synthetic case to begin.</div></div>
-          </div>
-        </div>
-        <button class="activity-toggle" id="activity-toggle" type="button" aria-expanded="false" aria-controls="stream" hidden>Show the full activity history</button>
-        <div class="wall-clock-proof">
-          <span class="advance-label">On the real clock</span>
-          <p class="control-help">Set one reminder ninety seconds from now. Nothing on this page
-            runs it — Cloud Scheduler claims it. You can close the tab and it still fires.</p>
-          <button id="btn-live-proof" type="button">Set a reminder 90 seconds from now</button>
-          <p class="small muted" id="live-proof-status" aria-live="polite"></p>
-        </div>
-
-        <div class="advance-controls" aria-label="Simulated deadline controls">
-          <span class="advance-label">Advance the simulated clock</span>
-          <div class="btn-row">
+        <div class="console-controls">
+          <div class="control-cluster">
+            <div class="advance-controls" aria-label="Simulated deadline controls">
+            <span class="advance-label">Advance the simulated clock</span>
+            <div class="btn-row">
             <button id="btn-day3" disabled>+3 days</button>
             <button id="btn-day52" disabled>+49 days</button>
             <button id="btn-day58" disabled>+6 days</button>
             <button id="btn-day61" disabled>+3 days</button>
+            </div>
+            </div>
+          </div>
+          <div class="control-cluster">
+            <div class="wall-clock-proof">
+            <span class="advance-label">On the real clock</span>
+            <p class="control-help">Set one reminder ninety seconds from now. Nothing on this page
+            runs it — Cloud Scheduler claims it. You can close the tab and it still fires.</p>
+            <button id="btn-live-proof" type="button">Set a reminder 90 seconds from now</button>
+            <p class="small muted" id="live-proof-status" aria-live="polite"></p>
+            </div>
+          </div>
+          <div class="control-cluster">
+            <div class="live-proof">
+            <span class="control-kicker">Is the model really there?</span>
+            <p class="control-help">Everything above replays a recorded call so judging is
+            repeatable. This sends the synthetic letter image to Gemini 3.5 Flash on Vertex AI
+            right now and scores the answer against the same truth file.</p>
+            <button id="btn-live-check" type="button">Read the letter live</button>
+            <p class="small muted" id="live-check-budget">Checking today&rsquo;s allowance…</p>
+            <div class="live-result" id="live-check-result" aria-live="polite" hidden></div>
+            </div>
           </div>
         </div>
       </div>
 
-      <div class="pane case-pane" id="workflow-case">
-        <div class="pane-heading compact">
-          <h3>Case plan</h3>
+      <div class="console-panes">
+        <div class="pane source-pane" id="workflow-source">
+          <div class="pane-heading compact">
+            <h3>Source documents</h3>
+          </div>
+          <div class="source-pair">
+          <figure class="source-figure" id="letter-figure">
+            <figcaption>
+              <span class="source-kicker">Stage 1 input</span>
+              <b id="letter-caption">Decision letter</b>
+              <a class="source-zoom" id="letter-zoom" href="#" target="_blank" rel="noopener" hidden>Open full size</a>
+            </figcaption>
+            <div class="source-frame">
+              <img id="letter-image" class="fixture-image"
+                   alt="Synthetic disaster-assistance determination letter used as the demonstration input" hidden>
+              <p class="source-placeholder" id="letter-placeholder">No letter selected yet.</p>
+            </div>
+            <p class="source-note" id="letter-state">Select a letter to preview it.</p>
+          </figure>
+          <figure class="source-figure" id="evidence-figure">
+            <figcaption>
+              <span class="source-kicker">Stage 2 input</span>
+              <b id="evidence-caption">Evidence photo</b>
+              <a class="source-zoom" id="evidence-zoom" href="#" target="_blank" rel="noopener" hidden>Open full size</a>
+            </figcaption>
+            <div class="source-frame">
+              <img id="evidence-image" class="fixture-image"
+                   alt="Synthetic damage evidence photograph used as the demonstration input" hidden>
+              <p class="source-placeholder" id="evidence-placeholder">No photo selected yet.</p>
+            </div>
+            <p class="source-note" id="evidence-state">Select a photo to preview it.</p>
+            <p class="source-verdict" id="evidence-verdict" hidden></p>
+          </figure>
+          </div>
+          <p class="source-boundary">Every letter, photograph, name, address, and case reference in
+            this demonstration is synthetic. No real applicant data is used.</p>
         </div>
-        <p class="pane-lede">Quoted reasons and routed evidence, from the letter itself.</p>
-        <div id="case-plan" class="small muted">No case open.</div>
-        <div class="live-proof">
-          <span class="control-kicker">Is the model really there?</span>
-          <p class="control-help">Everything above replays a recorded call so judging is
-            repeatable. This sends the synthetic letter image to Gemini 3.5 Flash on Vertex AI
-            right now and scores the answer against the same truth file.</p>
-          <button id="btn-live-check" type="button">Read the letter live</button>
-          <p class="small muted" id="live-check-budget">Checking today&rsquo;s allowance…</p>
-          <div class="live-result" id="live-check-result" aria-live="polite" hidden></div>
+
+        <div class="pane activity-pane" id="workflow-activity">
+          <div class="pane-heading compact">
+            <h3>Agent activity</h3>
+          </div>
+          <p class="pane-lede">A live audit trail: which role acted, and why.</p>
+          <div class="stream-wrap">
+            <div class="stream" id="stream" aria-live="polite" aria-relevant="additions">
+              <div class="event"><span class="agent">system</span><div>Open a synthetic case to begin.</div></div>
+            </div>
+          </div>
+          <button class="activity-toggle" id="activity-toggle" type="button" aria-expanded="false" aria-controls="stream" hidden>Show the full activity history</button>
+        
+
+        
+        </div>
+
+        <div class="pane case-pane" id="workflow-case">
+          <div class="pane-heading compact">
+            <h3>Case plan</h3>
+          </div>
+          <p class="pane-lede">Quoted reasons and routed evidence, from the letter itself.</p>
+          <div id="case-plan" class="small muted">No case open.</div>
+        
         </div>
       </div>
     </div>

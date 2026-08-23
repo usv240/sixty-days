@@ -281,27 +281,24 @@ button[disabled] { opacity: .5; cursor: not-allowed; }
 
 /* One named-area grid drives every breakpoint, so a stage never lands in a column that
    cannot hold it. Areas, not column counts, are what change as the viewport narrows. */
-.console {
-  display: grid; gap: 14px; align-items: stretch;
+.console { display: grid; gap: 14px; grid-template-columns: minmax(0, 1fr); }
+.console-panes {
+  display: grid; gap: 14px; align-items: start;
   grid-template-columns: minmax(0, 1fr);
-  grid-template-areas: "controls" "source" "activity" "case";
+  grid-template-areas: "source" "activity" "case";
 }
 @media (min-width: 860px) {
-  .console {
+  .console-panes {
     grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-    grid-template-areas: "controls controls" "source activity" "case case";
+    grid-template-areas: "source activity" "case case";
   }
 }
 @media (min-width: 1240px) {
-  .console {
+  .console-panes {
     grid-template-columns: minmax(330px, 1.05fr) minmax(0, 1.1fr) minmax(260px, .85fr);
-    grid-template-areas: "controls controls controls" "source activity case";
+    grid-template-areas: "source activity case";
   }
-  /* Row two stretches so the three panes share a baseline. Without this a tall document
-     preview leaves the activity and case panes floating over an empty band. */
-  .source-pane, .activity-pane, .case-pane { align-self: stretch; }
 }
-.controls-pane { grid-area: controls; }
 .source-pane   { grid-area: source; }
 .activity-pane { grid-area: activity; }
 .case-pane     { grid-area: case; }
@@ -509,6 +506,26 @@ textarea.control { resize: vertical; }
   padding: 8px 10px; border-radius: 8px; border-left: 3px solid var(--ok);
   background: var(--ok-soft); color: var(--text); font-weight: 640;
 }
+
+/* All three control clusters share the top row, which had horizontal room to spare while the
+   activity trail below was showing four per cent of its content in a hundred-pixel slot. Controls
+   with controls; the panes underneath are left to show what happened. */
+.console-controls {
+  display: grid; gap: 10px; margin-top: 10px;
+  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+  align-items: start;
+}
+.control-cluster { min-width: 0; }
+.control-cluster > * { margin-top: 0 !important; }
+.console-controls .advance-controls,
+.console-controls .live-proof {
+  padding: 9px 10px; border: 1px solid var(--border);
+  border-radius: var(--radius-sm, 10px); background: var(--surface-2);
+  border-top: 1px solid var(--border);
+}
+.console-controls .wall-clock-proof { margin-top: 0; }
+.console-controls .control-kicker { margin-bottom: 4px; }
+.console-controls .advance-controls .btn-row { grid-template-columns: repeat(2, 1fr); }
 
 /* --- Console density ----------------------------------------------------
    The panes hold reference material, not prose. At body size the case plan needed a scrollbar to
@@ -852,39 +869,28 @@ html { scroll-padding-top: 76px; }
    `dvh` rather than `vh` because mobile browsers change viewport height as their chrome hides,
    and `min-height: 0` throughout because a flex or grid child otherwise refuses to shrink below
    its content and quietly reintroduces the overflow this exists to prevent. */
-@media (min-width: 1240px) and (min-height: 700px) {
-  #run {
-    display: flex; flex-direction: column;
-    max-height: calc(100dvh - 5.5rem);
+/* The console is no longer forced into one viewport.
+   
+   That constraint was right for an empty console and wrong the moment it filled: after a full run
+   the activity trail holds 2,500 pixels of entries, and squeezing it into whatever height was left
+   showed four per cent of it through a hundred-pixel slot. Every pane grew its own scrollbar and
+   the page became a set of tiny windows onto content nobody could read.
+   
+   Content sizes itself now, and the controls stay pinned to the top of the console instead, so
+   pressing a button and watching the result still happens without hunting. The one thing that
+   scrolls is the activity log, which is what logs do. */
+@media (min-width: 1240px) {
+  #run .controls-pane {
+    position: sticky; top: 84px; z-index: 5;
+    box-shadow: 0 6px 18px -12px rgb(15 23 42 / 22%);
   }
-  #run .console { flex: 1 1 auto; min-height: 0; }
-  #run .pane { display: flex; flex-direction: column; min-height: 0; }
-  #run .source-pane, #run .case-pane { overflow-y: auto; }
-  #run .activity-pane { overflow: hidden; }
-  #run .stream-wrap { flex: 1 1 auto; display: flex; min-height: 108px; }
-  #run .stream { flex: 1 1 auto; min-height: 0; max-height: none; }
-  #run .advance-controls { flex: 0 0 auto; }
-  #run .source-pair { flex: 0 0 auto; }
-  /* The previews absorb whatever vertical slack is left rather than being told a height. A
-     ceiling stops a tall monitor turning thumbnails into hero images; the floor keeps them
-     legible on a short one. Full size is one click away at every size. */
-  #run .source-pane { overflow-y: auto; }
-  #run .source-pair { flex: 1 1 auto; min-height: 0; }
-  #run .source-figure { display: flex; flex-direction: column; min-height: 0; }
-  #run .source-figure figcaption,
-  #run .source-note,
-  #run .source-verdict { flex: 0 0 auto; }
-  #run .source-boundary { flex: 0 0 auto; }
+  #run .pane { overflow: visible; }
+  #run .stream { max-height: 420px; min-height: 200px; }
   #run .source-frame,
-  #run .source-frame.is-letter {
-    flex: 1 1 auto; height: auto; min-height: 72px; max-height: 190px;
-  }
+  #run .source-frame.is-letter { height: 150px; }
 }
 
-/* On a laptop-height screen the images are the evidence and the prose around them is not. The
-   per-figure helper text and the long-form boundary line give way first; the synthetic-data claim
-   itself is kept, shortened rather than dropped, because that one is not decoration. */
-@media (min-width: 1240px) and (min-height: 700px) and (max-height: 950px) {
+@media (min-width: 1240px) and (max-height: 860px) {
   #run .source-note { display: none; }
   /* Kicker, name, and link on one line. Stacked they cost 63px of a 118px pane -- more than the
      image they label. The stage number is already on the rail above. */
@@ -907,7 +913,7 @@ html { scroll-padding-top: 76px; }
 
 /* On the shortest single-screen displays the stage helper prose yields too: the button
    label and the boundary copy elsewhere on the page already carry the meaning. */
-@media (min-width: 1240px) and (min-height: 700px) and (max-height: 790px) {
+@media (min-width: 1240px) and (max-height: 760px) {
   #run .control-help { display: none; }
   #run .guided-controls .control-group { padding: 9px 11px; }
   #run .console-notes { display: none; }
