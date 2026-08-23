@@ -70,3 +70,41 @@ def test_the_local_baseline_matches_the_suite_that_actually_runs() -> None:
     actual = len(list((Path(__file__).resolve().parent).glob("test_*.py")))
     assert actual > 0
     assert stated >= 300, f"baseline {stated} looks stale"
+
+
+def test_the_published_claims_are_re_checked_from_the_browser() -> None:
+    """The 24/24 number came from a Python script, which a judge will not run.
+
+    Nothing about those calls needs Python -- they are HTTP against a public, credential-free
+    surface -- so the browser makes them too and the headline claims stop being assertions.
+    """
+    assert 'id="run-acceptance"' in PAGE
+    assert 'id="acceptance-result"' in PAGE
+    assert "run-acceptance" in SCRIPT
+
+
+def test_the_browser_run_checks_the_claims_the_readme_actually_makes() -> None:
+    for claim in [
+        "quoted word for word",          # reasons come from the letter
+        "reminders registered at intake",
+        "raw letter is not returned",
+        "ready for applicant review",    # never "accepted"
+        "prepared, not sent",
+        "still lists",                   # the draft admits its gaps
+        "no send or submission route",
+    ]:
+        assert claim in SCRIPT, f"the browser run does not check: {claim}"
+
+
+def test_the_absence_of_a_send_route_is_checked_by_asking_for_one() -> None:
+    """The most important safety claim is that something does not exist, so probe for it."""
+    block = SCRIPT[SCRIPT.index("The safety claim that matters most"):]
+    for route in ["/v1/send", "/v1/submit"]:
+        assert route in block
+    assert "code === 404" in block
+
+
+def test_a_broken_claim_would_be_shown_not_swallowed() -> None:
+    block = SCRIPT[SCRIPT.index("published claims held"):]
+    assert "did not hold" in block
+    assert "shown rather than hidden" in block

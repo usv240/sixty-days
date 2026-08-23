@@ -120,6 +120,16 @@
     </article>
 
     <article class="verify-card">
+      <h3>The published claims, re-checked live</h3>
+      <p>Runs the appeal workflow against the public API from this browser and checks what the
+        README claims: reasons quoted from the letter, eight reminders registered, a bad photo
+        refused, a request prepared but never sent, a draft that still lists its gaps, and no send
+        or submission route anywhere.</p>
+      <button id="run-acceptance" type="button">Re-check the claims</button>
+      <div class="verify-result" id="acceptance-result" aria-live="polite" hidden></div>
+    </article>
+
+    <article class="verify-card">
       <h3>The scheduler that wakes it</h3>
       <p>The demo clock is simulated and says so. This is the wall clock: a Cloud Scheduler job
         calls this service every minute whether or not anyone has the page open.</p>
