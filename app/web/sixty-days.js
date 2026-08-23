@@ -118,14 +118,95 @@ function setProgress(stage, finished = false) {
   });
 }
 
-function refreshActivityAffordance() {
-  const wrap = document.querySelector(".stream-wrap");
-  const toggle = $("#activity-toggle");
-  if (!wrap || !toggle) return;
-  const clipped = stream.scrollHeight > stream.clientHeight + 2;
-  const expanded = stream.classList.contains("is-expanded");
-  toggle.hidden = !clipped && !expanded;
-  wrap.classList.toggle("is-complete", expanded || !clipped);
+// --- The case timeline ---------------------------------------------------
+// A log answers "what happened, in order", which grows without bound, so any box holding one is
+// eventually cramped or scrolling. A judge is asking two fixed-size questions instead: where is
+// this case inside its sixty days, and what did the agent just do. So the reminders become marks
+// on the window they live on, the clock walks across it, and marks fill as they fire. The height
+// never changes, however long the case runs.
+
+let timelineWindow = null;
+
+// The reminders that end the case read differently from the ones that continue it.
+const TERMINAL_KINDS = new Set(["build_partial", "final_alert"]);
+
+function renderTimeline(data) {
+  const track = $("#timeline-markers");
+  const start = Date.parse(`${data.letter_date}T00:00:00Z`);
+  const end = Date.parse(`${data.deadline}T00:00:00Z`);
+  if (!Number.isFinite(start) || !Number.isFinite(end) || end <= start) return;
+  timelineWindow = { start, end };
+
+  track.replaceChildren();
+  for (const wake of data.wakes || []) {
+    const due = Date.parse(wake.due_at);
+    if (!Number.isFinite(due)) continue;
+    const marker = document.createElement("span");
+    marker.className = `timeline-marker${TERMINAL_KINDS.has(wake.kind) ? " is-terminal" : ""}`;
+    marker.style.left = `${((due - start) / (end - start)) * 100}%`;
+    marker.dataset.due = String(due);
+    marker.title = `${plainWake(wake.kind)} — due ${String(wake.due_at).slice(0, 10)}`;
+    track.append(marker);
+  }
+
+  $("#timeline-start").textContent = data.letter_date;
+  $("#timeline-end").textContent = `${data.deadline} · deadline`;
+  $("#case-timeline").hidden = false;
+  updateTimeline();
+}
+
+// Recomputed from the clock rather than tracked per event: a mark is filled when its date has
+// passed. Self-correcting, and it needs no bookkeeping to match fired wakes back to marks.
+function updateTimeline(nowIso) {
+  if (!timelineWindow) return;
+  const now = Date.parse(nowIso || $("#clock-now").dataset.iso || "");
+  if (!Number.isFinite(now)) return;
+
+  const { start, end } = timelineWindow;
+  const progress = Math.max(0, Math.min(1, (now - start) / (end - start)));
+  $("#timeline-fill").style.width = `${progress * 100}%`;
+  const cursor = $("#timeline-now");
+  cursor.style.left = `${progress * 100}%`;
+  cursor.hidden = false;
+
+  for (const dot of document.querySelectorAll(".timeline-marker")) {
+    dot.classList.toggle("is-fired", Number(dot.dataset.due) <= now);
+  }
+}
+
+function resetTimeline() {
+  timelineWindow = null;
+  $("#case-timeline").hidden = true;
+  $("#timeline-markers").replaceChildren();
+  $("#timeline-now").hidden = true;
+  $("#timeline-fill").style.width = "0";
+}
+
+// One thing happened most recently, and it is the thing worth reading at full size.
+function setLatest(agent, message, why, tone) {
+  const latest = $("#latest-event");
+  latest.className = `latest ${tone || ""}`.trim();
+  latest.replaceChildren();
+  const role = document.createElement("span");
+  role.className = "latest-role";
+  role.textContent = agent;
+  const what = document.createElement("b");
+  what.className = "latest-what";
+  what.textContent = message;
+  latest.append(role, what);
+  if (why) {
+    const reason = document.createElement("span");
+    reason.className = "latest-why";
+    reason.textContent = why;
+    latest.append(reason);
+  }
+}
+
+function refreshStepCount() {
+  const count = stream.querySelectorAll(".event").length;
+  $("#all-steps-count").textContent = count
+    ? `Show all ${count} step${count === 1 ? "" : "s"}`
+    : "No earlier steps yet";
 }
 
 function log(agent, message, why = "", tone = "") {
@@ -144,7 +225,8 @@ function log(agent, message, why = "", tone = "") {
   }
   event.append(badge, content);
   stream.prepend(event);
-  refreshActivityAffordance();
+  setLatest(agent, message, why, tone);
+  refreshStepCount();
 }
 
 // The judge should be able to see exactly what the agent was handed, before it is handed over.
@@ -379,6 +461,10 @@ async function refreshClock() {
   $("#clock-now").textContent = ok
     ? new Date(data.simulated_now).toUTCString().replace(" GMT", "")
     : "unavailable";
+  if (ok) {
+    $("#clock-now").dataset.iso = data.simulated_now;
+    updateTimeline(data.simulated_now);
+  }
 }
 
 async function boot() {
@@ -451,9 +537,11 @@ function resetDemoUi() {
   runId = null;
   setProgress(1);
   stream.replaceChildren();
+  refreshStepCount();
   log("demo preset", "Preparing a fresh synthetic case.",
       "No stored case or audit record is deleted.");
   $("#case-plan").replaceChildren();
+  resetTimeline();
   showEvidenceVerdict("", "");
   $("#prepared-request").textContent = "";
   $("#packet-status").textContent = "No packet built.";
@@ -505,6 +593,7 @@ $("#btn-open").addEventListener("click", async () => {
   plannedSend.setUTCDate(plannedSend.getUTCDate() + 5);
   $("#requested-on").value = plannedSend.toISOString().slice(0, 10);
   renderPlan(data);
+  renderTimeline(data);
   log("letter reader", `Found ${data.deficiencies.length} reason(s) the letter actually gives.`,
       `Each one is copied word for word from the letter. ${data.redacted} personal detail(s) were removed first.`,
       "accept");
@@ -717,22 +806,14 @@ $("#btn-day58").addEventListener("click", () => advance(6, "Advanced 6 more days
 $("#btn-day61").addEventListener("click", () => advance(3, "Advanced 3 more days"));
 
 $("#letter-image").closest(".source-frame").classList.add("is-letter");
+refreshStepCount();
 
-$("#activity-toggle").addEventListener("click", () => {
-  const expanded = stream.classList.toggle("is-expanded");
-  $("#activity-toggle").setAttribute("aria-expanded", String(expanded));
-  $("#activity-toggle").textContent = expanded
-    ? "Collapse the activity history"
-    : "Show the full activity history";
-  refreshActivityAffordance();
-});
 
 // Starting over is the one control a judge needs at every point, including after the run ends.
 $("#btn-restart").addEventListener("click", () => {
   $("#btn-open").click();
 });
 
-refreshActivityAffordance();
 boot();
 refreshClock();
 refreshScheduler();

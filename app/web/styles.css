@@ -527,6 +527,75 @@ textarea.control { resize: vertical; }
 .console-controls .control-kicker { margin-bottom: 4px; }
 .console-controls .advance-controls .btn-row { grid-template-columns: repeat(2, 1fr); }
 
+/* --- The case timeline --------------------------------------------------
+   A log grows without limit, so any box holding one is eventually either cramped or scrolling.
+   The information a judge needs is not "every line" but "where is this case, and what just
+   happened" -- both of which are fixed-size questions.
+
+   So the eight reminders become marks on the sixty-day window they actually live on. The whole
+   plan is legible at a glance, the clock walks across it, and marks fill in as they fire. Height
+   stays constant however long the case runs, and the full history is one disclosure away. */
+
+.timeline { margin: 2px 0 14px; }
+.timeline[hidden] { display: none; }
+.timeline-track {
+  position: relative; height: 34px; margin: 0 6px;
+}
+.timeline-track::before {
+  content: ""; position: absolute; left: 0; right: 0; top: 15px; height: 3px;
+  border-radius: 3px; background: var(--border-strong);
+}
+.timeline-fill {
+  position: absolute; left: 0; top: 15px; height: 3px; width: 0;
+  border-radius: 3px; background: var(--accent); transition: width .35s ease;
+}
+.timeline-now {
+  position: absolute; top: 4px; width: 2px; height: 25px; background: var(--text);
+  transform: translateX(-1px); transition: left .35s ease; z-index: 2;
+}
+.timeline-now span {
+  position: absolute; top: -3px; left: -3px; width: 8px; height: 8px;
+  border-radius: 50%; background: var(--text);
+}
+.timeline-marker {
+  position: absolute; top: 10px; width: 13px; height: 13px; margin-left: -6px;
+  border-radius: 50%; border: 2px solid var(--border-strong); background: var(--surface);
+  transition: background .3s ease, border-color .3s ease, transform .3s ease;
+}
+.timeline-marker.is-fired {
+  background: var(--accent); border-color: var(--accent); transform: scale(1.12);
+}
+.timeline-marker.is-terminal { border-color: var(--danger); }
+.timeline-marker.is-terminal.is-fired { background: var(--danger); border-color: var(--danger); }
+.timeline-ends {
+  display: flex; justify-content: space-between; margin-top: 4px;
+  color: var(--text-muted); font-size: .7rem;
+}
+
+/* What just happened, at a size worth reading, in a box that never grows. */
+.latest {
+  padding: 11px 13px; border-radius: var(--radius-sm, 10px);
+  border-left: 3px solid var(--border-strong); background: var(--surface-2);
+}
+.latest.accept { border-left-color: var(--ok); background: var(--ok-soft); }
+.latest.reject { border-left-color: var(--warn); background: var(--warn-soft); }
+.latest-role {
+  display: block; margin-bottom: 3px; color: var(--text-muted);
+  font-size: .66rem; font-weight: 750; letter-spacing: .06em; text-transform: uppercase;
+}
+.latest-what { display: block; font-size: .92rem; line-height: 1.4; }
+.latest-why {
+  display: block; margin-top: 5px; color: var(--text-muted);
+  font-size: .78rem; line-height: 1.45;
+}
+
+.all-steps { margin: 10px 0 0; padding: 0; border: 0; background: none; }
+.all-steps summary {
+  padding: 5px 0; color: var(--text-muted); font-size: .78rem; font-weight: 640; cursor: pointer;
+}
+.all-steps summary:hover { color: var(--accent); }
+.all-steps .stream { margin-top: 8px; max-height: 260px; overflow-y: auto; }
+
 /* --- Console density ----------------------------------------------------
    The panes hold reference material, not prose. At body size the case plan needed a scrollbar to
    show two quotes, and the controls at the foot of the activity pane took more room than the
@@ -628,25 +697,11 @@ td.changed { animation: flash 1.1s ease-out; }
 
 /* --- Activity stream ---------------------------------------------------- */
 
-.stream-wrap { position: relative; min-height: 0; overflow: hidden; }
 .stream {
   display: flex; flex-direction: column; gap: 8px;
   min-height: 150px; max-height: 420px; overflow-y: auto;
   scrollbar-gutter: stable;
 }
-/* The fade marks the cut as a scroll boundary. Without it a clipped sentence reads as a bug. */
-.stream-wrap::after {
-  content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 34px;
-  pointer-events: none; border-radius: 0 0 8px 8px;
-  background: linear-gradient(to bottom, transparent, var(--surface));
-}
-.stream-wrap.is-complete::after { display: none; }
-.activity-toggle {
-  width: 100%; min-height: 38px; margin-top: 10px; padding: 7px 10px;
-  background: var(--surface-2); color: var(--text); font-size: .78rem;
-}
-.activity-toggle[hidden] { display: none; }
-.stream.is-expanded { max-height: none; }
 .event {
   display: grid; grid-template-columns: auto 1fr; gap: 10px; align-items: start;
   border: 1px solid var(--border); border-radius: 8px; padding: 10px 12px;

@@ -331,12 +331,27 @@
             <h3>Agent activity</h3>
           </div>
           <p class="pane-lede">A live audit trail: which role acted, and why.</p>
-          <div class="stream-wrap">
-            <div class="stream" id="stream" aria-live="polite" aria-relevant="additions">
-              <div class="event"><span class="agent">system</span><div>Open a synthetic case to begin.</div></div>
+          <div class="timeline" id="case-timeline" hidden>
+            <div class="timeline-track">
+              <div class="timeline-fill" id="timeline-fill"></div>
+              <div class="timeline-now" id="timeline-now" hidden><span></span></div>
+              <div class="timeline-markers" id="timeline-markers"></div>
+            </div>
+            <div class="timeline-ends">
+              <span id="timeline-start">letter date</span>
+              <span id="timeline-end">deadline</span>
             </div>
           </div>
-          <button class="activity-toggle" id="activity-toggle" type="button" aria-expanded="false" aria-controls="stream" hidden>Show the full activity history</button>
+
+          <div class="latest" id="latest-event">
+            <span class="latest-role">system</span>
+            <b class="latest-what">Open a synthetic case to begin.</b>
+          </div>
+
+          <details class="all-steps" id="all-steps">
+            <summary><span id="all-steps-count">No earlier steps yet</span></summary>
+            <div class="stream" id="stream" aria-live="polite" aria-relevant="additions"></div>
+          </details>
         
 
         
