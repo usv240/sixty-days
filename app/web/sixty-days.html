@@ -303,6 +303,14 @@
           </div>
         </div>
         <button class="activity-toggle" id="activity-toggle" type="button" aria-expanded="false" aria-controls="stream" hidden>Show the full activity history</button>
+        <div class="wall-clock-proof">
+          <span class="advance-label">On the real clock</span>
+          <p class="control-help">Set one reminder ninety seconds from now. Nothing on this page
+            runs it — Cloud Scheduler claims it. You can close the tab and it still fires.</p>
+          <button id="btn-live-proof" type="button">Set a reminder 90 seconds from now</button>
+          <p class="small muted" id="live-proof-status" aria-live="polite"></p>
+        </div>
+
         <div class="advance-controls" aria-label="Simulated deadline controls">
           <span class="advance-label">Advance the simulated clock</span>
           <div class="btn-row">

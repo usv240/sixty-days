@@ -245,6 +245,62 @@ function plainWake(kind) {
   return key.replaceAll("_", " ").replaceAll(":", ": ");
 }
 
+// The honest objection to the whole demo is that a person pressed a button. This answers it
+// without a simulated clock: a reminder registered on the wall clock, executed by the scheduled
+// worker, while this page does nothing but ask whether it has happened yet.
+let liveProofTimer = null;
+
+async function pollLiveProof(wakeId, dueAt) {
+  const status = $("#live-proof-status");
+  const { ok, data } = await api(`/sixty-days/live-proof/${wakeId}`);
+  if (!ok) return;
+
+  if (data.fired) {
+    window.clearInterval(liveProofTimer);
+    liveProofTimer = null;
+    status.className = "small fired";
+    status.textContent =
+      `Cloud Scheduler fired it at ${new Date(data.fired_at).toLocaleTimeString()}. Nobody pressed anything.`;
+    log("deadline keeper", "A reminder fired on the real clock.",
+        "Registered ninety seconds earlier and executed by the scheduled worker, not by this page.",
+        "accept");
+    $("#btn-live-proof").disabled = false;
+    $("#btn-live-proof").textContent = "Set another one";
+    return;
+  }
+
+  const left = data.seconds_until_due ?? Math.max(0, Math.round((dueAt - Date.now()) / 1000));
+  status.className = "small waiting";
+  status.textContent = left > 0
+    ? `Waiting. Due in ${left}s, then the next scheduler pass picks it up.`
+    : "Due now. Waiting for the next scheduler pass.";
+}
+
+$("#btn-live-proof").addEventListener("click", async () => {
+  const button = $("#btn-live-proof");
+  const status = $("#live-proof-status");
+  button.disabled = true;
+  button.textContent = "Registering…";
+  const { ok, data } = await api("/sixty-days/live-proof", {});
+  if (!ok) {
+    status.className = "small muted";
+    status.textContent = data.detail || "The reminder could not be registered.";
+    button.disabled = false;
+    button.textContent = "Set a reminder 90 seconds from now";
+    return;
+  }
+  button.textContent = "Armed — leave it alone";
+  log("deadline keeper", "Set a reminder ninety seconds out on the real calendar.",
+      "Nothing on this page will run it. The scheduled worker will.", "accept");
+
+  const dueAt = new Date(data.due_at).getTime();
+  status.className = "small waiting";
+  status.textContent = `Waiting. Due in ${data.seconds_until_due}s.`;
+  if (liveProofTimer) window.clearInterval(liveProofTimer);
+  liveProofTimer = window.setInterval(() => pollLiveProof(data.wake_id, dueAt), 5000);
+  pollLiveProof(data.wake_id, dueAt);
+});
+
 async function refreshLiveBudget() {
   const { ok, data } = await api("/sixty-days/live-check/budget");
   const label = $("#live-check-budget");

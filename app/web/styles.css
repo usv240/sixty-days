@@ -332,7 +332,7 @@ textarea.control { resize: vertical; }
 }
 .pane-heading.compact { align-items: center; margin-bottom: 6px; }
 .pane-heading.compact h3 { margin: 0; }
-.pane-lede { margin: 0 0 10px; color: var(--text-muted); font-size: .84rem; line-height: 1.45; }
+.pane-lede { margin: 0 0 8px; color: var(--text-muted); font-size: .78rem; line-height: 1.4; }
 
 /* One line of console furniture instead of three stacked blocks. A judge should reach a control
    without scrolling, because the whole demo is press-this-watch-that. */
@@ -495,12 +495,54 @@ textarea.control { resize: vertical; }
 
 /* --- Activity ----------------------------------------------------------- */
 
+/* The one control that proves autonomy without a simulated clock, so it gets its own frame. */
+.wall-clock-proof {
+  margin-top: 10px; padding: 9px 10px; border: 1px solid var(--border-strong);
+  border-radius: var(--radius-sm, 10px); background: var(--surface-2);
+}
+.wall-clock-proof button { width: 100%; min-height: 32px; margin: 5px 0 0; font-size: .78rem; }
+.wall-clock-proof .control-help { margin: 3px 0 0; font-size: .72rem; line-height: 1.35; }
+.wall-clock-proof .advance-label { margin-bottom: 2px; }
+#live-proof-status { margin: 8px 0 0; }
+#live-proof-status.waiting { color: var(--text); font-weight: 640; }
+#live-proof-status.fired {
+  padding: 8px 10px; border-radius: 8px; border-left: 3px solid var(--ok);
+  background: var(--ok-soft); color: var(--text); font-weight: 640;
+}
+
+/* --- Console density ----------------------------------------------------
+   The panes hold reference material, not prose. At body size the case plan needed a scrollbar to
+   show two quotes, and the controls at the foot of the activity pane took more room than the
+   activity did. Everything here is a size or spacing reduction; nothing is hidden. */
+
+#case-plan { font-size: .84rem; line-height: 1.45; }
+#case-plan > p:first-child {
+  margin: 0 0 10px; padding: 6px 10px; border-radius: 8px;
+  background: var(--accent-soft); font-weight: 660; font-size: .82rem;
+}
+#case-plan h4 { margin: 0 0 4px; font-size: .84rem; line-height: 1.35; }
+#case-plan .card.compact { padding: 9px 10px; margin-bottom: 7px; }
+#case-plan .quote {
+  margin: 0; font-size: .78rem; line-height: 1.4; color: var(--text-muted);
+  border-left: 2px solid var(--border-strong); padding-left: 8px;
+}
+#case-plan ul { margin: 4px 0 0; padding-left: 16px; }
+#case-plan li { font-size: .8rem; line-height: 1.4; margin-bottom: 3px; }
+
+/* The clock chip carried body-sized text and pill padding for a single date. */
+.clock-inline { padding: 4px 11px; gap: 6px; }
+.clock-inline b { font-size: .86rem; }
+.clock-inline span { font-size: .66rem; }
+.scheduler-pill { padding: 4px 10px; font-size: .74rem; }
+.console-head { gap: 8px 12px; }
+
 .advance-controls { margin-top: 12px; padding-top: 10px; border-top: 1px solid var(--border); }
 
 /* The one control on the page that spends real money and answers the one question a recording
    cannot: whether the integration is live. */
-.live-proof { margin-top: 14px; padding-top: 12px; border-top: 1px solid var(--border); }
-.live-proof button { width: 100%; min-height: 38px; margin-top: 4px; }
+.live-proof { margin-top: 12px; padding-top: 10px; border-top: 1px solid var(--border); }
+.live-proof button { width: 100%; min-height: 32px; margin-top: 4px; font-size: .78rem; }
+.live-proof .control-help { font-size: .72rem; line-height: 1.35; }
 .live-result {
   margin-top: 10px; padding: 10px 12px; border-radius: 8px;
   border-left: 3px solid var(--border-strong); background: var(--surface-2);
@@ -517,7 +559,7 @@ textarea.control { resize: vertical; }
 }
 /* One row of three. Wrapping these onto two rows cost height the console could not spare. */
 .advance-controls .btn-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
-.advance-controls button { min-width: 0; min-height: 38px; padding: 6px 8px; }
+.advance-controls button { min-width: 0; min-height: 32px; padding: 4px 6px; font-size: .78rem; }
 .card.compact { padding: 12px; margin-bottom: 10px; }
 .eyebrow {
   color: var(--accent); font-size: .78rem; font-weight: 750;

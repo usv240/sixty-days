@@ -6,6 +6,11 @@
 # scan_due, or queries will fail with FAILED_PRECONDITION.
 #
 # Usage: PROJECT_ID=agentic-fleet-2026 bash infra/apply_indexes.sh
+#
+# Run this BEFORE pointing WAKE_COLLECTION at a new collection. Firestore builds composite indexes
+# asynchronously and takes minutes; until they are READY every due-wake query fails with
+# FAILED_PRECONDITION and the scheduler silently stops firing. Switching the collection first and
+# creating indexes afterwards takes the service down in a way that looks like a code bug.
 
 set -euo pipefail
 

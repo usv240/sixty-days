@@ -56,7 +56,18 @@ clock = (
     if settings.sim_mode else RealClock()
 )
 state_store = FirestoreStateStore(client)
-wake_store = FirestoreWakeStore(client)
+# Wakes live in their own collection rather than the shared "wakes" one.
+#
+# Claiming is a compare-and-swap, so whichever worker reaches a due wake first wins, and a worker
+# that claims one it has no handler for still completes it -- silently retiring the safeguard. A
+# predicate stops this service stealing from its neighbours, but it cannot stop a neighbour stealing
+# from this service: that depends on the neighbour running the fixed build. A separate collection
+# does not depend on anyone else's deployment.
+#
+# Found the hard way: a wall-clock reminder registered here was claimed early by another service and
+# stamped with that service's simulated clock.
+WAKE_COLLECTION = os.environ.get("WAKE_COLLECTION", "wakes_sixty_days").strip() or "wakes_sixty_days"
+wake_store = FirestoreWakeStore(client, WAKE_COLLECTION)
 beta_clock = RealClock()
 beta_wake_scheduler = WakeScheduler(wake_store, beta_clock, lease_seconds=settings.lease_seconds)
 worker_id = f"worker_{os.environ.get('K_REVISION', 'local')}_{uuid.uuid4().hex[:6]}"
@@ -342,6 +353,106 @@ def record_scheduler_heartbeat(executed: int, caller: str) -> None:
         pass
 
 
+LIVE_PROOF = "scheduler_live_proof"
+LIVE_PROOF_LEAD_SECONDS = 90
+
+
+class LiveProofRequest(BaseModel):
+    """Nothing to configure. The point is that the caller does not choose what happens."""
+
+
+@app.post("/sixty-days/live-proof")
+def arm_live_proof(request: LiveProofRequest) -> dict[str, Any]:
+    """Set one reminder ninety seconds out on the real clock, then stop being involved.
+
+    Everything else on the public page runs on a simulated clock the visitor advances, which is
+    honest but leaves one fair objection unanswered: you pressed a button, so how is that
+    autonomous? The button moves time, not the plan -- but that distinction is easier to assert than
+    to watch.
+
+    This closes it. The reminder is registered against the wall clock and nothing here executes it.
+    A Cloud Scheduler job calls this service every minute, claims whatever has come due, and runs
+    it. The page only polls to find out whether that has happened yet. Close the tab and it still
+    fires.
+    """
+    now = RealClock().now()
+    due_at = now + timedelta(seconds=LIVE_PROOF_LEAD_SECONDS)
+    run_id = Runner(
+        state_store, beta_clock, owner=worker_id, lease_seconds=settings.lease_seconds
+    ).start(BETA_PROJECT, "live-proof", {"note": "wall-clock autonomy proof"})
+
+    wake = beta_wake_scheduler.sleep_until(
+        run_id=run_id,
+        kind="live_proof",
+        due_at=due_at,
+        payload={"armed_at": now.isoformat()},
+        discriminator=run_id,
+    )
+    try:
+        client.collection(LIVE_PROOF).document(wake.wake_id).set({
+            "wake_id": wake.wake_id,
+            "run_id": run_id,
+            "armed_at": now,
+            "due_at": due_at,
+        })
+    except Exception:  # noqa: BLE001 - the wake is the proof; this record is only for lookup
+        pass
+
+    return {
+        "wake_id": wake.wake_id,
+        "run_id": run_id,
+        "armed_at": now.isoformat(),
+        "due_at": due_at.isoformat(),
+        "seconds_until_due": LIVE_PROOF_LEAD_SECONDS,
+        "note": (
+            "Registered on the real clock. Nothing on this page will run it. The Cloud Scheduler "
+            "job claims due work every minute; you can close this tab and it will still fire."
+        ),
+    }
+
+
+@app.get("/sixty-days/live-proof/{wake_id}")
+def check_live_proof(wake_id: str) -> dict[str, Any]:
+    """Has the scheduler picked it up yet? Polled by the page; it never causes the work."""
+    now = RealClock().now()
+    try:
+        armed = client.collection(LIVE_PROOF).document(wake_id).get()
+        action = client.collection("wake_actions").document(wake_id).get()
+    except Exception as exc:  # noqa: BLE001
+        raise HTTPException(status_code=503, detail=f"lookup unavailable: {exc}") from exc
+
+    if not armed.exists:
+        raise HTTPException(status_code=404, detail="no such live proof")
+
+    armed_data = armed.to_dict() or {}
+    due_at = armed_data.get("due_at")
+    seconds_left = None
+    if hasattr(due_at, "timestamp"):
+        seconds_left = max(0, int(due_at.timestamp() - now.timestamp()))
+
+    if not action.exists:
+        return {
+            "wake_id": wake_id,
+            "fired": False,
+            "seconds_until_due": seconds_left,
+            "status": "waiting" if (seconds_left or 0) > 0 else "due, waiting for the next scan",
+        }
+
+    fired = action.to_dict() or {}
+    recorded_at = fired.get("recorded_at")
+    return {
+        "wake_id": wake_id,
+        "fired": True,
+        "status": "fired by Cloud Scheduler",
+        "fired_at": recorded_at.isoformat() if hasattr(recorded_at, "isoformat") else str(recorded_at),
+        "worker": str(fired.get("worker", "")) or None,
+        "kind": str(fired.get("kind", "")),
+        "run_id": str(fired.get("run_id", "")),
+        "external_side_effect": False,
+        "note": "Executed by the scheduled worker. Nobody pressed anything.",
+    }
+
+
 @app.get("/sixty-days/scheduler")
 def scheduler_status() -> dict[str, Any]:
     """Public, credential-free proof that the deadline keeper is actually being woken.
@@ -358,6 +469,7 @@ def scheduler_status() -> dict[str, Any]:
         "authentication": "Google OIDC, scoped to this service",
         "clock": "wall-clock, not the simulated demo clock",
         "owned_projects": sorted(OWNED_PROJECTS),
+        "wake_collection": WAKE_COLLECTION,
         "note": (
             "The scheduler claims only wakes this service owns and creates typed case actions. "
             "It never contacts a third party, sends, or submits."
