@@ -360,11 +360,16 @@ def record_scheduler_heartbeat(executed: int, caller: str) -> None:
 
 
 LIVE_PROOF = "scheduler_live_proof"
-# The scheduler sweeps once a minute, so the real wait is this lead plus up to 60 seconds.
-# At 90 the worst case was ~150s, which overran the point in the demo where the reveal
-# happens and turned a reliable moment into a coin flip. At 45 the window is 45-105s and the
-# reveal is always safe, while still leaving minutes of unrelated work in between.
-LIVE_PROOF_LEAD_SECONDS = 45
+# The real wait is this lead plus however long until the next scheduler sweep. That second term
+# is not 60 seconds: measured against the deployed job, Cloud Scheduler's actual gaps ranged from
+# 51 to 84. So the worst case is lead + ~85 + a little, and a 90-second lead put it around 180
+# while a 45-second lead still reached ~130 -- close enough to the point where the demonstration
+# reveals the reminder that it was a coin flip on the tail.
+#
+# At 20 the worst case is roughly 110 seconds. The lead only decides when the reminder becomes
+# eligible; the reveal happens later regardless, so shortening it costs nothing that anyone
+# watching would notice and buys back the whole margin.
+LIVE_PROOF_LEAD_SECONDS = 20
 
 
 class LiveProofRequest(BaseModel):

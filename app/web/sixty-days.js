@@ -373,11 +373,11 @@ $("#btn-live-proof").addEventListener("click", async () => {
     status.className = "small muted";
     status.textContent = data.detail || "The reminder could not be registered.";
     button.disabled = false;
-    button.textContent = "Set a reminder 45 seconds from now";
+    button.textContent = "Set a reminder on the real clock";
     return;
   }
   button.textContent = "Armed — leave it alone";
-  log("deadline keeper", "Set a reminder 45 seconds out on the real calendar.",
+  log("deadline keeper", "Set a reminder a short way out on the real calendar.",
       "Nothing on this page will run it. The scheduled worker will.", "accept");
 
   const dueAt = new Date(data.due_at).getTime();
