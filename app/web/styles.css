@@ -641,10 +641,6 @@ textarea.control { resize: vertical; }
   padding: 3px 0; color: var(--text-muted); font-size: .74rem; font-weight: 640; cursor: pointer;
 }
 .plan-quotes summary:hover { color: var(--accent); }
-.plan-quotes .quote {
-  margin: 7px 0 0; padding-left: 9px; border-left: 2px solid var(--border-strong);
-  color: var(--text-muted); font-size: .76rem; line-height: 1.45;
-}
 .plan-subhead {
   margin: 0 0 6px; color: var(--text-muted);
   font-size: .68rem; font-weight: 740; letter-spacing: .06em; text-transform: uppercase;
@@ -668,6 +664,8 @@ textarea.control { resize: vertical; }
 }
 #case-plan h4 { margin: 0 0 4px; font-size: .84rem; line-height: 1.35; }
 #case-plan .card.compact { padding: 9px 10px; margin-bottom: 7px; }
+/* The only rule that styles a quote. There was a second one keyed on .plan-quotes .quote, which
+   this outranked on specificity and which therefore did nothing for as long as it existed. */
 #case-plan .quote {
   margin: 0; font-size: .78rem; line-height: 1.4; color: var(--text-muted);
   border-left: 2px solid var(--border-strong); padding-left: 8px;
@@ -975,7 +973,14 @@ footer.site {
 
 /* The header is sticky, so an anchor jump or scrollIntoView would otherwise land with the
    first row of content hidden underneath it. */
+/* The header is sticky, so scroll-padding keeps an anchored section from landing underneath it.
+   The smooth scroll is for the recording: "See it work" and the nav's "Live demo" both jump past
+   several screens of prose, and an instant teleport reads as a cut in a take that claims to have
+   none. Honoured only where motion is welcome. */
 html { scroll-padding-top: 76px; }
+@media (prefers-reduced-motion: no-preference) {
+  html { scroll-behavior: smooth; }
+}
 
 /* The console is one screen on any monitor.
 

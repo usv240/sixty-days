@@ -259,10 +259,14 @@
             <div class="advance-controls" aria-label="Simulated deadline controls">
             <span class="advance-label">Advance the simulated clock</span>
             <div class="btn-row">
-            <button id="btn-day3" disabled>+3 days</button>
-            <button id="btn-day52" disabled>+49 days</button>
-            <button id="btn-day58" disabled>+6 days</button>
-            <button id="btn-day61" disabled>+3 days</button>
+            <button id="btn-day3" disabled title="Day 3 of the 60-day window"
+              aria-label="Advance 3 days, to day 3">+3 days</button>
+            <button id="btn-day52" disabled title="Day 52 of the 60-day window"
+              aria-label="Advance 49 days, to day 52">+49 days</button>
+            <button id="btn-day58" disabled title="Day 58 of the 60-day window"
+              aria-label="Advance 6 days, to day 58">+6 days</button>
+            <button id="btn-day61" disabled title="Day 61 &mdash; past the deadline"
+              aria-label="Advance 3 days, to day 61, past the deadline">+3 days</button>
             </div>
             </div>
           </div>
