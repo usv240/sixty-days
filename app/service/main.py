@@ -360,7 +360,11 @@ def record_scheduler_heartbeat(executed: int, caller: str) -> None:
 
 
 LIVE_PROOF = "scheduler_live_proof"
-LIVE_PROOF_LEAD_SECONDS = 90
+# The scheduler sweeps once a minute, so the real wait is this lead plus up to 60 seconds.
+# At 90 the worst case was ~150s, which overran the point in the demo where the reveal
+# happens and turned a reliable moment into a coin flip. At 45 the window is 45-105s and the
+# reveal is always safe, while still leaving minutes of unrelated work in between.
+LIVE_PROOF_LEAD_SECONDS = 45
 
 
 class LiveProofRequest(BaseModel):
@@ -369,7 +373,7 @@ class LiveProofRequest(BaseModel):
 
 @app.post("/sixty-days/live-proof")
 def arm_live_proof(request: LiveProofRequest) -> dict[str, Any]:
-    """Set one reminder ninety seconds out on the real clock, then stop being involved.
+    """Set one reminder a short way out on the real clock, then stop being involved.
 
     Everything else on the public page runs on a simulated clock the visitor advances, which is
     honest but leaves one fair objection unanswered: you pressed a button, so how is that

@@ -348,8 +348,8 @@ async function pollLiveProof(wakeId, dueAt) {
     status.title = data.worker ? `Executed by ${data.worker}` : "";
     log("deadline keeper", "A reminder fired on the real clock.",
         data.revision
-          ? `Registered ninety seconds earlier and executed by Cloud Run revision ${data.revision}, not by this page.`
-          : "Registered ninety seconds earlier and executed by the scheduled worker, not by this page.",
+          ? `Registered earlier on the real clock and executed by Cloud Run revision ${data.revision}, not by this page.`
+          : "Registered earlier on the real clock and executed by the scheduled worker, not by this page.",
         "accept");
     $("#btn-live-proof").disabled = false;
     $("#btn-live-proof").textContent = "Set another one";
@@ -373,11 +373,11 @@ $("#btn-live-proof").addEventListener("click", async () => {
     status.className = "small muted";
     status.textContent = data.detail || "The reminder could not be registered.";
     button.disabled = false;
-    button.textContent = "Set a reminder 90 seconds from now";
+    button.textContent = "Set a reminder 45 seconds from now";
     return;
   }
   button.textContent = "Armed — leave it alone";
-  log("deadline keeper", "Set a reminder ninety seconds out on the real calendar.",
+  log("deadline keeper", "Set a reminder 45 seconds out on the real calendar.",
       "Nothing on this page will run it. The scheduled worker will.", "accept");
 
   const dueAt = new Date(data.due_at).getTime();

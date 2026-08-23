@@ -56,7 +56,9 @@ class Quote:
     text: str
 
     def appears_in(self, document: str) -> bool:
-        collapse = lambda s: re.sub(r"\s+", " ", s).strip().casefold()
+        def collapse(text: str) -> str:
+            return re.sub(r"\s+", " ", text).strip().casefold()
+
         needle = collapse(self.text)
         return bool(needle) and needle in collapse(document)
 
