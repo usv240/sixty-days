@@ -80,3 +80,11 @@ def test_console_has_no_mojibake_and_distinguishes_review_from_acceptance():
     assert "Ã¢" not in html + script
     assert "ready for applicant review" in html
     assert 'never “FEMA will accept this.”' in html
+
+
+def test_the_wordmark_returns_home_from_every_page():
+    """The first thing anyone tries when lost, and it worked on only one of the three pages."""
+    for name in ["sixty-days.html", "sixty-days-judges.html", "developer.html"]:
+        html = (WEB / name).read_text(encoding="utf-8")
+        assert '<a class="brand" href="/"' in html, f"{name}: the wordmark is not a link home"
+        assert 'aria-label="Sixty Days home"' in html, f"{name}: the link has no accessible name"

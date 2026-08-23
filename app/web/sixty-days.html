@@ -28,6 +28,8 @@
         <p class="lede">When disaster aid is refused, the letter saying no also starts a
           60-day clock. Sixty Days reads that letter, works out which documents are needed and who
           holds each one, and keeps track of the time left.</p>
+      </div>
+      <div class="hero-explainer">
         <div class="plain-box">
           <h2>In plain terms</h2>
           <p><b>The problem.</b> A letter arrives saying some help was refused. It explains why, in
@@ -37,38 +39,22 @@
             letter's own words. It lists what you need and who to ask. It writes the request letters
             for you to check and send. It watches the calendar and comes back on its own to tell you
             what is still missing.</p>
-          <p><b>What it will not do.</b> It never sends anything for you. It never contacts your
-            insurer or any agency. It cannot tell you whether you will win. Every message leaves
-            your hands only when you decide to send it.</p>
+          <p><b>What it will not do.</b> It never sends anything for you, and never contacts your
+            insurer or any agency. This is not legal advice: it cannot tell you whether you will
+            win. Every message leaves your hands only when you decide to send it.</p>
           <p class="plain-note">Everything on this page is made up for the demonstration<button class="info" data-info="synthetic" aria-expanded="false" aria-label="What is made-up demonstration data?">i</button>. No real
             person's letter, photo, or details are used.</p>
         </div>
-        <div class="btn-row">
+        <div class="btn-row hero-actions">
           <a class="btn btn-primary" href="#run">See it work</a>
+          <a class="btn" href="/developer">Create an API key</a>
           <a class="btn" href="/judges">How it was tested</a>
-        </div>
-        <p class="hero-tertiary">The public case needs no key at all. Building an integration? <a href="/developer">Create your own seven-day API key</a> or <a href="/docs">inspect the API docs</a>.</p>
-        <div class="stat-strip">
-          <div class="stat"><b>4.4 million</b><span>applicants referred to the Individuals and
-            Households Program, 2016-2018 <a href="#ref-scale" aria-label="Reference: GAO-20-503">[1]</a></span></div>
-          <div class="stat"><b>~1.7 million</b><span>were determined ineligible in that period;
-            <b>failure to submit supporting evidence</b> was among the common reasons
-            <a href="#ref-scale">[1]</a></span></div>
-          <div class="stat"><b>60 days</b><span>from the date on the decision letter to appeal, and
-            the letter names what is missing <a href="#ref-window">[2]</a></span></div>
-          <div class="stat"><b>20 of 20</b><span>letter fields extracted correctly across four real
-            Gemini&nbsp;3.5 calls, measured against ground truth <a href="/judges#requirements">[3]</a></span></div>
         </div>
         <div class="trust-band" aria-label="Product boundaries">
           <span class="trust-item"><b>Synthetic data</b> only</span>
           <span class="trust-item"><b>Applicant sends</b> every request</span>
           <span class="trust-item"><b>No submission</b> endpoint</span>
         </div>
-        <p class="small muted">These describe the documented population and process, not a
-          predicted outcome for any applicant. This product does not estimate eligibility, appeal
-          success, or how many people would benefit.</p>
-        <p class="boundary-line"><b>Scope:</b> This is not legal advice. It cannot tell you whether
-          you will win, and it has no way to file anything. You review and control every action.</p>
       </div>
     </div>
   </div>
@@ -81,6 +67,20 @@
       <p class="narrow">A decision letter can ask for records held by several different people
         while the applicant is still recovering from the disaster.</p>
     </div>
+    <div class="stat-strip">
+          <div class="stat"><b>4.4 million</b><span>applicants referred to the Individuals and
+            Households Program, 2016-2018 <a href="#ref-scale" aria-label="Reference: GAO-20-503">[1]</a></span></div>
+          <div class="stat"><b>~1.7 million</b><span>were determined ineligible in that period;
+            <b>failure to submit supporting evidence</b> was among the common reasons
+            <a href="#ref-scale">[1]</a></span></div>
+          <div class="stat"><b>60 days</b><span>from the date on the decision letter to appeal, and
+            the letter names what is missing <a href="#ref-window">[2]</a></span></div>
+          <div class="stat"><b>20 of 20</b><span>letter fields extracted correctly across four real
+            Gemini&nbsp;3.5 calls, measured against ground truth <a href="/judges#requirements">[3]</a></span></div>
+        </div>
+    <p class="small muted">These describe the documented population and process, not a
+          predicted outcome for any applicant. This product does not estimate eligibility, appeal
+          success, or how many people would benefit.</p>
     <div class="grid-3">
       <div class="card"><h3>One letter, several jobs</h3><p>The reason, the documents asked for, and the
         date are all buried in formal wording. Read the reason wrong and you gather the wrong
@@ -337,7 +337,8 @@
 
 <section id="api" class="integration-section">
   <div class="wrap">
-    <div class="section-heading"><div><p class="eyebrow">Use it beyond the demo</p><h2>An applicant-controlled API, explained before credentials.</h2></div><p>The public synthetic case is the fastest evaluation path. The API is an optional deidentified beta that anyone evaluating this project can open for themselves.</p></div>
+    <div class="section-heading"><div><p class="eyebrow">Use it beyond the demo</p><h2>An applicant-controlled API, explained before credentials.</h2></div><p class="hero-tertiary">The public case needs no key at all. Building an integration? <a href="/developer">Create your own seven-day API key</a> or <a href="/docs">inspect the API docs</a>.</p>
+      <p>The public synthetic case is the fastest evaluation path. The API is an optional deidentified beta that anyone evaluating this project can open for themselves.</p></div>
     <div class="api-onboarding-grid">
       <article class="path-card"><span class="path-number">No credentials</span><h3>Evaluate publicly</h3><p>Open a synthetic letter, inspect exact reason quotes, prepare a request, and build a visibly incomplete packet.</p><a href="#run">Run the public demo</a></article>
       <article class="path-card"><span class="path-number">Self-serve access</span><h3>Create a seven-day key</h3><p>Name a workspace and mint your own key. No invitation, no account, and no approval step; the key sets the tenant and scope.</p><a href="/developer">Open Developer quickstart</a></article>
