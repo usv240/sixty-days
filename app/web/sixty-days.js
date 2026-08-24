@@ -716,8 +716,18 @@ $("#btn-screen").addEventListener("click", async () => {
   // under a photo it was not about -- reading exactly as though the wider photo had been refused.
   const SCREENED = { damage_close_bad: "Close photo", damage_wide_good: "Wider photo" };
   const subject = SCREENED[fixture] || fixture.replaceAll("_", " ");
-  log("evidence checker", `${subject}: ${data.decision.replaceAll("_", " ")}`, data.guidance, tone);
-  showEvidenceVerdict(`${subject}: ${data.decision.replaceAll("_", " ")}. ${data.guidance}`, tone);
+  // The page's glossary term is "ready for your review", and the safety line in What it will not do
+  // depends on that exact phrase: it never means genuine, sufficient, approved, or accepted. The
+  // verdict was humanising the enum instead, so the one place the boundary is actually applied said
+  // "ready for review" -- which does not say whose review, and whose is the entire point.
+  const DECISION = {
+    ready_for_review: "ready for your review",
+    manual_review: "needs a person to look at it",
+    retake: "retake",
+  };
+  const verdict = DECISION[data.decision] || data.decision.replaceAll("_", " ");
+  log("evidence checker", `${subject}: ${verdict}`, data.guidance, tone);
+  showEvidenceVerdict(`${subject}: ${verdict}. ${data.guidance}`, tone);
   if (fixture === "damage_close_bad") {
     $("#evidence-fixture").value = "damage_wide_good";
     previewSource("evidence", "damage_wide_good");

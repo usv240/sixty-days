@@ -109,10 +109,12 @@ def audit_test_counts(root: Path, app: Path) -> tuple[str | None, list[str]]:
     total = reported.group(1)
 
     stale: list[str] = []
-    for document in sorted(root.rglob("*.md")):
+    documents = [*root.rglob("*.md"), *root.rglob("*.html")]
+    skip = {".venv", "node_modules", "__pycache__", ".git", "site-packages"}
+    for document in sorted(d for d in documents if not skip & set(d.parts)):
         # The published build story is a snapshot of an article that is already public. Editing it
         # would make the repository disagree with what was published rather than agree with it.
-        if document.name == "public-build-story.md" or ".git" in document.parts:
+        if document.name == "public-build-story.md":
             continue
         for number, line in _claimed_counts(document):
             if number != total:
