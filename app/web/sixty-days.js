@@ -711,8 +711,13 @@ $("#btn-screen").addEventListener("click", async () => {
     return;
   }
   const tone = data.decision === "ready_for_review" ? "accept" : "reject";
-  log("evidence checker", data.decision.replaceAll("_", " "), data.guidance, tone);
-  showEvidenceVerdict(`${data.decision.replaceAll("_", " ")}. ${data.guidance}`, tone);
+  // The verdict has to name the photo it judged. Screening the close one immediately swaps the
+  // preview to the wider one, ready for the next click, which left a "retake" message sitting
+  // under a photo it was not about -- reading exactly as though the wider photo had been refused.
+  const SCREENED = { damage_close_bad: "Close photo", damage_wide_good: "Wider photo" };
+  const subject = SCREENED[fixture] || fixture.replaceAll("_", " ");
+  log("evidence checker", `${subject}: ${data.decision.replaceAll("_", " ")}`, data.guidance, tone);
+  showEvidenceVerdict(`${subject}: ${data.decision.replaceAll("_", " ")}. ${data.guidance}`, tone);
   if (fixture === "damage_close_bad") {
     $("#evidence-fixture").value = "damage_wide_good";
     previewSource("evidence", "damage_wide_good");
@@ -811,8 +816,8 @@ async function reportLifecycle() {
   lastLifecycleState = data.state;
   const headline = {
     resolved: "Case complete. It stopped scheduling reminders by itself.",
-    exhausted: "Nothing left it can usefully chase. It closed the case by itself.",
-    deadline_passed: "The appeal window has closed. It closed the case by itself.",
+    exhausted: "Nothing left it can usefully chase. It stopped its own reminders.",
+    deadline_passed: "The 60-day window has passed. It stopped its own reminders.",
   }[data.state] || "It closed the case by itself.";
   log("deadline keeper", headline, data.reason, data.state === "resolved" ? "accept" : "");
 }
@@ -860,7 +865,7 @@ async function advance(days, label) {
       const headline = {
         resolved: "Case complete. It stopped scheduling reminders by itself.",
         exhausted: "Nothing left it can usefully chase. It stopped by itself.",
-        deadline_passed: "The appeal window closed. It stopped by itself.",
+        deadline_passed: "The 60-day window has passed. It stopped its own reminders.",
       }[life.state] || "It closed the case by itself.";
       const cancelled = life.cancelled_reminders
         ? ` ${life.cancelled_reminders} remaining reminder(s) were cancelled.`
