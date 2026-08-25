@@ -1,6 +1,6 @@
 flowchart LR
     LETTER["Synthetic decision letter photo<br/>and damage photo"]
-    DEVAPI["Developer API /v1<br/>text screened by Model Armor"]
+    DEVAPI["Developer API /v1<br/>Model Armor screens the text,<br/>Gemma 4 rechecks names"]
 
     subgraph CR ["Cloud Run: sixty-days"]
         direction LR
@@ -24,7 +24,7 @@ flowchart LR
     end
 
     SCHED["Cloud Scheduler<br/>sixty-days-wake-scan"]
-    VERTEX["Vertex AI<br/>Gemini 3.5 Flash reads the letter<br/>Gemma 4 rechecks the redaction"]
+    VERTEX["Vertex AI<br/>Gemini 3.5 Flash reads the letter"]
     STATE[("Firestore<br/>cases, evidence, requests,<br/>and this service's own reminders")]
     TRACE["Cloud Trace"]
     MEDIA["Gemini 3.1 Flash Image and Veo 3.1 Fast<br/>make the onboarding briefing at build time.<br/>Never case evidence"]
@@ -32,7 +32,7 @@ flowchart LR
 
     LETTER --> P1
     DEVAPI --> P1
-    P1 <--> VERTEX
+    P1 <-- "recorded call in the demo,<br/>live on request" --> VERTEX
     SCHED -- "signed call to /internal/scan-due" --> W1
     P3 --> STATE
     W1 <--> STATE
