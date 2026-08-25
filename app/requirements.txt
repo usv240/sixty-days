@@ -1,11 +1,23 @@
-google-cloud-firestore>=2.19
-google-auth>=2.35
-google-genai>=1.0
-fastapi>=0.115
-uvicorn[standard]>=0.32
-pydantic>=2.9
-reportlab>=4.2
-pypdf>=5.0
-opentelemetry-sdk>=1.27
-opentelemetry-exporter-gcp-trace>=1.7
+# Pinned deliberately, not out of caution-by-default.
+#
+# google-api-core 2.35.0 breaks every Firestore transaction with "400 Invalid database id
+# %28default%29" -- the default database name arriving percent-encoded where it must not be.
+# This service claims wakes by compare-and-swap inside a transaction, so that failure takes out
+# the scheduled execution this submission is built on, and it does it on a rebuild rather than
+# on a code change. Bisected against the live database on 2026-08-24: 2.29.0 through 2.34.0 pass,
+# 2.35.0 fails.
+#
+# Judging runs for a month. An unpinned transitive floor is a live outage waiting for a release
+# date nobody here controls.
+google-api-core>=2.29,<2.35
+google-cloud-firestore>=2.19,<3.0
+google-auth>=2.35,<3.0
+google-genai>=1.0,<2.0
+fastapi>=0.115,<1.0
+uvicorn[standard]>=0.32,<1.0
+pydantic>=2.9,<3.0
+reportlab>=4.2,<5.0
+pypdf>=5.0,<7.0
+opentelemetry-sdk>=1.27,<2.0
+opentelemetry-exporter-gcp-trace>=1.7,<2.0
 opentelemetry-instrumentation-fastapi>=0.48b0
