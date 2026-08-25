@@ -11,5 +11,5 @@ should read as missing.
 | Hosted project | https://sixty-days-109051079423.us-central1.run.app |
 | Public repository | https://github.com/usv240/sixty-days |
 | Build story (published) | https://dev.to/ujwal240/a-deadline-does-not-care-that-you-are-still-recovering-3080 |
-| Demo video | _not recorded yet — paste the public YouTube or Vimeo URL here_ |
-| Social post | _not published yet — paste the public X or LinkedIn URL here_ |
+| Demo video | https://youtu.be/QMIub0leFIQ |
+| Social post | https://x.com/usv2400/status/2087305244350767148 |
