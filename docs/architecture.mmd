@@ -13,14 +13,14 @@ flowchart LR
             P1 --> P2 --> P3
         end
 
-        subgraph EVERY ["Then every minute, for sixty days"]
+        subgraph EVERY ["Then every minute, until the window closes"]
             direction TB
             W1["Claim whatever has come due.<br/>One worker wins, the rest skip"]
             W2["Follow up. Change plan when a<br/>request keeps failing. Warn. Stop"]
             W1 --> W2
         end
 
-        P2 -. "sets 8 reminders, day 3 to day 58" .-> W1
+        P2 -. "sets 8 reminders, from day 3<br/>up to the deadline" .-> W1
     end
 
     SCHED["Cloud Scheduler<br/>sixty-days-wake-scan"]
