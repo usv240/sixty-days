@@ -20,7 +20,7 @@ decision.
 1. Press **Start guided demo with this letter**: the demo clock anchors to the synthetic letter date.
 2. Inspect the exact quoted decision reason, routed evidence needs, deadline, and eight registered wakes.
 3. Press **Screen close photo (expected retake)**: the observable framing check asks for a retake and selects the wider comparison.
-4. Screen the wider photo: it may become ready for applicant review, never "accepted by FEMA."
+4. Screen the wider photo: it may become ready for your review, never "accepted by FEMA."
 5. Press **Prepare and track** using the clearly labelled do-not-send control, then inspect the draft with blanks and the no-reply wake.
 6. Add an applicant explanation, press **Check draft packet**, and download the clearly marked draft PDF.
 7. Advance the simulated days: watch the scheduled safeguard build a partial packet snapshot automatically while preserving every missing item.
@@ -110,7 +110,7 @@ lawyer, caseworker, insurer, or filing service.
 | **2. Gather** | Routes ownership, occupancy, insurance, or damage evidence and checks only observable photo framing and legibility. | No photo is called authentic, sufficient, causal, valued, or agency-approved. |
 | **3. Track** | Prepares a records-request draft and registers a no-reply wake. | The applicant reviews and sends it; the service has no contact or send route. |
 | **4. Review** | Builds a partial-safe draft packet, repeats synthetic references in each footer, and lists every missing item. | The applicant verifies the draft and decides what, if anything, to submit. |
-| **5. Wake** | Registers the full day-3 through day-58 ladder up front. Due wakes create typed case actions; the packet safeguard builds a partial snapshot from accepted evidence automatically. | No wake contacts a third party, submits a packet, or claims an official filing or extension. |
+| **5. Wake** | Registers all eight reminders up front, from day 3 up to the deadline the letter states. Due wakes create typed case actions; the packet safeguard builds a partial snapshot from accepted evidence automatically. | No wake contacts a third party, submits a packet, or claims an official filing or extension. |
 | **6. Verify** | Rejects unsupported quotes, real-looking identifiers, and overconfident evidence claims. | It does not interpret law, predict eligibility, or forecast appeal success. |
 
 ## Architecture
@@ -120,34 +120,16 @@ lawyer, caseworker, insurer, or filing service.
 The solid path below is the live applicant workflow. The dotted path is optional onboarding media
 generated at build time. It never sees a letter, image, case reference, or applicant narrative.
 
-```mermaid
-flowchart LR
-    A[Synthetic judge letter and evidence] --> B[Cloud Run: sixty-days]
-    API[Approved API client] --> K[Hash-only API key and server-derived tenant]
-    K --> DI[De-identified /v1 letter intake]
-    B --> L[Letter reader and redaction]
-    DI --> L
-    L --> D[Deadline and requirement router]
-    D --> E[Evidence check and request preparation]
-    E --> P[Packet builder and verifier]
-    B <--> F[(Firestore: tenant cases, requirements, and wakes)]
-    L --> V[Vertex AI: Gemini 3.5 Flash and Gemma 4 MaaS]
-    F --> X[Deadline action executor]
-    X --> P
-    S[Cloud Scheduler: sixty-days-wake-scan] --> B
-    B --> T[Cloud Trace and Logging]
-    P --> H[Applicant-reviewed draft]
-    M[Gemini 3.1 Flash Image and Veo 3.1 Fast] -. recorded at build time .-> O[Static onboarding media]
-    O -. outside case path .-> B
-```
 
 The domain modules and copied spine run inside one `sixty-days` Cloud Run service. It is not a fleet of
 pretend microservices. A dedicated `sixty-days-wake-scan` Cloud Scheduler job posts to
 `/internal/scan-due` every minute, authenticated with an OIDC token minted for
 `agent-wake-scheduler` and scoped to this service's URL as the audience. The worker claims only the
-wakes this service owns, because wakes from several projects share one Firestore collection and
-claiming is a compare-and-swap: a worker that claims a wake it cannot execute would complete it and
-silently retire another service's safeguard. Each claimed wake creates one idempotent, typed case
+wakes this service owns, and it reads them from a collection no other service scans. Claiming is a
+compare-and-swap, so a worker that claimed a wake it cannot execute would complete it and silently
+retire another service's safeguard. An ownership predicate stops this service doing that to a
+neighbour; the separate collection is what stops a neighbour doing it here, and it does not depend
+on anyone else's deployment. Each claimed wake creates one idempotent, typed case
 action. The packet safeguard actually builds and records a partial packet snapshot; no action sends
 or submits. Raw letter text,
 image bytes, and applicant narrative are deliberately omitted from durable case records.
@@ -193,7 +175,7 @@ hashes are public, and none of them creates evidence or makes an appeal decision
 - No legal advice, eligibility prediction, appeal strategy, or outcome forecast.
 - No send, contact, or submission endpoint; the applicant controls every external action.
 - Evidence screening is limited to observable framing and legibility, never authenticity or damage valuation.
-- A "ready for applicant review" result is not a claim that an agency will accept the evidence.
+- A "ready for your review" result is not a claim that an agency will accept the evidence.
 - Partial packets remain visibly partial; missing evidence is never converted into confidence.
 - The appeal letter or form remains optional, in line with the reviewed FEMA guidance.
 - Raw letters, photos, transcriptions, and applicant free text are omitted from Firestore.
@@ -271,25 +253,26 @@ for a Google Cloud project with Vertex AI enabled.
 ```bash
 cd app
 python -m venv .venv
-.venv/bin/pip install -e ".[dev]"
-python -m pytest -q
-python scripts/check_a11y.py
+source .venv/bin/activate        # Windows: .venv\Scripts\activate
+pip install -e ".[dev]"
+python -m pytest -q              # 365 passed
+python scripts/check_a11y.py     # light and dark themes
 ```
 
 Run deterministically with the committed recordings:
 
 ```bash
-export GOOGLE_CLOUD_PROJECT=agentic-fleet-2026
+export GOOGLE_CLOUD_PROJECT=agentic-fleet-2026     # Windows: set GOOGLE_CLOUD_PROJECT=...
 export SIM_MODE=true
 export REPLAY_MODE=true
-uvicorn service.main:app --reload
-python scripts/sixty_days_demo_flow.py --url http://127.0.0.1:8000
-curl -X POST -H "Content-Type: application/json" -d '{}' http://127.0.0.1:8000/exit-test
+uvicorn service.main:app --reload                  # leave running, then in a second shell:
+python scripts/sixty_days_demo_flow.py --url http://127.0.0.1:8000   # 24/24
+curl -X POST -H "Content-Type: application/json" -d '{}' http://127.0.0.1:8000/exit-test   # 10/10
 ```
 
 The guided control calls `/sixty-days/demo/anchor` before opening the selected fixture. It freezes
 the labelled simulation at that letter's date without deleting case, wake, or audit records, so the
-day-3 through day-58 sequence stays reproducible during judging. The close-photo preset automatically
+eight-reminder sequence stays reproducible during judging. The close-photo preset automatically
 selects the wider comparison after the expected retake.
 
 Deploying from `app/` with `bash deploy.sh` targets the independent Cloud Run service
