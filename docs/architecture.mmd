@@ -1,18 +1,54 @@
 flowchart LR
-    A[Synthetic judge letter and evidence] --> B[Cloud Run: sixty-days]
-    API[Approved API client] --> K[Hash-only API key and server-derived tenant]
-    K --> DI[De-identified /v1 letter intake]
-    B --> L[Letter reader and redaction]
-    DI --> L
-    L --> D[Deadline and requirement router]
-    D --> E[Evidence check and request preparation]
-    E --> P[Packet builder and verifier]
-    B <--> F[(Firestore: tenant cases, requirements, and wakes)]
-    L --> V[Vertex AI: Gemini 3.5 Flash and Gemma 4 MaaS]
-    F --> X[Deadline action executor]
-    X --> P
-    S[Cloud Scheduler: sixty-days-wake-scan] --> B
-    B --> T[Cloud Trace and Logging]
-    P --> H[Applicant-reviewed draft]
-    M[Gemini 3.1 Flash Image and Veo 3.1 Fast] -. recorded at build time .-> O[Static onboarding media]
-    O -. outside case path .-> B
+    LETTER["Synthetic decision letter photo<br/>and damage photo"]
+    DEVAPI["Developer API /v1<br/>text screened by Model Armor"]
+
+    subgraph CR ["Cloud Run: sixty-days"]
+        direction LR
+
+        subgraph ONCE ["Once, when the case is opened"]
+            direction TB
+            P1["Read the letter, redact it,<br/>keep only reasons it can quote"]
+            P2["Route each document<br/>to whoever holds it"]
+            P3["Draft the request.<br/>There is no send route"]
+            P1 --> P2 --> P3
+        end
+
+        subgraph EVERY ["Then every minute, for sixty days"]
+            direction TB
+            W1["Claim whatever has come due.<br/>One worker wins, the rest skip"]
+            W2["Follow up. Change plan when a<br/>request keeps failing. Warn. Stop"]
+            W1 --> W2
+        end
+
+        P2 -. "sets 8 reminders, day 3 to day 58" .-> W1
+    end
+
+    SCHED["Cloud Scheduler<br/>sixty-days-wake-scan"]
+    VERTEX["Vertex AI<br/>Gemini 3.5 Flash reads the letter<br/>Gemma 4 rechecks the redaction"]
+    STATE[("Firestore<br/>cases, evidence, requests,<br/>and this service's own reminders")]
+    TRACE["Cloud Trace"]
+    MEDIA["Gemini 3.1 Flash Image and Veo 3.1 Fast<br/>make the onboarding briefing at build time.<br/>Never case evidence"]
+    DRAFT["A draft packet that stays<br/>visibly partial. The applicant<br/>reviews it and sends it"]
+
+    LETTER --> P1
+    DEVAPI --> P1
+    P1 <--> VERTEX
+    SCHED -- "signed call to /internal/scan-due" --> W1
+    P3 --> STATE
+    W1 <--> STATE
+    W2 --> DRAFT
+    P3 --> DRAFT
+    CR --> TRACE
+    MEDIA -. "outside the case path" .-> CR
+
+    classDef svc fill:#e8f0fe,stroke:#4285f4,color:#174ea6
+    classDef out fill:#e6f4ea,stroke:#137333,color:#0d652d
+    classDef inp fill:#fff,stroke:#5f6368,color:#202124
+    classDef aside fill:#fff,stroke:#c6c9cc,color:#5f6368
+    class SCHED,VERTEX,STATE,TRACE svc
+    class MEDIA aside
+    class DRAFT out
+    class LETTER,DEVAPI inp
+    style CR fill:#fafafa,stroke:#9aa0a6
+    style ONCE fill:#fff,stroke:#c6c9cc
+    style EVERY fill:#fff,stroke:#c6c9cc
