@@ -290,7 +290,6 @@ receives HTTP 411.
 - `docs/research-traceability.md`: official source-to-guardrail decisions and rejected claims
 - [Validation evidence](VALIDATION_EVIDENCE.md): research-to-test evidence, adversarial checks, and explicit limits
 - [Project differentiation](PROJECT_DIFFERENTIATION.md): concrete separation from the other submission and shared-spine disclosure
-- `SUBMISSION_KIT.md`: evidence-backed video and Devpost plan
 - `LICENSE`: MIT
 - `SUBMISSION_LINKS.md`: every public URL, fetched by the compliance script rather than trusted
 - [Live scheduler proof](https://sixty-days-109051079423.us-central1.run.app/sixty-days/scheduler): wall-clock evidence that the deadline keeper is being woken, refreshed in the console
